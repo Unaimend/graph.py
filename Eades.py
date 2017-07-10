@@ -2,15 +2,14 @@ import Graph
 import Vector
 import math
 
-
+# TODO Eine minimal Distanz benutzen um dafür zu sorgen dass die nodes nicht "verschmelzen"
 
 class Eades:
     graph = None
     c1 = 2
     c2 = 1
-    c3 = 3
+    c3 = 1
     c4 = 0.1
-
 
 
     @staticmethod
@@ -28,15 +27,22 @@ class Eades:
         v = Vector.Vector(v.x / Eades.distance(node1, node2), v.y / Eades.distance(node1, node2))
         return v
 
+    # TODO Bessere Konstanten errechnen
+
+    # TODO  Unit Vector gibt halt 2 ergebniss(vorzeichen) haengt von der richtung ab
     @staticmethod
     def calculate_attractive_force_for_all_nodes_and_move_accordingly(event = None):
         # TODO Exception falls Eades.graph == None
         for node in Eades.graph.graphNodes:
             for nodes in Eades.graph.node_adjacency_list[node.id]:
-                distance = Eades.distance(node, nodes)
-                attractive_force = Eades.c1 * math.log(Eades.c2 / distance)
-                direction = Eades.unit_vector(node, nodes)
-                node.move(direction.x * attractive_force* Eades.c4, direction.y * attractive_force* Eades.c4)
+                # If if would calc. the distance between two node, which have the same id, the distance would be 0
+                # and that would mean that I would divide by 0 in the attractive_force calculation
+                if node.id != nodes.id:
+                    distance = Eades.distance(node, nodes)
+                    attractive_force = Eades.c1 * math.log( distance/Eades.c2)
+                    # TODO Vorzeichen des unit vec.(sollte so stimmen)
+                    direction = Eades.unit_vector(nodes, node)
+                    node.move(direction.x * attractive_force* Eades.c4, direction.y * attractive_force* Eades.c4)
 
     @staticmethod
     def calculate_repelling_force_for_all_nodes_and_move_accordingly(event = None):
@@ -44,7 +50,8 @@ class Eades:
             for nodes in Eades.graph.graphNodes:
                 if node.id != nodes.id:
                     distance = Eades.distance(node, nodes)
-                    attractive_force = Eades.c3 / (distance**2)
+                    attractive_force = (Eades.c3 / (distance**2))
+                    # TODO Vorzeichen des unit vec.
                     direction = Eades.unit_vector(node, nodes)
                     node.move(direction.x * attractive_force * Eades.c4, direction.y * attractive_force * Eades.c4)
 
