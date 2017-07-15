@@ -2,12 +2,28 @@ import Graph
 import Vector
 import math
 
+
 # TODO Eine minimal Distanz benutzen um dafür zu sorgen dass die nodes nicht "verschmelzen"
 
 class Eades:
     graph = None
+
+    # Graph konv. langsamer gegen gleichgewicht besonderns bei hoher Anzahl an Iterationen
+    c1 = 2
+    c2 = 25
+    c3 = 1
+    c4 = 0.1
+
+
+    # c1 = 2
+    # c2 = 1
+    # # c3 = 10000
+    # c3 = 1
+    # c4 = 0.1
+
     c1 = 2
     c2 = 1
+    # c3 = 10000
     c3 = 1
     c4 = 0.1
 
@@ -35,7 +51,7 @@ class Eades:
         # TODO Exception falls Eades.graph == None
         for node in Eades.graph.graphNodes:
             for nodes in Eades.graph.node_adjacency_list[node.id]:
-                # If if would calc. the distance between two node, which have the same id, the distance would be 0
+                # If if would calc. the distance between two node which have the same id, the distance would be 0
                 # and that would mean that I would divide by 0 in the attractive_force calculation
                 if node.id != nodes.id:
                     distance = Eades.distance(node, nodes)
