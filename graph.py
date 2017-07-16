@@ -15,6 +15,8 @@ class GraphNode:
     graphNodeRadius = 12
 
     # TODO  x und y sollte in einem Vektor verpackt werden
+    # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
+
     def __init__(self, canvas, x, y, text, drawIds, id):
         self.x = x
         self.y = y
@@ -39,6 +41,7 @@ class GraphNode:
     def move(self, x,y):
         self.x += x
         self.y += y
+        # TODO Nur einmal am Ende moven
         self.canvas.move(self.canvas_id, x, y)
         self.canvas.move(self.canvas_text_id, x,y)
 
