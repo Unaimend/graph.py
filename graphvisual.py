@@ -9,6 +9,7 @@ import profile
 
 import Eades
 
+import time
 
 # TODO enumerate instead of index in for loops
 
@@ -188,6 +189,7 @@ class Window:
 
     def __init__(self, root):
         self.root = root
+        self.graph = None
         # self.root.geometry("1400x800")
         # Init. canvas
         self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
@@ -199,66 +201,21 @@ class Window:
 
         # Show eades constant choices only if user selected eades as algorithm
         if Window.EADES:
-            l1 = tk.Label(self.root, text="c1")
-            l1.pack(side=tk.LEFT)
+            self.init_eades_constant_widgets()
 
-            # Textfield for ... Eades constant
-            t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
-            t1.pack(side=tk.LEFT)
 
-            l2 = tk.Label(self.root, text="c2")
-            l2.pack(side=tk.LEFT)
+        self.load_graph("graph.json")
 
-            # Textfield for ... Eades constant
-            t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
-            t2.pack(side=tk.LEFT)
-
-        # e1.grid(row=0, column=1)
-        # e2.grid(row=1, column=1)
-
-        #Textfield for ... Eades constant
-        # T = tk.Text(self.root, height=1, width=2)
-        # T.pack()
-
-        self.graph = Graph.Graph(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath="graph.json")
-
+        # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
         self.graph_visuals = GraphVisual.fromGraph(cavas=self.canvas, width=Window.CANVAS_WIDTH,
                                                    height=Window.CANVAS_HEIGHT, graph=self.graph)
-
+        # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
         Eades.Eades.graph_visuals = self.graph_visuals
 
-
-
-        self.root.bind("<d>", self.doEades)
-
-
-
-        self.root.bind("<g>", self.graph_visuals.change_node_look)
-
+        self.root.bind("<d>", self.do_eades)
+        self.root.bind("<f>", self.do_eades_old)
+        # self.root.bind("<g>", self.graph_visuals.change_node_look)
         self.root.bind("<n>", self.open_new_graph)
-
-        self.counter = 0
-
-        # print("Edges", self.graph.graphEdges)
-
-
-
-        #ddddddadd
-        # self.menubar = tk.Menu(self.root)
-        # # File menu
-        # self.filemenu = tk.Menu(self.menubar, tearoff=0)
-        # self.filemenu.add_separator()
-        # self.filemenu.add_command(label="Exit")
-        # self.menubar.add_cascade(label="File", menu=self.filemenu)
-        #
-        # # View menu
-        # self.viewmenu = tk.Menu(self.menubar, tearoff=0)
-        # self.viewmenu.add_command(label="Toggle ids     (g)", c®ommand=self.changeNodeLook)
-        # self.viewmenu.add_command(label="Clear canvas   (cg)", command=self.clearCanvas)
-        # self.menubar.add_cascade(label="View", menu=self.viewmenu)
-        #
-        # self.root.config(menu=self.menubar)
-
 
     def run(self):
         self.root.mainloop()
@@ -267,16 +224,67 @@ class Window:
         self.graph_visuals.graphNodes[0].move(10, 0)
 
     # TODO Das moven is slooooow as fuck
-    def doEades(self, event="nothing"):
+    def do_eades(self, event="nothing"):
+        start = time.time()
         for x in range(0, 100):
             Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
             Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
+        end = time.time()
+        print("Elapsed Time", end - start)
+        self.graph_visuals.generate_edges()
 
+        # TODO Das moven is slooooow as fuck
+
+    def do_eades_old(self, event="nothing"):
+        start = time.time()
+        for x in range(0, 100):
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old()
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old()
+        end = time.time()
+        print("Elapsed Time", end - start)
         self.graph_visuals.generate_edges()
 
 
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
+
+    def load_graph(self, filepath):
+        self.graph = Graph.Graph(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath=filepath)
+
+    def init_eades_constant_widgets(self):
+        l1 = tk.Label(self.root, text="c1")
+        l1.pack(side=tk.LEFT)
+
+        # Textfield for ... Eades constant
+        t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t1.pack(side=tk.LEFT)
+        t1.insert(tk.END, Eades.Eades.c1)
+
+        l2 = tk.Label(self.root, text="c2")
+        l2.pack(side=tk.LEFT)
+
+        # Textfield for ... Eades constant
+        t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t2.pack(side=tk.LEFT)
+        t2.insert(tk.END, Eades.Eades.c2)
+
+        l3 = tk.Label(self.root, text="c3")
+        l3.pack(side=tk.LEFT)
+
+        # Textfield for ... Eades constant
+        t3 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t3.pack(side=tk.LEFT)
+        t3.insert(tk.END, Eades.Eades.c3)
+
+        l4 = tk.Label(self.root, text="c4")
+        l4.pack(side=tk.LEFT)
+
+        # Textfield for ... Eades constant
+        t4 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t4.pack(side=tk.LEFT)
+        t4.insert(tk.END, Eades.Eades.c4)
+
+
 
 
 
@@ -335,3 +343,20 @@ window.run()
 #     [],
 #     []
 # ]
+
+
+# ddddddadd
+# self.menubar = tk.Menu(self.root)
+# # File menu
+# self.filemenu = tk.Menu(self.menubar, tearoff=0)
+# self.filemenu.add_separator()
+# self.filemenu.add_command(label="Exit")
+# self.menubar.add_cascade(label="File", menu=self.filemenu)
+#
+# # View menu
+# self.viewmenu = tk.Menu(self.menubar, tearoff=0)
+# self.viewmenu.add_command(label="Toggle ids     (g)", c®ommand=self.changeNodeLook)
+# self.viewmenu.add_command(label="Clear canvas   (cg)", command=self.clearCanvas)
+# self.menubar.add_cascade(label="View", menu=self.viewmenu)
+#
+# self.root.config(menu=self.menubar)
