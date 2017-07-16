@@ -6,7 +6,7 @@ import math
 # TODO Eine minimal Distanz benutzen um dafür zu sorgen dass die nodes nicht "verschmelzen"
 
 class Eades:
-    graph = None
+    graph_visuals = None
 
     # Graph konv. langsamer gegen gleichgewicht besonderns bei hoher Anzahl an Iterationen
     c1 = 2
@@ -49,8 +49,8 @@ class Eades:
     @staticmethod
     def calculate_attractive_force_for_all_nodes_and_move_accordingly(event = None):
         # TODO Exception falls Eades.graph == None
-        for node in Eades.graph.graphNodes:
-            for nodes in Eades.graph.node_adjacency_list[node.id]:
+        for node in Eades.graph_visuals.graphNodes:
+            for nodes in Eades.graph_visuals.node_adjacency_list[node.id]:
                 # If if would calc. the distance between two node which have the same id, the distance would be 0
                 # and that would mean that I would divide by 0 in the attractive_force calculation
                 if node.id != nodes.id:
@@ -62,8 +62,8 @@ class Eades:
 
     @staticmethod
     def calculate_repelling_force_for_all_nodes_and_move_accordingly(event = None):
-        for node in Eades.graph.graphNodes:
-            for nodes in Eades.graph.graphNodes:
+        for node in Eades.graph_visuals.graphNodes:
+            for nodes in Eades.graph_visuals.graphNodes:
                 if node.id != nodes.id:
                     distance = Eades.distance(node, nodes)
                     attractive_force = (Eades.c3 / (distance**2))
