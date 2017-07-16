@@ -1,4 +1,4 @@
-import Graph
+import graph
 import Vector
 import math
 
@@ -30,13 +30,13 @@ class Eades:
 
     @staticmethod
     # TODO UNITTESSSSTTSSSSSSS
-    def distance(node1: Graph.GraphNode = None, node2: Graph.GraphNode = None):
+    def distance(node1: graph.GraphNode = None, node2: graph.GraphNode = None):
         #Pythagorean theorem in R^2(euclidean distance in R^2)
         distance = math.sqrt((node1.x - node2.x) ** 2 + (node1.y - node2.y) ** 2)
         return distance
 
     @staticmethod
-    def unit_vector(node1: Graph.GraphNode = None, node2: Graph.GraphNode = None):
+    def unit_vector(node1: graph.GraphNode = None, node2: graph.GraphNode = None):
         # Calculate x and y distance separate
         v = Vector.Vector(node1.x - node2.x, node1.y - node2.y)
         # Divide vector by its length to obtain a unit vector

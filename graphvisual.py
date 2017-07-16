@@ -1,6 +1,6 @@
 import tkinter as tk
 import Vector as Vector
-import Graph as Graph
+import graph as Graph
 import random
 import tkinter as tk
 import math
@@ -230,7 +230,6 @@ class Window:
 
 
         self.root.bind("<d>", self.doEades)
-        self.root.bind("<f>", self.doEadesThreaded)
 
 
 
