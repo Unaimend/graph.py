@@ -48,8 +48,10 @@ class Eades:
     # TODO  Unit Vector gibt halt 2 ergebniss(vorzeichen) haengt von der richtung ab
     @staticmethod
     def calculate_attractive_force_for_all_nodes_and_move_accordingly(event = None):
+
         # TODO Exception falls Eades.graph == None
         for node in Eades.graph_visuals.graphNodes:
+            displacemt = Vector.Vector(0, 0)
             for nodes in Eades.graph_visuals.node_adjacency_list[node.id]:
                 # If if would calc. the distance between two node which have the same id, the distance would be 0
                 # and that would mean that I would divide by 0 in the attractive_force calculation
@@ -58,18 +60,30 @@ class Eades:
                     attractive_force = Eades.c1 * math.log( distance/Eades.c2)
                     # TODO Vorzeichen des unit vec.(sollte so stimmen)
                     direction = Eades.unit_vector(nodes, node)
-                    node.move(direction.x * attractive_force* Eades.c4, direction.y * attractive_force* Eades.c4)
+                    displacemt.x += direction.x
+                    displacemt.y += direction.y
+            node.move(displacemt.x * attractive_force* Eades.c4, displacemt.y * attractive_force* Eades.c4)
 
     @staticmethod
     def calculate_repelling_force_for_all_nodes_and_move_accordingly(event = None):
         for node in Eades.graph_visuals.graphNodes:
+            displacemt = Vector.Vector(0, 0)
             for nodes in Eades.graph_visuals.graphNodes:
+                attractive_force = 0
                 if node.id != nodes.id:
                     distance = Eades.distance(node, nodes)
                     attractive_force = (Eades.c3 / (distance**2))
                     # TODO Vorzeichen des unit vec.
                     direction = Eades.unit_vector(node, nodes)
-                    node.move(direction.x * attractive_force * Eades.c4, direction.y * attractive_force * Eades.c4)
+                    displacemt.x += direction.x
+                    displacemt.y += direction.y
+            node.move(displacemt.x * attractive_force * Eades.c4, displacemt.y * attractive_force * Eades.c4)
+
+
+
+
+
+
 
 
 
