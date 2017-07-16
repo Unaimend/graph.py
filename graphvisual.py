@@ -5,21 +5,48 @@ import random
 import tkinter as tk
 import math
 import json
+import profile
 
 import Eades
 
 
+# TODO enumerate instead of index in for loops
+
+from profilehooks import profile
+
+
+class OpenGraphDialog:
+    def __init__(self, root):
+        self.root = root
+        self.window = tk.Toplevel(self.root)
+        self.window.wm_title("Open new graph")
+        l = tk.Label(self.window, text="This is window")
+        l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
+
+
+        # TODO Auswahl der graph.json
+        # TODO Auswahl des Layout Algorithmuses
+        # TODO Seed auswahl fuer den RNG
+
+
 class GraphVisual:
+
+    seed = 25
     def __init__(self, canvas, width, height, graph):
+        random.seed(GraphVisual.seed)
         self.canvas = canvas
         # Specifies the minimal distance two nodes are allowed to have
+        # TODO eades doesnt implement this min. distance atm.
+        # TODO Solution: Compare the distance from every node to every other node(n^2 runtime)
         self.graphNodesMinDistance = 2*Graph.GraphNode.graphNodeRadius
-        # Array for the the nodes of the graph
-        self.graphNodes = []
-        # Array for the the edges of the graph
-        self.graphEdges = []
 
-        #Adjacency list but with nodes instead of integers
+        # Array for the the nodes of the graph(holds Graph.GraphEdge objects)
+        self.graphNodes = []
+        # Array for the the edges of the graph(holds Graph.GraphEdge objects)
+        self.graphEdges = []
+        # Adjacency list but with nodes instead of integers
+        # Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drinnen die zu x adj. sind.,
+        # x ist zurzeit die id der node von der die adjazenz ausgehen soll
         self.node_adjacency_list = []
 
 
@@ -32,45 +59,39 @@ class GraphVisual:
         # Saves the coordinates of the last two clicked notes
         self.clickedNodes = []
         # Specifies whether the node ids should be drawn or not
-        self.drawNodeIds = False;
+        self.drawNodeIds = False
         # Helper variable for the node id
-        self.nodeCounter = 0;
+        self.nodeCounter = 0
 
 
         if graph:
             self.graph = graph
 
-        # Wasn das fuern ne datenstruktur bzw whyyyy ddoes this work
+        # bzw whyyyy ddoes this work
         self.int_adj_to_node_adj()
         self.int_edges_to_node_edges()
+
+        # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
-        #TODO Algorithmus zum Zeichen von Graphen anschauen (graph drawing wikipedia)
 
-
-        print(self.width,self.height)
-        # Array which represents the isConnectedTo relationship
-        # self.adjacencyList = [
-        #     [1,2],
-        #     [0],
-        #     [2]
-        # ]
+        print(self.width, self.height)
 
 
 
-    #Methoden um einen Graphen von einem vordefinierten Graphen zu zeichnen
+
+    # Methoden um einen Graphen von einem vordefinierten Graphen zu zeichnen
     @classmethod
     def fromGraph(cls,cavas, height: int=None, width: int=None, graph :Graph=None):
         return cls(canvas=cavas, height=height, width=width, graph=graph)
 
-
     def int_adj_to_node_adj(self):
+
         for x in self.graph.adjacency_list:
             self.graphNodes.append(Graph.GraphNode(self.canvas, random.randint(0, self.width),
                                                    random.randint(0, self.height),
                                                    "black", self.drawNodeIds, self.nodeCounter))
             self.nodeCounter+=1
 
-    #Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drin die zu x adj. sind.
     def int_edges_to_node_edges(self):
         counter = 0
         for x in self.graph.adjacency_list:
@@ -79,27 +100,27 @@ class GraphVisual:
                 self.node_adjacency_list[counter].append(self.graphNodes[y])
             counter += 1
 
-
-
-
     def toPixelPos(self, x, y):
         pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
         return pos
 
 
-    def changeNodeLook(self, event="nothing"):
-        self.canvas.delete("all")
-
-
+    def change_node_look(self, event="nothing"):
+        # TODO BUUUUUG
+        # TODO Irwas wird hier nicht richtig gelöscht :(
         if not self.drawNodeIds:
             self.drawNodeIds = True
         else:
             self.drawNodeIds = False;
 
         self.redrawNodes()
-        self.graphEdges()
+        # self.generate_edges()
 
     def redrawNodes(self):
+
+        for node in self.graphNodes:
+            self.canvas.delete(node.id)
+
         alternativNodeList = []
         for node in self.graphNodes:
             alternativNodeList.append(Graph.GraphNode(self.canvas, node.x,
@@ -107,23 +128,22 @@ class GraphVisual:
         self.graphNodes = alternativNodeList
 
     def generate_edges(self):
+        """Generates edges between graph nodes"""
 
+        # Deletes all old edges from the canvas
         for edges in self.graphEdges:
             self.canvas.delete(edges.id)
-
+        # Init graphEdges with an new array because the old edges are not needed anymore
         self.graphEdges = []
 
+        # Iterate over all nodes(those are Graph.GraphNode objects)
         for node in self.graphNodes:
+            # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
+                # Draw an edge between two nodes
                 edge = Graph.GraphEdge(canvas=self.canvas, x0=node.x, y0=node.y,xn=nodes.x, yn=nodes.y )
+                # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
-
-    # def redrawEdges(self):
-    #     alternativEdgeList = []
-    #     for edge in self.graphEdges:
-    #         alternativEdgeList.append(Graph.GraphEdge(self.canvas, edge.start.x,
-    #                                             edge.start.y, edge.end.x, edge.end.y))
-    #     self.graphEdges = alternativEdgeList
 
     def clearGraph(self, event="nothing"):
        # clear canvas
@@ -134,15 +154,10 @@ class GraphVisual:
        # reset nodeCounter and also the ids
        self.nodeCounter = -1
 
-
-
-
-
     def createNodeAtMousePos(self,event):
         isInCircle = False
         for node in self.graphNodes:
-            if (abs((node.x - event.x)) <= Graph.GraphNode.graphNodeRadius
-                and abs((node.y - event.y)) <= Graph.GraphNode.graphNodeRadius):
+            if (abs((node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs((node.y - event.y)) <= Graph.GraphNode.graphNodeRadius):
                 isInCircle = True;
 
         isFarEnough = True
@@ -167,35 +182,65 @@ class GraphVisual:
 
 
 class Window:
+    CANVAS_WIDTH = 1200
+    CANVAS_HEIGHT = 800
+    EADES = True
+
     def __init__(self, root):
         self.root = root
-
+        # self.root.geometry("1400x800")
         # Init. canvas
         self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
-                                width=1200, height=800,  background='white')
+                                width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, background='white')
 
-        # Sth. with the layout
+        # Sth. with the layout(row = y)
         self.canvas.pack()
 
-        test = Graph.Graph(width=1200, height=800, filepath="graph.json")
 
-        self.graph = GraphVisual.fromGraph(cavas=self.canvas, width=1200, height=800, graph=test)
+        # Show eades constant choices only if user selected eades as algorithm
+        if Window.EADES:
+            l1 = tk.Label(self.root, text="c1")
+            l1.pack(side=tk.LEFT)
 
-        # id = self.graph.canvas.create_oval(500, 500, 10, 10, tags="MOVE")
-        # print(id)
+            # Textfield for ... Eades constant
+            t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+            t1.pack(side=tk.LEFT)
 
-        # # Mouse and keyboard bindings
-        # self.root.bind("<Button 1>", self.graph.createNodeAtMousePos)
-        # self.root.bind("<g>", self.graph.changeNodeLook)
-        # self.root.bind("<c>", self.graph.clearGraph)
+            l2 = tk.Label(self.root, text="c2")
+            l2.pack(side=tk.LEFT)
+
+            # Textfield for ... Eades constant
+            t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+            t2.pack(side=tk.LEFT)
+
+        # e1.grid(row=0, column=1)
+        # e2.grid(row=1, column=1)
+
+        #Textfield for ... Eades constant
+        # T = tk.Text(self.root, height=1, width=2)
+        # T.pack()
+
+        self.graph = Graph.Graph(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath="graph.json")
+
+        self.graph_visuals = GraphVisual.fromGraph(cavas=self.canvas, width=Window.CANVAS_WIDTH,
+                                                   height=Window.CANVAS_HEIGHT, graph=self.graph)
+
+        Eades.Eades.graph_visuals = self.graph_visuals
 
 
-        Eades.Eades.graph = self.graph
+
+        self.root.bind("<d>", self.doEades)
+        self.root.bind("<f>", self.doEadesThreaded)
 
 
-        self.root.bind("<d>",self.doEades )
 
-        print("Edges", self.graph.graphEdges)
+        self.root.bind("<g>", self.graph_visuals.change_node_look)
+
+        self.root.bind("<n>", self.open_new_graph)
+
+        self.counter = 0
+
+        # print("Edges", self.graph.graphEdges)
 
 
 
@@ -220,14 +265,26 @@ class Window:
         self.root.mainloop()
 
     def move(self, event="nothing"):
-        self.graph.graphNodes[0].move(10, 0)
+        self.graph_visuals.graphNodes[0].move(10, 0)
 
+    # TODO Das moven is slooooow as fuck
     def doEades(self, event="nothing"):
-        for x in range(0,100):
+        for x in range(0, 100):
             Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
             Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
 
-        self.graph.generate_edges()
+        self.graph_visuals.generate_edges()
+
+
+    def open_new_graph(self, event="nothing"):
+        current_instance = OpenGraphDialog(self.root)
+
+
+
+
+
+
+
 
 
 
@@ -250,6 +307,8 @@ class Window:
 window = Window(tk.Tk())
 window.run()
 
+# profile.run(window.run())
+
 
 
 #
@@ -268,3 +327,12 @@ window.run()
 # a = json.load(f)
 # print(a)
 # f.close()
+
+
+# [
+# 	[1,2],
+# 	[0,2],
+# 	[1,0],
+#     [],
+#     []
+# ]
