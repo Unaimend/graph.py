@@ -31,8 +31,8 @@ class OpenGraphDialog:
 
 
 class GraphVisual:
-
     seed = 25
+
     def __init__(self, canvas, width, height, graph):
         random.seed(GraphVisual.seed)
         self.canvas = canvas
@@ -68,30 +68,25 @@ class GraphVisual:
         if graph:
             self.graph = graph
 
-        # bzw whyyyy ddoes this work
+        # TODO whyyyy ddoes this work
         self.int_adj_to_node_adj()
         self.int_edges_to_node_edges()
 
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
-        print(self.width, self.height)
 
-
-
-
-    # Methoden um einen Graphen von einem vordefinierten Graphen zu zeichnen
     @classmethod
-    def fromGraph(cls,cavas, height: int=None, width: int=None, graph :Graph=None):
-        return cls(canvas=cavas, height=height, width=width, graph=graph)
+    def fromGraph(cls, canvas, height: int=None, width: int=None, graph :Graph=None):
+        return cls(canvas=canvas, height=height, width=width, graph=graph)
 
     def int_adj_to_node_adj(self):
 
         for x in self.graph.adjacency_list:
             self.graphNodes.append(Graph.GraphNode(self.canvas, random.randint(0, self.width),
                                                    random.randint(0, self.height),
-                                                   "black", self.drawNodeIds, self.nodeCounter))
-            self.nodeCounter+=1
+                                                   self.drawNodeIds, self.nodeCounter))
+            self.nodeCounter += 1
 
     def int_edges_to_node_edges(self):
         counter = 0
@@ -101,10 +96,9 @@ class GraphVisual:
                 self.node_adjacency_list[counter].append(self.graphNodes[y])
             counter += 1
 
-    def toPixelPos(self, x, y):
+    def to_pixel_pos(self, x, y):
         pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
         return pos
-
 
     def change_node_look(self, event="nothing"):
         # TODO BUUUUUG
@@ -114,41 +108,38 @@ class GraphVisual:
         else:
             self.drawNodeIds = False;
 
-        self.redrawNodes()
+        self.redraw_nodes()
         # self.generate_edges()
 
-    def redrawNodes(self):
-
+    def redraw_nodes(self):
+        # Delete nodes from the canvas
         for node in self.graphNodes:
             self.canvas.delete(node.id)
 
-        alternativNodeList = []
+        alternative_nodelist = []
+        # Redraw nodes with updated arguments
         for node in self.graphNodes:
-            alternativNodeList.append(Graph.GraphNode(self.canvas, node.x,
-                                                node.y, "", self.drawNodeIds, node.id))
-        self.graphNodes = alternativNodeList
+            alternative_nodelist.append(Graph.GraphNode(self.canvas, node.position.x,
+                                                        node.position.y, "", self.drawNodeIds, node.id))
+        self.graphNodes = alternative_nodelist
 
     def generate_edges(self):
         """Generates edges between graph nodes"""
-
         # Deletes all old edges from the canvas
         for edges in self.graphEdges:
             self.canvas.delete(edges.id)
         # Init graphEdges with an new array because the old edges are not needed anymore
         self.graphEdges = []
-
         # Iterate over all nodes(those are Graph.GraphNode objects)
         for node in self.graphNodes:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = Graph.GraphEdge(canvas=self.canvas, x0=node.x, y0=node.y,xn=nodes.x, yn=nodes.y )
+                edge = Graph.GraphEdge(canvas=self.canvas, x0=node.position.x, y0=node.position.y,xn=nodes.position.x, yn=nodes.position.y )
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
     def clearGraph(self, event="nothing"):
-       # clear canvas
-
        # clear nodes and edges
        self.graphNodes = []
        self.graphEdges = []
@@ -207,7 +198,7 @@ class Window:
         self.load_graph("graph.json")
 
         # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
-        self.graph_visuals = GraphVisual.fromGraph(cavas=self.canvas, width=Window.CANVAS_WIDTH,
+        self.graph_visuals = GraphVisual.fromGraph(canvas=self.canvas, width=Window.CANVAS_WIDTH,
                                                    height=Window.CANVAS_HEIGHT, graph=self.graph)
         # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
         Eades.Eades.graph_visuals = self.graph_visuals
@@ -241,7 +232,7 @@ class Window:
             Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old()
             Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old()
         end = time.time()
-        print("Elapsed Time", end - start)
+        print("Old elapsed Time", end - start)
         self.graph_visuals.generate_edges()
 
 
@@ -249,7 +240,7 @@ class Window:
         current_instance = OpenGraphDialog(self.root)
 
     def load_graph(self, filepath):
-        self.graph = Graph.Graph(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath=filepath)
+        self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath=filepath)
 
     def init_eades_constant_widgets(self):
         l1 = tk.Label(self.root, text="c1")
