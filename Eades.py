@@ -32,7 +32,7 @@ class Eades:
     @staticmethod
     # TODO UNITTESSSSTTSSSSSSS
     def distance(node1: graph.GraphNode = None, node2: graph.GraphNode = None):
-        #Pythagorean theorem in R^2(euclidean distance in R^2)
+        # Pythagorean theorem in R^2(euclidean distance in R^2)
         distance = math.sqrt((node1.position.x - node2.position.x) ** 2 + (node1.position.y - node2.position.y) ** 2)
         return distance
 
@@ -63,7 +63,7 @@ class Eades:
             node.move(displacement.x * attractive_force * Eades.c4, displacement.y * attractive_force* Eades.c4)
 
     @staticmethod
-    def calculate_repelling_force_for_all_nodes_and_move_accordingly(event = None):
+    def calculate_repelling_force_for_all_nodes_and_move_accordingly():
         for node in Eades.graph_visuals.graphNodes:
             displacement = Vector.Vector(0, 0)
             for nodes in Eades.graph_visuals.graphNodes:
@@ -82,7 +82,7 @@ class Eades:
 
 
     @staticmethod
-    def calculate_attractive_force_for_all_nodes_and_move_accordingly_old(event=None):
+    def calculate_attractive_force_for_all_nodes_and_move_accordingly_old():
         # TODO Exception falls Eades.graph == None
         for node in Eades.graph_visuals.graphNodes:
             for nodes in Eades.graph_visuals.node_adjacency_list[node.id]:

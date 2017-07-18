@@ -139,37 +139,42 @@ class GraphVisual:
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
-    def clearGraph(self, event="nothing"):
-       # clear nodes and edges
-       self.graphNodes = []
-       self.graphEdges = []
-       # reset nodeCounter and also the ids
-       self.nodeCounter = -1
+    def clear_graph(self, event="nothing"):
+        # clear nodes and edges
+        self.graphNodes = []
+        self.graphEdges = []
+        # reset nodeCounter and also the ids
+        self.nodeCounter = -1
 
-    def createNodeAtMousePos(self,event):
-        isInCircle = False
+    def createNodeAtMousePos(self, event):
+        is_in_circle = False
+        # Check for all the nodes if position of the click is in another node
         for node in self.graphNodes:
-            if (abs((node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs((node.y - event.y)) <= Graph.GraphNode.graphNodeRadius):
-                isInCircle = True;
+            if abs((node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs((node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
+                is_in_circle = True
 
-        isFarEnough = True
+        is_far_enough = True
+        # Check for all the nodes if position of the click is far enough away from all the other nodes
         for node in self.graphNodes:
             if(abs((node.x - event.x)) <= self.graphNodesMinDistance
                and abs((node.y - event.y)) <= self.graphNodesMinDistance):
-                isFarEnough = False;
+                is_far_enough = False
 
-        if isFarEnough and not isInCircle:
+        # If distance is big enough and I clicked not int a circle draw a node
+        if is_far_enough and not is_in_circle:
             self.nodeCounter += 1
             self.graphNodes.append(Graph.GraphNode(self.canvas, event.x, event.y,
-                                             "black", self.drawNodeIds, self.nodeCounter))
+                                                   self.drawNodeIds, self.nodeCounter))
 
-        if not isFarEnough and isInCircle:
+        # If distance is small(in another node) and I clicked in a node remember this node
+        # to draw an edge
+        if not is_far_enough and is_in_circle:
             self.clickedNodes.append(event.x)
             self.clickedNodes.append(event.y)
-            if (len(self.clickedNodes) == 4):
-                self.graphEdges.append(Graph.GraphEdge(self.canvas, self.clickedNodes[0],
-                                                 self.clickedNodes[1], self.clickedNodes[2],
-                                                 self.clickedNodes[3]))
+            if len(self.clickedNodes) == 4:
+                self.graphEdges.append(Graph.GraphEdge(self.canvas,
+                                                       self.clickedNodes[0], self.clickedNodes[1],
+                                                       self.clickedNodes[2], self.clickedNodes[3]))
                 self.clickedNodes = []
 
 
@@ -193,10 +198,7 @@ class Window:
         # Show eades constant choices only if user selected eades as algorithm
         if Window.EADES:
             self.init_eades_constant_widgets()
-
-
         self.load_graph("graph.json")
-
         # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
         self.graph_visuals = GraphVisual.fromGraph(canvas=self.canvas, width=Window.CANVAS_WIDTH,
                                                    height=Window.CANVAS_HEIGHT, graph=self.graph)
@@ -211,8 +213,7 @@ class Window:
     def run(self):
         self.root.mainloop()
 
-    def move(self, event="nothing"):
-        self.graph_visuals.graphNodes[0].move(10, 0)
+
 
     # TODO Das moven is slooooow as fuck
     def do_eades(self, event="nothing"):
@@ -223,8 +224,6 @@ class Window:
         end = time.time()
         print("Elapsed Time", end - start)
         self.graph_visuals.generate_edges()
-
-        # TODO Das moven is slooooow as fuck
 
     def do_eades_old(self, event="nothing"):
         start = time.time()

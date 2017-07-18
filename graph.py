@@ -80,7 +80,7 @@ class Graph:
             f.close()
             # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
-            print("Adjancency list", self.adjacency_list)
+            print("Adjacency list", self.adjacency_list)
         # Load from an adjacency list
         elif adjacency_list:
             self.adjacency_list = adjacency_list
@@ -94,13 +94,13 @@ class Graph:
     def from_file(cls, width, height, filepath):
         return cls(width=width, height=height, filepath=filepath)
 
-    # @classmethod
-    # def from_adjacency_list(cls, adjacency_list):
-    #     return cls(adjacency_list=adjacency_list)
-    #
-    # @classmethod
-    # def from_adjacency_matrix(cls, adjacency_matrix):
-    #     return cls(adjacency_matrix=adjacency_matrix)
+    @classmethod
+    def from_adjacency_list(cls, width, height, adjacency_list):
+        return cls(width=width, height=height, adjacency_list=adjacency_list)
+
+    @classmethod
+    def from_adjacency_matrix(cls, width, height, adjacency_matrix):
+        return cls(width=width, height=height, adjacency_matrix=adjacency_matrix)
 
     def adjacent_to(self, node: GraphNode=None):
         return self.adjacency_list[node.id]
