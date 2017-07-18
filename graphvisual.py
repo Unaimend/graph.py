@@ -13,7 +13,6 @@ import time
 
 # TODO enumerate instead of index in for loops
 
-from profilehooks import profile
 
 
 class OpenGraphDialog:
@@ -23,7 +22,6 @@ class OpenGraphDialog:
         self.window.wm_title("Open new graph")
         l = tk.Label(self.window, text="This is window")
         l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
-
 
         # TODO Auswahl der graph.json
         # TODO Auswahl des Layout Algorithmuses
@@ -39,7 +37,7 @@ class GraphVisual:
         # Specifies the minimal distance two nodes are allowed to have
         # TODO eades doesnt implement this min. distance atm.
         # TODO Solution: Compare the distance from every node to every other node(n^2 runtime)
-        self.graphNodesMinDistance = 2*Graph.GraphNode.graphNodeRadius
+        self.graphNodesMinDistance = 2 * Graph.GraphNode.graphNodeRadius
 
         # Array for the the nodes of the graph(holds Graph.GraphEdge objects)
         self.graphNodes = []
@@ -50,12 +48,10 @@ class GraphVisual:
         # x ist zurzeit die id der node von der die adjazenz ausgehen soll
         self.node_adjacency_list = []
 
-
         # Höhe und Breite des Canvas
         self.width = width
         self.height = height
         self.graph = None
-
 
         # Saves the coordinates of the last two clicked notes
         self.clickedNodes = []
@@ -63,7 +59,6 @@ class GraphVisual:
         self.drawNodeIds = False
         # Helper variable for the node id
         self.nodeCounter = 0
-
 
         if graph:
             self.graph = graph
@@ -75,17 +70,22 @@ class GraphVisual:
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
-
     @classmethod
-    def fromGraph(cls, canvas, height: int=None, width: int=None, graph :Graph=None):
+    def fromGraph(cls,
+                  canvas,
+                  height: int=None,
+                  width: int=None,
+                  graph: Graph=None):
         return cls(canvas=canvas, height=height, width=width, graph=graph)
 
     def int_adj_to_node_adj(self):
 
         for x in self.graph.adjacency_list:
-            self.graphNodes.append(Graph.GraphNode(self.canvas, random.randint(0, self.width),
-                                                   random.randint(0, self.height),
-                                                   self.drawNodeIds, self.nodeCounter))
+            self.graphNodes.append(
+                Graph.GraphNode(self.canvas,
+                                random.randint(0, self.width),
+                                random.randint(0, self.height),
+                                self.drawNodeIds, self.nodeCounter))
             self.nodeCounter += 1
 
     def int_edges_to_node_edges(self):
@@ -106,7 +106,7 @@ class GraphVisual:
         if not self.drawNodeIds:
             self.drawNodeIds = True
         else:
-            self.drawNodeIds = False;
+            self.drawNodeIds = False
 
         self.redraw_nodes()
         # self.generate_edges()
@@ -119,8 +119,9 @@ class GraphVisual:
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graphNodes:
-            alternative_nodelist.append(Graph.GraphNode(self.canvas, node.position.x,
-                                                        node.position.y, "", self.drawNodeIds, node.id))
+            alternative_nodelist.append(
+                Graph.GraphNode(self.canvas, node.position.x, node.position.y,
+                                "", self.drawNodeIds, node.id))
         self.graphNodes = alternative_nodelist
 
     def generate_edges(self):
@@ -135,7 +136,12 @@ class GraphVisual:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = Graph.GraphEdge(canvas=self.canvas, x0=node.position.x, y0=node.position.y,xn=nodes.position.x, yn=nodes.position.y )
+                edge = Graph.GraphEdge(
+                    canvas=self.canvas,
+                    x0=node.position.x,
+                    y0=node.position.y,
+                    xn=nodes.position.x,
+                    yn=nodes.position.y)
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
@@ -150,21 +156,24 @@ class GraphVisual:
         is_in_circle = False
         # Check for all the nodes if position of the click is in another node
         for node in self.graphNodes:
-            if abs((node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs((node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
+            if abs(
+                (node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs(
+                    (node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
                 is_in_circle = True
 
         is_far_enough = True
         # Check for all the nodes if position of the click is far enough away from all the other nodes
         for node in self.graphNodes:
-            if(abs((node.x - event.x)) <= self.graphNodesMinDistance
-               and abs((node.y - event.y)) <= self.graphNodesMinDistance):
+            if (abs((node.x - event.x)) <= self.graphNodesMinDistance and abs(
+                (node.y - event.y)) <= self.graphNodesMinDistance):
                 is_far_enough = False
 
         # If distance is big enough and I clicked not int a circle draw a node
         if is_far_enough and not is_in_circle:
             self.nodeCounter += 1
-            self.graphNodes.append(Graph.GraphNode(self.canvas, event.x, event.y,
-                                                   self.drawNodeIds, self.nodeCounter))
+            self.graphNodes.append(
+                Graph.GraphNode(self.canvas, event.x, event.y,
+                                self.drawNodeIds, self.nodeCounter))
 
         # If distance is small(in another node) and I clicked in a node remember this node
         # to draw an edge
@@ -172,9 +181,10 @@ class GraphVisual:
             self.clickedNodes.append(event.x)
             self.clickedNodes.append(event.y)
             if len(self.clickedNodes) == 4:
-                self.graphEdges.append(Graph.GraphEdge(self.canvas,
-                                                       self.clickedNodes[0], self.clickedNodes[1],
-                                                       self.clickedNodes[2], self.clickedNodes[3]))
+                self.graphEdges.append(
+                    Graph.GraphEdge(self.canvas, self.clickedNodes[0],
+                                    self.clickedNodes[1], self.clickedNodes[2],
+                                    self.clickedNodes[3]))
                 self.clickedNodes = []
 
 
@@ -188,20 +198,27 @@ class Window:
         self.graph = None
         # self.root.geometry("1400x800")
         # Init. canvas
-        self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
-                                width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, background='white')
+        self.canvas = tk.Canvas(
+            self.root,
+            relief=tk.SUNKEN,
+            bd=4,
+            width=Window.CANVAS_WIDTH,
+            height=Window.CANVAS_HEIGHT,
+            background='white')
 
         # Sth. with the layout(row = y)
         self.canvas.pack()
-
 
         # Show eades constant choices only if user selected eades as algorithm
         if Window.EADES:
             self.init_eades_constant_widgets()
         self.load_graph("graph.json")
         # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
-        self.graph_visuals = GraphVisual.fromGraph(canvas=self.canvas, width=Window.CANVAS_WIDTH,
-                                                   height=Window.CANVAS_HEIGHT, graph=self.graph)
+        self.graph_visuals = GraphVisual.fromGraph(
+            canvas=self.canvas,
+            width=Window.CANVAS_WIDTH,
+            height=Window.CANVAS_HEIGHT,
+            graph=self.graph)
         # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
         Eades.Eades.graph_visuals = self.graph_visuals
 
@@ -213,14 +230,14 @@ class Window:
     def run(self):
         self.root.mainloop()
 
-
-
     # TODO Das moven is slooooow as fuck
     def do_eades(self, event="nothing"):
         start = time.time()
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly(
+            )
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly(
+            )
         end = time.time()
         print("Elapsed Time", end - start)
         self.graph_visuals.generate_edges()
@@ -228,25 +245,30 @@ class Window:
     def do_eades_old(self, event="nothing"):
         start = time.time()
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old()
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old()
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old(
+            )
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old(
+            )
         end = time.time()
         print("Old elapsed Time", end - start)
         self.graph_visuals.generate_edges()
-
 
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
 
     def load_graph(self, filepath):
-        self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT, filepath=filepath)
+        self.graph = Graph.Graph.from_file(
+            width=Window.CANVAS_WIDTH,
+            height=Window.CANVAS_HEIGHT,
+            filepath=filepath)
 
     def init_eades_constant_widgets(self):
         l1 = tk.Label(self.root, text="c1")
         l1.pack(side=tk.LEFT)
 
         # Textfield for ... Eades constant
-        t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t1 = tk.Text(
+            self.root, height=1, width=5, relief="sunken", borderwidth=2)
         t1.pack(side=tk.LEFT)
         t1.insert(tk.END, Eades.Eades.c1)
 
@@ -254,7 +276,8 @@ class Window:
         l2.pack(side=tk.LEFT)
 
         # Textfield for ... Eades constant
-        t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t2 = tk.Text(
+            self.root, height=1, width=5, relief="sunken", borderwidth=2)
         t2.pack(side=tk.LEFT)
         t2.insert(tk.END, Eades.Eades.c2)
 
@@ -262,7 +285,8 @@ class Window:
         l3.pack(side=tk.LEFT)
 
         # Textfield for ... Eades constant
-        t3 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t3 = tk.Text(
+            self.root, height=1, width=5, relief="sunken", borderwidth=2)
         t3.pack(side=tk.LEFT)
         t3.insert(tk.END, Eades.Eades.c3)
 
@@ -270,20 +294,10 @@ class Window:
         l4.pack(side=tk.LEFT)
 
         # Textfield for ... Eades constant
-        t4 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        t4 = tk.Text(
+            self.root, height=1, width=5, relief="sunken", borderwidth=2)
         t4.pack(side=tk.LEFT)
         t4.insert(tk.END, Eades.Eades.c4)
-
-
-
-
-
-
-
-
-
-
-
 
 
 # TODO Graphen sollte so realisiert werden
@@ -295,18 +309,10 @@ class Window:
 #           "f" : []
 #         }
 
-
-
-
-
-
-
 window = Window(tk.Tk())
 window.run()
 
 # profile.run(window.run())
-
-
 
 #
 # test = list()
@@ -325,7 +331,6 @@ window.run()
 # print(a)
 # f.close()
 
-
 # [
 # 	[1,2],
 # 	[0,2],
@@ -333,7 +338,6 @@ window.run()
 #     [],
 #     []
 # ]
-
 
 # ddddddadd
 # self.menubar = tk.Menu(self.root)
