@@ -4,6 +4,7 @@ import math
 
 
 # TODO Eine minimal Distanz benutzen um dafür zu sorgen dass die nodes nicht "verschmelzen"
+#       ist in allen force base algorithmen enthalten(kraefte gleichgewicht)
 
 class Eades:
     graph_visuals = None
