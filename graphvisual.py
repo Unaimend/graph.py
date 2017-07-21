@@ -231,13 +231,13 @@ class Window:
         self.root.mainloop()
 
     # TODO Das moven is slooooow as fuck
+    # TODO 2. Modosu implementieren indem erst der Original Graph gezeichnet wird, dann wird das Canvas gecleared
+    # TODO dann werden die neuen position berechnet und dann werden neue Nodes mit den neuen Koordinaten plaziertd
     def do_eades(self, event="nothing"):
         start = time.time()
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly(
-            )
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly(
-            )
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
         end = time.time()
         print("Elapsed Time", end - start)
         self.graph_visuals.generate_edges()
@@ -245,10 +245,8 @@ class Window:
     def do_eades_old(self, event="nothing"):
         start = time.time()
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old(
-            )
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old(
-            )
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old()
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old()
         end = time.time()
         print("Old elapsed Time", end - start)
         self.graph_visuals.generate_edges()
