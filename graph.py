@@ -27,6 +27,8 @@ class GraphNode:
         self.canvas_id = 0
         # Id to identify the text of this node
         self.canvas_text_id = "-1"
+        #
+        self.draw_ids = draw_ids
 
         # TODO Magic number ersetzen
         if draw_ids:
@@ -34,13 +36,14 @@ class GraphNode:
                                                 self.position.y - self.graphNodeRadius / 1.5,
                                                 self.position.x + self.graphNodeRadius,
                                                 self.position.y + self.graphNodeRadius, fill="white")
+            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id)
         else:
             self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
                                                 self.position.y - self.graphNodeRadius / 1.5,
                                                 self.position.x + self.graphNodeRadius,
                                                 self.position.y + self.graphNodeRadius, fill="black")
 
-        self.canvas_text_id = canvas.create_text(self.position.x+2, self.position.y+2, text=self.id)
+
 
     def move(self, x, y):
         # update current position
@@ -110,11 +113,17 @@ class GraphEdge:
     def __init__(self, canvas, x0, y0, xn, yn):
         # Start der Kanten
         self.start = Vector.Vector(x0, y0)
+        # self.start_node = start_node
+        # self.end_node  = end_node
 
         # Ende der Kanten
         self.end = Vector.Vector(xn, yn)
         # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
+    @classmethod
+    def from_nodes(cls, canvas, start_node, end_node):
+        return cls(canvas=canvas, x0=start_node.position.x,
+                   y0=start_node.position.y, xn=end_node.position.x, yn=end_node.position.y)
 
 
