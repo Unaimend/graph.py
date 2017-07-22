@@ -45,8 +45,45 @@ class Eades:
         v = Vector.Vector(v.x / Eades.distance(node1, node2), v.y / Eades.distance(node1, node2))
         return v
 
-    # TODO Bessere Konstanten errechnen
 
+
+    @staticmethod
+    def calculate_attractive_force_for_all_nodes_and_move_accordingly_new(event=None):
+        # TODO Exception falls Eades.graph == None
+        for node in Eades.graph_visuals.graphNodes:
+            displacement = Vector.Vector(0, 0)
+            for nodes in Eades.graph_visuals.node_adjacency_list[node.id]:
+                # If if would calc. the distance between two node which have the same id, the distance would be 0
+                # and log(0) is undefined
+                if node.id != nodes.id:
+                    distance = Eades.distance(node, nodes)
+                    attractive_force = Eades.c1 * math.log(distance / Eades.c2)
+                    direction = Eades.unit_vector(nodes, node)
+                    displacement.x += direction.x
+                    displacement.y += direction.y
+            node.move(displacement.x * attractive_force * Eades.c4, displacement.y * attractive_force * Eades.c4)
+
+    @staticmethod
+    def calculate_repelling_force_for_all_nodes_and_move_accordingly_new():
+        for node in Eades.graph_visuals.graphNodes:
+            displacement = Vector.Vector(0, 0)
+            for nodes in Eades.graph_visuals.graphNodes:
+                repelling_force = 0
+                # If if would calc. the distance between two node which have the same id, the distance would be 0
+                # and that would mean that I would divide by 0 in the attractive_force calculation
+                if node.id != nodes.id:
+                    distance = Eades.distance(node, nodes)
+                    repelling_force = (Eades.c3 / (distance ** 2))
+                    direction = Eades.unit_vector(node, nodes)
+                    displacement.x += direction.x
+                    displacement.y += direction.y
+            node.move(displacement.x * repelling_force * Eades.c4, displacement.y * repelling_force * Eades.c4)
+
+
+
+
+
+    # TODO Bessere Konstanten errechnen
     @staticmethod
     def calculate_attractive_force_for_all_nodes_and_move_accordingly(event = None):
         # TODO Exception falls Eades.graph == None
