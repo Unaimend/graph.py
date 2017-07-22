@@ -35,8 +35,7 @@ class GraphVisual:
         random.seed(GraphVisual.seed)
         self.canvas = canvas
         # Specifies the minimal distance two nodes are allowed to have
-        # TODO eades doesnt implement this min. distance atm.
-        # TODO Solution: Compare the distance from every node to every other node(n^2 runtime)
+        # needed when user places nodes himself
         self.graphNodesMinDistance = 2 * Graph.GraphNode.graphNodeRadius
 
         # Array for the the nodes of the graph(holds Graph.GraphEdge objects)
@@ -63,7 +62,8 @@ class GraphVisual:
         if graph:
             self.graph = graph
 
-        # TODO whyyyy ddoes this work
+        # Converts the graph arrays which represent the graph to
+        # arrays which holds objects of Graph.edges and Graph.nodes
         self.int_adj_to_node_adj()
         self.int_edges_to_node_edges()
 
@@ -79,7 +79,6 @@ class GraphVisual:
         return cls(canvas=canvas, height=height, width=width, graph=graph)
 
     def int_adj_to_node_adj(self):
-
         for x in self.graph.adjacency_list:
             self.graphNodes.append(
                 Graph.GraphNode(self.canvas,
@@ -107,21 +106,19 @@ class GraphVisual:
             self.drawNodeIds = True
         else:
             self.drawNodeIds = False
-
         self.redraw_nodes()
         # self.generate_edges()
 
     def redraw_nodes(self):
         # Delete nodes from the canvas
         for node in self.graphNodes:
-            self.canvas.delete(node.id)
+            self.canvas.delete(node.canvas_id)
 
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graphNodes:
-            alternative_nodelist.append(
-                Graph.GraphNode(self.canvas, node.position.x, node.position.y,
-                                "", self.drawNodeIds, node.id))
+            alternative_nodelist.append( Graph.GraphNode(self.canvas, node.position.x, node.position.y,
+                                                         node.draw_ids, node.id))
         self.graphNodes = alternative_nodelist
 
     def generate_edges(self):
@@ -129,6 +126,8 @@ class GraphVisual:
         # Deletes all old edges from the canvas
         for edges in self.graphEdges:
             self.canvas.delete(edges.id)
+
+        print(self.graphEdges)
         # Init graphEdges with an new array because the old edges are not needed anymore
         self.graphEdges = []
         # Iterate over all nodes(those are Graph.GraphNode objects)
@@ -136,12 +135,10 @@ class GraphVisual:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = Graph.GraphEdge(
+                edge = Graph.GraphEdge.from_nodes(
                     canvas=self.canvas,
-                    x0=node.position.x,
-                    y0=node.position.y,
-                    xn=nodes.position.x,
-                    yn=nodes.position.y)
+                    start_node=node,
+                    end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
@@ -221,7 +218,7 @@ class Window:
             graph=self.graph)
         # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
         Eades.Eades.graph_visuals = self.graph_visuals
-
+        self.root.bind("<s>", self.do_eades_new)
         self.root.bind("<d>", self.do_eades)
         self.root.bind("<f>", self.do_eades_old)
         # self.root.bind("<g>", self.graph_visuals.change_node_look)
@@ -249,6 +246,16 @@ class Window:
             Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_old()
         end = time.time()
         print("Old elapsed Time", end - start)
+        self.graph_visuals.generate_edges()
+
+    def do_eades_new(self, event="nothing"):
+        start = time.time()
+        for x in range(0, 100):
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
+        end = time.time()
+        print("Elapsed Time", end - start)
+        self.graph_visuals.redraw_nodes()
         self.graph_visuals.generate_edges()
 
     def open_new_graph(self, event="nothing"):
