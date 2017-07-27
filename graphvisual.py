@@ -64,21 +64,21 @@ class GraphVisual:
 
         # Converts the graph arrays which represent the graph to
         # arrays which holds objects of Graph.edges and Graph.nodes
-        self.int_adj_to_node_adj()
-        self.int_edges_to_node_edges()
+        self.int_node_to_graph_node()
+        self.generate_adj_list()
 
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
     @classmethod
-    def fromGraph(cls,
-                  canvas,
-                  height: int=None,
-                  width: int=None,
-                  graph: Graph=None):
+    def from_graph(cls,
+                   canvas,
+                   height: int=None,
+                   width: int=None,
+                   graph: Graph=None):
         return cls(canvas=canvas, height=height, width=width, graph=graph)
 
-    def int_adj_to_node_adj(self):
+    def int_node_to_graph_node(self):
         for x in self.graph.adjacency_list:
             self.graphNodes.append(
                 Graph.GraphNode(self.canvas,
@@ -87,7 +87,8 @@ class GraphVisual:
                                 self.drawNodeIds, self.nodeCounter))
             self.nodeCounter += 1
 
-    def int_edges_to_node_edges(self):
+    def generate_adj_list(self):
+        self.node_adjacency_list = []
         counter = 0
         for x in self.graph.adjacency_list:
             self.node_adjacency_list.append([])
@@ -99,42 +100,36 @@ class GraphVisual:
         pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
         return pos
 
-    def change_node_look(self, event="nothing"):
-        # TODO BUUUUUG
-        # TODO Irwas wird hier nicht richtig gelöscht :(
-        if not self.drawNodeIds:
-            self.drawNodeIds = True
-        else:
-            self.drawNodeIds = False
-        self.redraw_nodes()
-        # self.generate_edges()
-
+    # TODO Nodes in node_adjacency_list werden nie geupdated werden sie jetzt(Unbedingt in commit)
     def redraw_nodes(self):
-        # Delete nodes from the canvas
+        # Delete nodes and node text from the canvas
         for node in self.graphNodes:
             self.canvas.delete(node.canvas_id)
+            self.canvas.delete(node.canvas_text_id)
 
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graphNodes:
             alternative_nodelist.append( Graph.GraphNode(self.canvas, node.position.x, node.position.y,
-                                                         node.draw_ids, node.id))
+                                                         self.drawNodeIds, node.id))
         self.graphNodes = alternative_nodelist
 
     def generate_edges(self):
+
         """Generates edges between graph nodes"""
         # Deletes all old edges from the canvas
         for edges in self.graphEdges:
             self.canvas.delete(edges.id)
 
-        print(self.graphEdges)
         # Init graphEdges with an new array because the old edges are not needed anymore
         self.graphEdges = []
+
         # Iterate over all nodes(those are Graph.GraphNode objects)
         for node in self.graphNodes:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
+                # print("Start", node.id, node.position.x, node.position.y, "End", nodes.id,nodes.position.x, nodes.position.y)
                 edge = Graph.GraphEdge.from_nodes(
                     canvas=self.canvas,
                     start_node=node,
@@ -142,47 +137,68 @@ class GraphVisual:
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
-    def clear_graph(self, event="nothing"):
-        # clear nodes and edges
-        self.graphNodes = []
-        self.graphEdges = []
-        # reset nodeCounter and also the ids
-        self.nodeCounter = -1
+    # Text widget doesn't loose focus if another widget is clicked
+    # this function emulates this behaviour.
+    def set_focus(self, event):
+        caller = event.widget
+        caller.focus_set()
 
-    def createNodeAtMousePos(self, event):
-        is_in_circle = False
-        # Check for all the nodes if position of the click is in another node
-        for node in self.graphNodes:
-            if abs(
-                (node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs(
-                    (node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
-                is_in_circle = True
+    def redraw_graph(self, event=None):
+        self.canvas.delete(tk.ALL)
+        self.redraw_nodes()
+        self.generate_adj_list()
+        self.generate_edges()
 
-        is_far_enough = True
-        # Check for all the nodes if position of the click is far enough away from all the other nodes
-        for node in self.graphNodes:
-            if (abs((node.x - event.x)) <= self.graphNodesMinDistance and abs(
-                (node.y - event.y)) <= self.graphNodesMinDistance):
-                is_far_enough = False
+    def change_node_look(self, event="nothing"):
+        if not self.drawNodeIds:
+            self.drawNodeIds = True
+        else:
+            self.drawNodeIds = False
+        # NOTE EIg. sollte es hier reichen nur die Nodes neu zu zeichnen
+        self.redraw_graph()
 
-        # If distance is big enough and I clicked not int a circle draw a node
-        if is_far_enough and not is_in_circle:
-            self.nodeCounter += 1
-            self.graphNodes.append(
-                Graph.GraphNode(self.canvas, event.x, event.y,
-                                self.drawNodeIds, self.nodeCounter))
 
-        # If distance is small(in another node) and I clicked in a node remember this node
-        # to draw an edge
-        if not is_far_enough and is_in_circle:
-            self.clickedNodes.append(event.x)
-            self.clickedNodes.append(event.y)
-            if len(self.clickedNodes) == 4:
-                self.graphEdges.append(
-                    Graph.GraphEdge(self.canvas, self.clickedNodes[0],
-                                    self.clickedNodes[1], self.clickedNodes[2],
-                                    self.clickedNodes[3]))
-                self.clickedNodes = []
+        # def clear_graph(self, event="nothing"):
+    #     # clear nodes and edges
+    #     self.graphNodes = []
+    #     self.graphEdges = []
+    #     # reset nodeCounter and also the ids
+    #     self.nodeCounter = -1
+    #
+    # def createNodeAtMousePos(self, event):
+    #     is_in_circle = False
+    #     # Check for all the nodes if position of the click is in another node
+    #     for node in self.graphNodes:
+    #         if abs(
+    #             (node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs(
+    #                 (node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
+    #             is_in_circle = True
+    #
+    #     is_far_enough = True
+    #     # Check for all the nodes if position of the click is far enough away from all the other nodes
+    #     for node in self.graphNodes:
+    #         if (abs((node.x - event.x)) <= self.graphNodesMinDistance and abs(
+    #             (node.y - event.y)) <= self.graphNodesMinDistance):
+    #             is_far_enough = False
+    #
+    #     # If distance is big enough and I clicked not int a circle draw a node
+    #     if is_far_enough and not is_in_circle:
+    #         self.nodeCounter += 1
+    #         self.graphNodes.append(
+    #             Graph.GraphNode(self.canvas, event.x, event.y,
+    #                             self.drawNodeIds, self.nodeCounter))
+    #
+    #     # If distance is small(in another node) and I clicked in a node remember this node
+    #     # to draw an edge
+    #     if not is_far_enough and is_in_circle:
+    #         self.clickedNodes.append(event.x)
+    #         self.clickedNodes.append(event.y)
+    #         if len(self.clickedNodes) == 4:
+    #             self.graphEdges.append(
+    #                 Graph.GraphEdge(self.canvas, self.clickedNodes[0],
+    #                                 self.clickedNodes[1], self.clickedNodes[2],
+    #                                 self.clickedNodes[3]))
+    #             self.clickedNodes = []
 
 
 class Window:
@@ -195,51 +211,44 @@ class Window:
         self.graph = None
         # self.root.geometry("1400x800")
         # Init. canvas
-        self.canvas = tk.Canvas(
-            self.root,
-            relief=tk.SUNKEN,
-            bd=4,
-            width=Window.CANVAS_WIDTH,
-            height=Window.CANVAS_HEIGHT,
-            background='white')
+        self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
+                                width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,background='white')
 
         # Sth. with the layout(row = y)
         self.canvas.pack()
 
-        # Show eades constant choices only if user selected eades as algorithm
-        if Window.EADES:
-            self.init_eades_constant_widgets()
+
+
         self.load_graph("graph.json")
         # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
-        self.graph_visuals = GraphVisual.fromGraph(
+        self.graph_visuals = GraphVisual.from_graph(
             canvas=self.canvas,
             width=Window.CANVAS_WIDTH,
             height=Window.CANVAS_HEIGHT,
             graph=self.graph)
-        # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
-        Eades.Eades.graph_visuals = self.graph_visuals
-        self.root.bind("<s>", self.do_eades_new)
-        self.root.bind("<d>", self.do_eades)
-        self.root.bind("<f>", self.do_eades_old)
-        # self.root.bind("<g>", self.graph_visuals.change_node_look)
+
+        # Show eades constant choices only if user selected eades as algorithm
+        if Window.EADES:
+            # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
+            Eades.Eades.graph_visuals = self.graph_visuals
+            self.root.bind("<s>", self.do_eades_new)
+            self.root.bind("<f>", self.do_eades_old)
+            self.t1 = None
+            self.t2 = None
+            self.t3 = None
+            self.t4 = None
+            self.init_eades_constant_widgets()
+
+        self.root.bind("<g>", self.graph_visuals.change_node_look)
         self.root.bind("<n>", self.open_new_graph)
+        self.root.bind("<c>", self.graph_visuals.redraw_graph)
+        self.root.bind("<Button-1>", self.graph_visuals.set_focus)
 
     def run(self):
         self.root.mainloop()
 
-    # TODO Das moven is slooooow as fuck
-    # TODO 2. Modosu implementieren indem erst der Original Graph gezeichnet wird, dann wird das Canvas gecleared
-    # TODO dann werden die neuen position berechnet und dann werden neue Nodes mit den neuen Koordinaten plaziertd
-    def do_eades(self, event="nothing"):
-        start = time.time()
-        for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
-        end = time.time()
-        print("Elapsed Time", end - start)
-        self.graph_visuals.generate_edges()
-
     def do_eades_old(self, event="nothing"):
+        # TODO Kosntanten fuer Eades auf der Werte aus den Textboxen setzen
         start = time.time()
         for x in range(0, 100):
             Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_old()
@@ -249,60 +258,75 @@ class Window:
         self.graph_visuals.generate_edges()
 
     def do_eades_new(self, event="nothing"):
+        text = str()
+
+        text = self.t1.get("1.0", 'end-1c')
+        Eades.Eades.c1 = float(text)
+
+        text = self.t2.get("1.0", 'end-1c')
+        Eades.Eades.c2 = float(text)
+
+        text = self.t3.get("1.0", 'end-1c')
+        Eades.Eades.c3 = float(text)
+
+        text = self.t4.get("1.0", 'end-1c')
+        Eades.Eades.c4 = float(text)
+
         start = time.time()
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly()
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly()
+            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
+            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
         end = time.time()
-        print("Elapsed Time", end - start)
+
+        # Update positions
         self.graph_visuals.redraw_nodes()
+        print("Elapsed Time", end - start)
+        # Update adjacency list
+        self.graph_visuals.generate_adj_list()
+        # Update edges between nodes
         self.graph_visuals.generate_edges()
+
+
 
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
 
     def load_graph(self, filepath):
-        self.graph = Graph.Graph.from_file(
-            width=Window.CANVAS_WIDTH,
-            height=Window.CANVAS_HEIGHT,
-            filepath=filepath)
+        self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH,height=Window.CANVAS_HEIGHT,
+                                           filepath=filepath)
 
     def init_eades_constant_widgets(self):
+
         l1 = tk.Label(self.root, text="c1")
         l1.pack(side=tk.LEFT)
-
         # Textfield for ... Eades constant
-        t1 = tk.Text(
-            self.root, height=1, width=5, relief="sunken", borderwidth=2)
-        t1.pack(side=tk.LEFT)
-        t1.insert(tk.END, Eades.Eades.c1)
+        self.t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        self.t1.pack(side=tk.LEFT)
+        self.t1.insert(tk.END, Eades.Eades.c1)
 
         l2 = tk.Label(self.root, text="c2")
         l2.pack(side=tk.LEFT)
-
         # Textfield for ... Eades constant
-        t2 = tk.Text(
-            self.root, height=1, width=5, relief="sunken", borderwidth=2)
-        t2.pack(side=tk.LEFT)
-        t2.insert(tk.END, Eades.Eades.c2)
+        self.t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        self.t2.pack(side=tk.LEFT)
+        self.t2.insert(tk.END, Eades.Eades.c2)
 
         l3 = tk.Label(self.root, text="c3")
         l3.pack(side=tk.LEFT)
-
         # Textfield for ... Eades constant
-        t3 = tk.Text(
-            self.root, height=1, width=5, relief="sunken", borderwidth=2)
-        t3.pack(side=tk.LEFT)
-        t3.insert(tk.END, Eades.Eades.c3)
+        self.t3 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
+        self.t3.pack(side=tk.LEFT)
+        self.t3.insert(tk.END, Eades.Eades.c3)
 
         l4 = tk.Label(self.root, text="c4")
         l4.pack(side=tk.LEFT)
-
         # Textfield for ... Eades constant
-        t4 = tk.Text(
-            self.root, height=1, width=5, relief="sunken", borderwidth=2)
-        t4.pack(side=tk.LEFT)
-        t4.insert(tk.END, Eades.Eades.c4)
+        self.t4 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
+        self.t4.pack(side=tk.LEFT)
+        self.t4.insert(tk.END, Eades.Eades.c4)
+
+        t5 = tk.Entry(self.root)
+        t5.pack(side=tk.LEFT)
 
 
 # TODO Graphen sollte so realisiert werden
