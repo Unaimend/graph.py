@@ -44,14 +44,22 @@ class GraphNode:
                                                 self.position.y + self.graphNodeRadius, fill="black")
 
 
-
-    def move(self, x, y):
+    def move_old(self, x, y):
         # update current position
         self.position.x += x
         self.position.y += y
         # update current canvas position
         self.canvas.move(self.canvas_id, x, y)
         self.canvas.move(self.canvas_text_id, x, y)
+
+
+    def move(self, x, y):
+        # update current position
+        self.position.x += x
+        self.position.y += y
+        # update current canvas position
+        # self.canvas.move(self.canvas_id, x, y)
+        # self.canvas.move(self.canvas_text_id, x, y)
 
 
 class Graph:
