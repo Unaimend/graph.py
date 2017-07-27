@@ -14,59 +14,84 @@ AdjacencyMatrix = List[List[int]]
 class GraphNode:
     graphNodeRadius = 12
 
-    # TODO  x und y sollte in einem Vektor verpackt werden
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas, x, y, text, drawIds, id):
-        self.x = x
-        self.y = y
-        self.text = text
+    def __init__(self, canvas, x, y, draw_ids: bool, id: int):
+        # Canvas position for the node
+        self.position = Vector.Vector(x, y)
+        # The canvas on which the node should be drawn(for multi-canvas support)
         self.canvas = canvas
+        # The id that will be drawn "in the node"
         self.id = id
+        # The id to identify this node
         self.canvas_id = 0
+        # Id to identify the text of this node
         self.canvas_text_id = "-1"
-        if drawIds:
-            self.canvas_id = canvas.create_oval(x - self.graphNodeRadius / 1.5, y - self.graphNodeRadius / 1.5,
-                           x + self.graphNodeRadius,
-                           y + self.graphNodeRadius,
-                           fill="white")
+        #
+        self.draw_ids = draw_ids
+
+        # TODO Magic number ersetzen
+        if draw_ids:
+            self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
+                                                self.position.y - self.graphNodeRadius / 1.5,
+                                                self.position.x + self.graphNodeRadius,
+                                                self.position.y + self.graphNodeRadius, fill="white")
+            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id)
         else:
-            self.canvas_id =  canvas.create_oval(x - self.graphNodeRadius / 1.5, y - self.graphNodeRadius / 1.5,
-                           x + self.graphNodeRadius,
-                           y + self.graphNodeRadius,
-                           fill="black")
+            self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
+                                                self.position.y - self.graphNodeRadius / 1.5,
+                                                self.position.x + self.graphNodeRadius,
+                                                self.position.y + self.graphNodeRadius, fill="black")
 
-        self.canvas_text_id = canvas.create_text(self.x+2, self.y+2, text=self.id)
 
-    def move(self, x,y):
-        self.x += x
-        self.y += y
-        # TODO Nur einmal am Ende moven
+    def move_old(self, x, y):
+        # update current position
+        self.position.x += x
+        self.position.y += y
+        # update current canvas position
         self.canvas.move(self.canvas_id, x, y)
-        self.canvas.move(self.canvas_text_id, x,y)
+        self.canvas.move(self.canvas_text_id, x, y)
+
+
+    def move(self, x, y):
+        # update current position
+        self.position.x += x
+        self.position.y += y
+        # update current canvas position
+        # self.canvas.move(self.canvas_id, x, y)
+        # self.canvas.move(self.canvas_text_id, x, y)
 
 
 class Graph:
     def __init__(self, width: int=None, height: int=None, filepath: str=None, adjacency_list: AdjacencyList=None,
                  adjacency_matrix: AdjacencyMatrix=None):
+        # Filepath to the grad which should be loaded
         self.filepath = filepath
+        # dict. which holds all adjacent nodes in the form of and adjacency list
         self.adjacency_list = None
-        self.adjacencyMatrix = None
+        # dict. which holds all adjacent nodes in the form of and adjacency matrix
+        self.adjacency_matrix = None
+        # Total number of vertices
         self.vertice_count = None
-        self.height = height
-        self.width = width
-        # Load from a file
+        # Heigth of the canvas in pixel
+        self.canvas_height = height
+        # Width of the canvas in pixel
+        self.canvas_width = width
 
+        # Load from a file
         #TODO in try catch verpacken
         #https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
         if filepath:
             print("Loading from " + filepath)
+            # Get file descriptor
             f = open(self.filepath, "r")
+            # Load data into the adjacency_list
             self.adjacency_list = json.load(f)
+            # Close file
             f.close()
+            # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
-            print(self.adjacency_list)
-            # print("%s with length %s" % (''.join(self.adjacency_list), str(self.vertice_count)))
+            print("Adjacency list", self.adjacency_list)
         # Load from an adjacency list
         elif adjacency_list:
             self.adjacency_list = adjacency_list
@@ -77,39 +102,36 @@ class Graph:
             print("TODO exception")
 
     @classmethod
-    def from_file(cls, path):
-        return cls(filepath=path)
+    def from_file(cls, width, height, filepath):
+        return cls(width=width, height=height, filepath=filepath)
 
     @classmethod
-    def from_adjacency_list(cls, adjacency_list):
-        return cls(adjacency_list=adjacency_list)
+    def from_adjacency_list(cls, width, height, adjacency_list):
+        return cls(width=width, height=height, adjacency_list=adjacency_list)
 
     @classmethod
-    def from_adjacency_matrix(cls, adjacency_matrix):
-        return cls(adjacency_matrix=adjacency_matrix)
+    def from_adjacency_matrix(cls, width, height, adjacency_matrix):
+        return cls(width=width, height=height, adjacency_matrix=adjacency_matrix)
 
     def adjacent_to(self, node: GraphNode=None):
         return self.adjacency_list[node.id]
 
 
-
-
-
-
-
-
-class GraphEdge():
+class GraphEdge:
     def __init__(self, canvas, x0, y0, xn, yn):
-        # Start der Kante
+        # Start der Kanten
         self.start = Vector.Vector(x0, y0)
+        # self.start_node = start_node
+        # self.end_node  = end_node
 
-        # Ender der Katen
+        # Ende der Kanten
         self.end = Vector.Vector(xn, yn)
-
-        # Debugausgaben
-        # print("x0", self.x0, "y0", self.y0)
-        # print("endX", self.endX, "endY", self.endY)
+        # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
+    @classmethod
+    def from_nodes(cls, canvas, start_node, end_node):
+        return cls(canvas=canvas, x0=start_node.position.x,
+                   y0=start_node.position.y, xn=end_node.position.x, yn=end_node.position.y)
 
 
