@@ -130,10 +130,7 @@ class GraphVisual:
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
                 # print("Start", node.id, node.position.x, node.position.y, "End", nodes.id,nodes.position.x, nodes.position.y)
-                edge = Graph.GraphEdge.from_nodes(
-                    canvas=self.canvas,
-                    start_node=node,
-                    end_node=nodes)
+                edge = Graph.GraphEdge.from_nodes(canvas=self.canvas,start_node=node,end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
@@ -206,9 +203,16 @@ class Window:
     CANVAS_HEIGHT = 800
     EADES = True
 
+
     def __init__(self, root):
         self.root = root
         self.graph = None
+        self.graph_visuals = None
+        # Four textboxes for the eades constants
+        self.t1 = None
+        self.t2 = None
+        self.t3 = None
+        self.t4 = None
         # self.root.geometry("1400x800")
         # Init. canvas
         self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
@@ -217,27 +221,8 @@ class Window:
         # Sth. with the layout(row = y)
         self.canvas.pack()
 
-
-
-        self.load_graph("graph.json")
         # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
-        self.graph_visuals = GraphVisual.from_graph(
-            canvas=self.canvas,
-            width=Window.CANVAS_WIDTH,
-            height=Window.CANVAS_HEIGHT,
-            graph=self.graph)
-
-        # Show eades constant choices only if user selected eades as algorithm
-        if Window.EADES:
-            # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
-            Eades.Eades.graph_visuals = self.graph_visuals
-            self.root.bind("<s>", self.do_eades_new)
-            self.root.bind("<f>", self.do_eades_old)
-            self.t1 = None
-            self.t2 = None
-            self.t3 = None
-            self.t4 = None
-            self.init_eades_constant_widgets()
+        self.load_graph("graph.json")
 
         self.root.bind("<g>", self.graph_visuals.change_node_look)
         self.root.bind("<n>", self.open_new_graph)
@@ -286,14 +271,26 @@ class Window:
         # Update edges between nodes
         self.graph_visuals.generate_edges()
 
-
-
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
 
     def load_graph(self, filepath):
         self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH,height=Window.CANVAS_HEIGHT,
                                            filepath=filepath)
+
+        self.graph_visuals = GraphVisual.from_graph(
+            canvas=self.canvas,
+            width=Window.CANVAS_WIDTH,
+            height=Window.CANVAS_HEIGHT,
+            graph=self.graph)
+
+        # Show eades constant choices only if user selected eades as algorithm
+        if Window.EADES:
+            # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
+            Eades.Eades.graph_visuals = self.graph_visuals
+            self.root.bind("<s>", self.do_eades_new)
+            self.root.bind("<f>", self.do_eades_old)
+            self.init_eades_constant_widgets()
 
     def init_eades_constant_widgets(self):
 
