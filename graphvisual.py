@@ -3,6 +3,7 @@ import Vector as Vector
 import graph as Graph
 import random
 import tkinter as tk
+from tkinter import filedialog
 import math
 import json
 import profile
@@ -14,18 +15,39 @@ import time
 # TODO enumerate instead of index in for loops
 
 
-
 class OpenGraphDialog:
     def __init__(self, root):
+        self.filename = "test"
+        self.eades = tk.BooleanVar()
+
         self.root = root
         self.window = tk.Toplevel(self.root)
         self.window.wm_title("Open new graph")
-        l = tk.Label(self.window, text="This is window")
-        l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
 
+        # self.open_new_graph_but = tk.Button(self.window, text="Open...", command=self.open_graph)
+        # self.open_new_graph_but.pack()
+
+        self.open_graph()
         # TODO Auswahl der graph.json
         # TODO Auswahl des Layout Algorithmuses
         # TODO Seed auswahl fuer den RNG
+
+    def open_graph(self):
+        var = tk.IntVar()
+        self.filename = filedialog.askopenfilename(title="Select file",
+                                                   filetypes=(("graph files", "*.json"), ("all files", "*.*")))
+        button = tk.Button(self.window, text="Ok", command=lambda: var.set(1))
+        button.pack()
+        label = tk.Label(self.window, text="Which layouting algorithm do you want to use")
+        label.pack()
+        c = tk.Checkbutton(self.window, text="eades", variable=self.eades, onvalue=True, offvalue=False)
+        c.pack()
+        button.wait_variable(var)
+
+
+
+        self.window.destroy()
+
 
 
 class GraphVisual:
@@ -201,36 +223,61 @@ class GraphVisual:
 class Window:
     CANVAS_WIDTH = 1200
     CANVAS_HEIGHT = 800
-    EADES = True
-
+    EADES = False
 
     def __init__(self, root):
         self.root = root
         self.graph = None
         self.graph_visuals = None
-        # Four textboxes for the eades constants
+        # Four textboxes and labels for the eades constants
         self.t1 = None
         self.t2 = None
         self.t3 = None
         self.t4 = None
+        self.l1 = None
+        self.l2 = None
+        self.l3 = None
+        self.l4 = None
         # self.root.geometry("1400x800")
         # Init. canvas
         self.canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
                                 width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,background='white')
-
-        # Sth. with the layout(row = y)
         self.canvas.pack()
-
-        # TODO Nur machen wenn der Dateipfad zum Graphen nicht leer ist
-        self.load_graph("graph.json")
-
-        self.root.bind("<g>", self.graph_visuals.change_node_look)
+        self.load_graph("default_graph.json")
         self.root.bind("<n>", self.open_new_graph)
+        self.root.bind("<g>", self.graph_visuals.change_node_look)
         self.root.bind("<c>", self.graph_visuals.redraw_graph)
         self.root.bind("<Button-1>", self.graph_visuals.set_focus)
 
     def run(self):
         self.root.mainloop()
+
+    def open_new_graph(self, event="nothing"):
+        current_instance = OpenGraphDialog(self.root)
+
+        Window.EADES = current_instance.eades.get()
+        self.load_graph(current_instance.filename)
+
+    def load_graph(self, filepath):
+        print("Loading graph...")
+        self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
+                                           filepath=filepath)
+
+        self.graph_visuals = GraphVisual.from_graph(canvas=self.canvas, width=Window.CANVAS_WIDTH,
+                                                    height=Window.CANVAS_HEIGHT, graph=self.graph)
+
+        self.del_eades_constant_widgets()
+        # Show eades constant choices only if user selected eades as algorithm
+        if Window.EADES:
+
+            # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
+            Eades.Eades.graph_visuals = self.graph_visuals
+            self.root.bind("<s>", self.do_eades_new)
+            self.root.bind("<f>", self.do_eades_old)
+            self.init_eades_constant_widgets()
+        # Next algorithm gui stuff
+        self.graph_visuals.redraw_graph()
+
 
     def do_eades_old(self, event="nothing"):
         # TODO Kosntanten fuer Eades auf der Werte aus den Textboxen setzen
@@ -270,60 +317,48 @@ class Window:
         self.graph_visuals.generate_adj_list()
         # Update edges between nodes
         self.graph_visuals.generate_edges()
-
-    def open_new_graph(self, event="nothing"):
-        current_instance = OpenGraphDialog(self.root)
-
-    def load_graph(self, filepath):
-        self.graph = Graph.Graph.from_file(width=Window.CANVAS_WIDTH,height=Window.CANVAS_HEIGHT,
-                                           filepath=filepath)
-
-        self.graph_visuals = GraphVisual.from_graph(
-            canvas=self.canvas,
-            width=Window.CANVAS_WIDTH,
-            height=Window.CANVAS_HEIGHT,
-            graph=self.graph)
-
-        # Show eades constant choices only if user selected eades as algorithm
-        if Window.EADES:
-            # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
-            Eades.Eades.graph_visuals = self.graph_visuals
-            self.root.bind("<s>", self.do_eades_new)
-            self.root.bind("<f>", self.do_eades_old)
-            self.init_eades_constant_widgets()
+    def del_eades_constant_widgets(self):
+        if self.l1 != None:
+            self.l1.destroy()
+            self.l2.destroy()
+            self.l3.destroy()
+            self.l4.destroy()
+            self.t1.destroy()
+            self.t2.destroy()
+            self.t3.destroy()
+            self.t4.destroy()
 
     def init_eades_constant_widgets(self):
 
-        l1 = tk.Label(self.root, text="c1")
-        l1.pack(side=tk.LEFT)
+        self.l1 = tk.Label(self.root, text="c1")
+        self.l1.pack(side=tk.LEFT)
         # Textfield for ... Eades constant
         self.t1 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
         self.t1.pack(side=tk.LEFT)
         self.t1.insert(tk.END, Eades.Eades.c1)
 
-        l2 = tk.Label(self.root, text="c2")
-        l2.pack(side=tk.LEFT)
+        self.l2 = tk.Label(self.root, text="c2")
+        self.l2.pack(side=tk.LEFT)
         # Textfield for ... Eades constant
         self.t2 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
         self.t2.pack(side=tk.LEFT)
         self.t2.insert(tk.END, Eades.Eades.c2)
 
-        l3 = tk.Label(self.root, text="c3")
-        l3.pack(side=tk.LEFT)
+        self.l3 = tk.Label(self.root, text="c3")
+        self.l3.pack(side=tk.LEFT)
         # Textfield for ... Eades constant
         self.t3 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2)
         self.t3.pack(side=tk.LEFT)
         self.t3.insert(tk.END, Eades.Eades.c3)
 
-        l4 = tk.Label(self.root, text="c4")
-        l4.pack(side=tk.LEFT)
+        self.l4 = tk.Label(self.root, text="c4")
+        self. l4.pack(side=tk.LEFT)
         # Textfield for ... Eades constant
         self.t4 = tk.Text(self.root, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
         self.t4.insert(tk.END, Eades.Eades.c4)
 
-        t5 = tk.Entry(self.root)
-        t5.pack(side=tk.LEFT)
+
 
 
 # TODO Graphen sollte so realisiert werden
