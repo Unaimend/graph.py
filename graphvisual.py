@@ -7,9 +7,8 @@ from tkinter import filedialog
 import math
 import json
 import profile
-
 import Eades
-
+from tkinter import ttk
 import time
 
 # TODO enumerate instead of index in for loops
@@ -33,6 +32,10 @@ class OpenGraphDialog:
         # TODO Seed auswahl fuer den RNG
 
     def open_graph(self):
+        nb = ttk.Notebook(self.window)
+        nb.pack()
+
+
         var = tk.IntVar()
         self.filename = filedialog.askopenfilename(title="Select file",
                                                    filetypes=(("graph files", "*.json"), ("all files", "*.*")))
