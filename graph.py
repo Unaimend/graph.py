@@ -15,7 +15,7 @@ class GraphNode:
     graphNodeRadius = 12
 
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
-
+    # TODO Nodes sollte wissen zu wem sie adjazent sind
     def __init__(self, canvas, x, y, draw_ids: bool, id: int):
         # Canvas position for the node
         self.position = Vector.Vector(x, y)
@@ -116,7 +116,7 @@ class Graph:
     def adjacent_to(self, node: GraphNode=None):
         return self.adjacency_list[node.id]
 
-
+# TODO Edges sollte wissen zu wem sie inzident sind
 class GraphEdge:
     def __init__(self, canvas, x0, y0, xn, yn):
         # Start der Kanten

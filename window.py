@@ -18,8 +18,9 @@ import time
 
 # TODO from <modul> import <functions, class, variable> syntax verwenden
 # Frozen binarie am besten mit pypy3
-
-
+# Control statt Cmd verwenden
+# TODO Auf Linux ist die CMD(Mac)-Taste die Alt-Taste, falls die Mod1 gesetzt ist(i3)
+# und mit einer anderen Tasten beledung belegt nimmt tkinter die Kombination (CMD+s) nicht an
 class OpenGraphDialog:
     def __init__(self, root):
         self.filename = "test"
@@ -244,7 +245,7 @@ class Window:
         # Show eades constant choices only if user selected eades as algorithm
         if Window.EADES:
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
-            current_tab.canvas.bind("<Command-s>", self.do_eades_new)
+            current_tab.canvas.bind("<Control-s>", self.do_eades_new)
             self.init_eades_constant_widgets()
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
