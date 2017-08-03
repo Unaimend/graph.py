@@ -11,11 +11,10 @@ class Eades:
     # Graph konv. langsamer gegen gleichgewicht besonderns bei hoher Anzahl an Iterationen
     c1 = 2
     # beeinflusst min. distance
-    c2 = 25
-    c3 = 1
+    c2 = 200
+    c3 = 300
     c4 = 0.1
 
-
     # c1 = 2
     # c2 = 1
     # # c3 = 10000
@@ -27,6 +26,8 @@ class Eades:
     # # c3 = 10000
     # c3 = 1
     # c4 = 0.1
+
+    # 2,200,5000,0.1
 
 
     @staticmethod
