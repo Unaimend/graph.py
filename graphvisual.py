@@ -1,4 +1,3 @@
-
 import graph as Graph
 import random
 import tkinter as tk
@@ -6,9 +5,8 @@ import tkinter as tk
 # TODO enumerate instead of index in for loops
 
 
-
 class GraphVisual:
-    seed = 25
+    seed = 50
 
     def __init__(self, canvas, width, height, graph):
         random.seed(GraphVisual.seed)
@@ -191,45 +189,4 @@ class GraphVisual:
 #         }
 
 
-# profile.run(window.run())
 
-#
-# test = list()
-# test.append([1])
-# test.append([2])
-# test.append([3])
-#
-#
-#
-# f = open("1graph.json", "w")
-#
-# json.dump(test,f)
-# f.close()
-# f = open("1graph.json", "r")
-# a = json.load(f)
-# print(a)
-# f.close()
-
-# [
-# 	[1,2],
-# 	[0,2],
-# 	[1,0],
-#     [],
-#     []
-# ]
-
-# ddddddadd
-# self.menubar = tk.Menu(self.root)
-# # File menu
-# self.filemenu = tk.Menu(self.menubar, tearoff=0)
-# self.filemenu.add_separator()
-# self.filemenu.add_command(label="Exit")
-# self.menubar.add_cascade(label="File", menu=self.filemenu)
-#
-# # View menu
-# self.viewmenu = tk.Menu(self.menubar, tearoff=0)
-# self.viewmenu.add_command(label="Toggle ids     (g)", c®ommand=self.changeNodeLook)
-# self.viewmenu.add_command(label="Clear canvas   (cg)", command=self.clearCanvas)
-# self.menubar.add_cascade(label="View", menu=self.viewmenu)
-#
-# self.root.config(menu=self.menubar)
