@@ -1,3 +1,12 @@
+"""
+.. module:: graph
+   :platform: Unix, Windows
+   :synopsis: A useful module indeed.
+
+.. moduleauthor:: Tja
+
+
+"""
 from typing import List
 import json
 from Vector import Vector
@@ -115,17 +124,20 @@ class Graph:
 
 # TODO Edges sollte wissen zu wem sie inzident sind
 class GraphEdge:
+    """
+    Graph Edge class
+    """
     def __init__(self, canvas, x0, y0, xn, yn):
         """
-        Ctor for the GraphEdge class
         :param canvas: The canvas on which the edge should be drawn
-        :type canvas: A canvas type which muss support creating a line
-         canvas.create(xstart:float, ytart:float, xend:float, yend:float, smoothing:bool
+        :type canvas: A canvas type which must support creating a line like this:
+         <canvas>.create_line(xstart:float, ytart:float, xend:float, yend:float, smoothing:bool
         :param x0: The start on the x coordinate
         :param y0: The start on the y coordinate
         :param xn: The end on the x coordinate
-        :param yn: The end on the y coordinate
+        :param yn: The end on the y coordinate 
         """
+
         # Start der Kanten
         self.start = Vector(x0, y0)
         # self.start_node = start_node
@@ -138,6 +150,12 @@ class GraphEdge:
 
     @classmethod
     def from_nodes(cls, canvas, start_node, end_node):
+        """
+        :param canvas: 
+        :param start_node: 
+        :param end_node: 
+        :return: 
+        """
         return cls(canvas=canvas, x0=start_node.position.x,
                    y0=start_node.position.y, xn=end_node.position.x, yn=end_node.position.y)
 
