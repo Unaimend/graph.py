@@ -41,7 +41,6 @@ class GraphNode:
                                                 self.position.x + self.graphNodeRadius,
                                                 self.position.y + self.graphNodeRadius, fill="black")
 
-
     def move_old(self, x, y):
         # update current position
         self.position.x += x
@@ -49,7 +48,6 @@ class GraphNode:
         # update current canvas position
         self.canvas.move(self.canvas_id, x, y)
         self.canvas.move(self.canvas_text_id, x, y)
-
 
     def move(self, x, y):
         # update current position
@@ -114,9 +112,20 @@ class Graph:
     def adjacent_to(self, node: GraphNode=None):
         return self.adjacency_list[node.id]
 
+
 # TODO Edges sollte wissen zu wem sie inzident sind
 class GraphEdge:
     def __init__(self, canvas, x0, y0, xn, yn):
+        """
+        Ctor for the GraphEdge class
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: A canvas type which muss support creating a line
+         canvas.create(xstart:float, ytart:float, xend:float, yend:float, smoothing:bool
+        :param x0: The start on the x coordinate
+        :param y0: The start on the y coordinate
+        :param xn: The end on the x coordinate
+        :param yn: The end on the y coordinate
+        """
         # Start der Kanten
         self.start = Vector(x0, y0)
         # self.start_node = start_node
