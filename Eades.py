@@ -1,5 +1,5 @@
 import graph
-import Vector
+from Vector import Vector
 import math
 
 # TODO Bessere Konstanten errechnen
@@ -40,16 +40,16 @@ class Eades:
     @staticmethod
     def unit_vector(node1: graph.GraphNode = None, node2: graph.GraphNode = None):
         # Calculate x and y distance separate
-        v = Vector.Vector(node1.position.x - node2.position.x, node1.position.y - node2.position.y)
+        v = Vector(node1.position.x - node2.position.x, node1.position.y - node2.position.y)
         # Divide vector by its length to obtain a unit vector
-        v = Vector.Vector(v.x / Eades.distance(node1, node2), v.y / Eades.distance(node1, node2))
+        v = Vector(v.x / Eades.distance(node1, node2), v.y / Eades.distance(node1, node2))
         return v
 
     @staticmethod
     def calculate_attractive_force_for_all_nodes_and_move_accordingly_new(event=None):
         # TODO Exception falls Eades.graph == None
         for node in Eades.graph_visuals.graphNodes:
-            displacement = Vector.Vector(0, 0)
+            displacement = Vector(0, 0)
             for nodes in Eades.graph_visuals.node_adjacency_list[node.id]:
                 # If if would calc. the distance between two node which have the same id, the distance would be 0
                 # and log(0) is undefined
@@ -64,7 +64,7 @@ class Eades:
     @staticmethod
     def calculate_repelling_force_for_all_nodes_and_move_accordingly_new():
         for node in Eades.graph_visuals.graphNodes:
-            displacement = Vector.Vector(0, 0)
+            displacement = Vector(0, 0)
             for nodes in Eades.graph_visuals.graphNodes:
                 repelling_force = 0
                 # If if would calc. the distance between two node which have the same id, the distance would be 0

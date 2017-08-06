@@ -1,8 +1,6 @@
 from typing import List
 import json
-import random
-import Vector
-import tkinter as tk
+from Vector import Vector
 
 
 
@@ -18,7 +16,7 @@ class GraphNode:
     # TODO Nodes sollte wissen zu wem sie adjazent sind
     def __init__(self, canvas, x, y, draw_ids: bool, id: int):
         # Canvas position for the node
-        self.position = Vector.Vector(x, y)
+        self.position = Vector(x, y)
         # The canvas on which the node should be drawn(for multi-canvas support)
         self.canvas = canvas
         # The id that will be drawn "in the node"
@@ -120,12 +118,12 @@ class Graph:
 class GraphEdge:
     def __init__(self, canvas, x0, y0, xn, yn):
         # Start der Kanten
-        self.start = Vector.Vector(x0, y0)
+        self.start = Vector(x0, y0)
         # self.start_node = start_node
         # self.end_node  = end_node
 
         # Ende der Kanten
-        self.end = Vector.Vector(xn, yn)
+        self.end = Vector(xn, yn)
         # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 

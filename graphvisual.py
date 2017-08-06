@@ -1,4 +1,4 @@
-import graph as Graph
+from graph import Graph, GraphEdge, GraphNode
 import random
 import tkinter as tk
 
@@ -13,11 +13,11 @@ class GraphVisual:
         self.canvas = canvas
         # Specifies the minimal distance two nodes are allowed to have
         # needed when user places nodes himself
-        self.graphNodesMinDistance = 2 * Graph.GraphNode.graphNodeRadius
+        self.graphNodesMinDistance = 2 * GraphNode.graphNodeRadius
 
-        # Array for the the nodes of the graph(holds Graph.GraphEdge objects)
+        # Array for the the nodes of the graph(holds GraphEdge objects)
         self.graphNodes = []
-        # Array for the the edges of the graph(holds Graph.GraphEdge objects)
+        # Array for the the edges of the graph(holds GraphEdge objects)
         self.graphEdges = []
         # Adjacency list but with nodes instead of integers
         # Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drinnen die zu x adj. sind.,
@@ -58,7 +58,7 @@ class GraphVisual:
     def int_node_to_graph_node(self):
         for x in self.graph.adjacency_list:
             self.graphNodes.append(
-                Graph.GraphNode(self.canvas,
+                GraphNode(self.canvas,
                                 random.randint(0, self.width),
                                 random.randint(0, self.height),
                                 self.drawNodeIds, self.nodeCounter))
@@ -87,7 +87,7 @@ class GraphVisual:
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graphNodes:
-            alternative_nodelist.append( Graph.GraphNode(self.canvas, node.position.x, node.position.y,
+            alternative_nodelist.append( GraphNode(self.canvas, node.position.x, node.position.y,
                                                          self.drawNodeIds, node.id))
         self.graphNodes = alternative_nodelist
 
@@ -101,13 +101,13 @@ class GraphVisual:
         # Init graphEdges with an new array because the old edges are not needed anymore
         self.graphEdges = []
 
-        # Iterate over all nodes(those are Graph.GraphNode objects)
+        # Iterate over all nodes(those are GraphNode objects)
         for node in self.graphNodes:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
                 # print("Start", node.id, node.position.x, node.position.y, "End", nodes.id,nodes.position.x, nodes.position.y)
-                edge = Graph.GraphEdge.from_nodes(canvas=self.canvas,start_node=node,end_node=nodes)
+                edge = GraphEdge.from_nodes(canvas=self.canvas,start_node=node,end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 self.graphEdges.append(edge)
 
@@ -144,8 +144,8 @@ class GraphVisual:
     #     # Check for all the nodes if position of the click is in another node
     #     for node in self.graphNodes:
     #         if abs(
-    #             (node.x - event.x)) <= Graph.GraphNode.graphNodeRadius and abs(
-    #                 (node.y - event.y)) <= Graph.GraphNode.graphNodeRadius:
+    #             (node.x - event.x)) <= GraphNode.graphNodeRadius and abs(
+    #                 (node.y - event.y)) <= GraphNode.graphNodeRadius:
     #             is_in_circle = True
     #
     #     is_far_enough = True
@@ -159,7 +159,7 @@ class GraphVisual:
     #     if is_far_enough and not is_in_circle:
     #         self.nodeCounter += 1
     #         self.graphNodes.append(
-    #             Graph.GraphNode(self.canvas, event.x, event.y,
+    #             GraphNode(self.canvas, event.x, event.y,
     #                             self.drawNodeIds, self.nodeCounter))
     #
     #     # If distance is small(in another node) and I clicked in a node remember this node
@@ -169,7 +169,7 @@ class GraphVisual:
     #         self.clickedNodes.append(event.y)
     #         if len(self.clickedNodes) == 4:
     #             self.graphEdges.append(
-    #                 Graph.GraphEdge(self.canvas, self.clickedNodes[0],
+    #                 GraphEdge(self.canvas, self.clickedNodes[0],
     #                                 self.clickedNodes[1], self.clickedNodes[2],
     #                                 self.clickedNodes[3]))
     #             self.clickedNodes = []

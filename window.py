@@ -1,26 +1,25 @@
-import graph as Graph
+from graph import Graph
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 
-import graphvisual as gv
-import Eades
+from graphvisual import GraphVisual
+from Eades import Eades
 import time
 
-# TODO Enter drucken in den Eades Kosntantenboxen geht gar nicht gut
-# TODO BInd mac touchbad to scrollbars
+# TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
+# TODO Bind mac touchbad to scrollbars
 # TODO Siehe Shift-MouseWheel MouseWheel
 # TODO Wenn graph gezeichnet wird sollten scrollsbars auf anfang gesetzt werden damit man den graphen sieht
 
 # TODO Pypy3 is kranker shit mal auseinandersettzen KRANK
 # TODO RESIZABLE
+# MUltishredding fuer die Algorithmen
 
-
-# TODO from <modul> import <functions, class, variable> syntax verwenden
-# Frozen binarie am besten mit pypy3
+# Frozen binarie am Besten mit pypy3
 # Control statt Cmd verwenden
-# TODO Auf Linux ist die CMD(Mac)-Taste die Alt-Taste, falls die Mod1 gesetzt ist(i3)
-# und mit einer anderen Tasten beledung belegt nimmt tkinter die Kombination (CMD+s) nicht an
+
+
 class OpenGraphDialog:
     def __init__(self, root):
         self.filename = "test"
@@ -123,12 +122,7 @@ class Window:
         # Init. canvas
         self.tabs = {}
 
-        # style = ttk.Style()
-        # style.theme_create("MyStyle", parent="alt", settings={
-        #     "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
-        #     "TNotebook.Tab": {"configure": {"padding": [0, 0]}, }})
-        #
-        # style.theme_use("MyStyle")
+
 
         self.nb = ttk.Notebook(self.root)
 
@@ -165,6 +159,7 @@ class Window:
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
 
         self.nb.grid(column=1, row=0, sticky=tk.E)
+        # Add shortcuts
         self.root.bind("<Command-n>", self.open_new_graph)
         self.root.bind("<Command-t>", self.add_canvas)
         self.root.bind("<Command-b>", self.toggle_info_menu)
@@ -176,12 +171,15 @@ class Window:
         return self.nb.index("current")
 
     def add_canvas(self, event=None):
+        # Anzahl der Tabs herausfinden
         index = len(self.nb.tabs())
+        # Neuen Tab und zugehoeriges Canvas erstellen
         self.tabs[index] = (NoteBookTab(tk.Canvas(self.nb, relief=tk.SUNKEN, bd=4,
                                                   width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
                                                   background='white', scrollregion=(-2000, -2000, 2000, 2000),
                                                   xscrollcommand=self.xscrollbar.set,
                                                   yscrollcommand=self.yscrollbar.set), None, None))
+        # Erstellten Tab zum Canvas hizufuegen
         self.nb.add(self.tabs[index].canvas,  text="Canvas " + str(index))
 
     def run(self):
@@ -189,11 +187,11 @@ class Window:
 
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
-
         Window.EADES = current_instance.eades.get()
         self.load_graph(current_instance.filename)
 
     def add_info_menu(self):
+        """In dieser Methoden koennen dem Info Menu widgets hinzugefuegt werden"""
         self.info_menu = InfoMenu(self.root)
         self.info_menu.grid(column=0, row=0, sticky=tk.N)
 
@@ -205,38 +203,31 @@ class Window:
     def toggle_info_menu(self, event=None):
         new_width = 0
         self.info_menu.toggle()
-        # TODO Das Canvas zuckt links so komisch
-        if self.info_menu.visible == True:
+        # Neue Breite berechnen(abhaengig davon ob das info_menu zu sehen ist oder nicht)
+        if self.info_menu.visible:
             new_width = self.tabs[self.get_current_notebook_tab()].original_canvas_width
         else:
             # Magic 28 sorgt dafuer das canvas nicht an Breite waechst
             new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab()].canvas.winfo_width() - 28
 
-        print(self.tabs[self.get_current_notebook_tab()].canvas.winfo_width())
         self.tabs[self.get_current_notebook_tab()].canvas.configure(width=new_width)
-
-        # TODO Entscheiden ob das obere oder das unteren
-        # TODO PS. das untere is schoener
-        # if self.info_menu == None:
-        #     self.add_info_menu()
-        # else:
-        #     self.info_menu.destroy()
-        #     self.info_menu = None
 
     def load_graph(self, filepath):
         print("Loading graph...")
+        # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
-        current_tab.set_graph((Graph.Graph.from_file(width=Window.CANVAS_WIDTH,
+        # Aktuellem Tab den Graphen zuweisen
+        current_tab.set_graph((Graph.from_file(width=Window.CANVAS_WIDTH,
                                                      height=Window.CANVAS_HEIGHT,
                                                      filepath=filepath)))
-
-        current_tab.set_graph_vis(gv.GraphVisual.from_graph(
+        # Aktuellem Tab die GraphVisuals zuweisen
+        current_tab.set_graph_vis(GraphVisual.from_graph(
                                                      canvas=self.tabs[self.get_current_notebook_tab()].canvas,
                                                      width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
                                                      graph=self.tabs[self.get_current_notebook_tab()].graph))
 
         # Bind actions to the last added graph_vis
-        # TODO Command-w to close tab
+        # TODO Control-w to close tab
         current_tab.canvas.bind("<Command-g>", current_tab.graph_vis.change_node_look)
         current_tab.canvas.bind("<Command-c>", current_tab.graph_vis.redraw_graph)
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.set_focus)
@@ -251,27 +242,31 @@ class Window:
         current_tab.graph_vis.redraw_graph()
 
     def do_eades_new(self, event="nothing"):
+        # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
-        Eades.Eades.graph_visuals = current_tab.graph_vis
+        # Graphen auf dem gearbeitet wird zuweisen
+        Eades.graph_visuals = current_tab.graph_vis
 
         text = str()
 
+        # Aktuelle Werte der Konstante laden
         text = self.t1.get("1.0", 'end-1c')
-        Eades.Eades.c1 = float(text)
+        Eades.c1 = float(text)
 
         text = self.t2.get("1.0", 'end-1c')
-        Eades.Eades.c2 = float(text)
+        Eades.c2 = float(text)
 
         text = self.t3.get("1.0", 'end-1c')
-        Eades.Eades.c3 = float(text)
+        Eades.c3 = float(text)
 
         text = self.t4.get("1.0", 'end-1c')
-        Eades.Eades.c4 = float(text)
+        Eades.c4 = float(text)
 
         start = time.time()
+        # 100x den Algorithmus ausführen(siehe [EAD84] Paper)
         for x in range(0, 100):
-            Eades.Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
-            Eades.Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
+            Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
+            Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
         end = time.time()
 
         # Update positions
@@ -283,7 +278,9 @@ class Window:
         current_tab.graph_vis.generate_edges()
 
     def del_eades_constant_widgets(self):
-        if self.eades_options_frame != None:
+        # Wenn self.eades_options_frame exisitiert, exisitieren die anderen Variablen auch
+        # und es is sicher .destroy zu callen
+        if self.eades_options_frame is not None:
             self.eades_options_frame.destroy()
             self.t1.destroy()
             self.t2.destroy()
@@ -295,7 +292,9 @@ class Window:
             self.l4.destroy()
 
     def init_eades_constant_widgets(self):
+        # Frame der die Label und TextInputs hält
         self.eades_options_frame = tk.Frame(self.root)
+        # Position des Frames in der GUI setzen
         self.eades_options_frame.grid(column=1, row=3)
 
         self.l1 = tk.Label(self.eades_options_frame, text="c1")
@@ -303,22 +302,32 @@ class Window:
         # Textfield for c1 Eades constant
         self.t1 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t1.pack(side=tk.LEFT)
-        self.t1.insert(tk.END, Eades.Eades.c1)
+        self.t1.insert(tk.END, Eades.c1)
         self.l2 = tk.Label(self.eades_options_frame, text="c2")
         self.l2.pack(side=tk.LEFT)
         # Textfield for c2 Eades constant
         self.t2 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t2.pack(side=tk.LEFT)
-        self.t2.insert(tk.END, Eades.Eades.c2)
+        self.t2.insert(tk.END, Eades.c2)
         self.l3 = tk.Label(self.eades_options_frame, text="c3")
         self.l3.pack(side=tk.LEFT)
         # Textfield for c3 Eades constant
         self.t3 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t3.pack(side=tk.LEFT)
-        self.t3.insert(tk.END, Eades.Eades.c3)
+        self.t3.insert(tk.END, Eades.c3)
         self.l4 = tk.Label(self.eades_options_frame, text="c4")
         self.l4.pack(side=tk.LEFT)
         # Textfield for c4 Eades constant
         self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
-        self.t4.insert(tk.END, Eades.Eades.c4)
+        self.t4.insert(tk.END, Eades.c4)
+
+
+
+
+  # style = ttk.Style()
+        # style.theme_create("MyStyle", parent="alt", settings={
+        #     "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
+        #     "TNotebook.Tab": {"configure": {"padding": [0, 0]}, }})
+        #
+        # style.theme_use("MyStyle")
