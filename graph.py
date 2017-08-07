@@ -1,40 +1,64 @@
 """
 .. module:: graph
-   :platform: Unix, Windows
-   :synopsis: A useful module indeed.
+   :platform: Unix, Windows, Mac
+   :synopsis: This module includes classes necessary for working with graphs
 
-.. moduleauthor:: Tja
+.. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 
 
 """
 from typing import List
 import json
 from Vector import Vector
+import tkinter as tk
 
 
 
 #typedefs
 AdjacencyList = List[List[int]]
+AdjacencyListEntry = List[int]
 AdjacencyMatrix = List[List[int]]
+
+# TODO How to type annotate the return type of class methods
+# SOLUTION https://stackoverflow.com/questions/15853469/putting-current-class-as-return-type-annotation
+# TODO Should GraphNode and GraphEdge be in the graphvisual module since the are only important for the graphical
+# TODO representation of graphs
+# TODO Redraw methoden so das nicht alles neue erstleelt werden muss
+# TODO Siehe https://stackoverflow.com/questions/13212300/how-to-reconfigure-tkinter-canvas-items
 
 
 class GraphNode:
+    """
+    Class which represents a node in a graph
+    """
+
+    #: Min. distance in pixel which nodes can be placed away from each pother from the use
     graphNodeRadius = 12
 
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
-    # TODO Nodes sollte wissen zu wem sie adjazent sind
-    def __init__(self, canvas, x, y, draw_ids: bool, id: int):
-        # Canvas position for the node
+    # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int):
+        """
+        :param canvas: The canvas on which the node should be drawn
+        :param x:  The x-position on which the node should be drawn
+        :param y:  The y-position on which the node should be drawn
+        :param draw_ids: Whether to draw ids or not 
+        :param id: The id which should be drawn in node
+        """
+        #: Canvas position for the node
         self.position = Vector(x, y)
-        # The canvas on which the node should be drawn(for multi-canvas support)
+        #: The canvas on which the node should be drawn(for multi-canvas support)
         self.canvas = canvas
-        # The id that will be drawn "in the node"
+        #: The id that will be drawn "in the node"
         self.id = id
-        # The id to identify this node
+        #: The id to identify this node
         self.canvas_id = 0
-        # Id to identify the text of this node
+        #: Id to identify the text of this node
         self.canvas_text_id = "-1"
-        #
+        """
+        Boolean which determines if the node is represented through a black dot or
+        through a circle with a number inside
+        """
         self.draw_ids = draw_ids
 
         # TODO Magic number ersetzen
@@ -50,7 +74,13 @@ class GraphNode:
                                                 self.position.x + self.graphNodeRadius,
                                                 self.position.y + self.graphNodeRadius, fill="black")
 
-    def move_old(self, x, y):
+    def move_old(self, x: float, y: float):
+        """
+        NOTE: Does immediately change the position on the canvas
+        :param x: The x-offset which should be added 
+        :param y: The y-offset which should be added
+        :return: 
+        """
         # update current position
         self.position.x += x
         self.position.y += y
@@ -58,30 +88,49 @@ class GraphNode:
         self.canvas.move(self.canvas_id, x, y)
         self.canvas.move(self.canvas_text_id, x, y)
 
-    def move(self, x, y):
+    def move(self, x: float, y: float):
+        """
+        NOTE: Does not change the position on the canvas, a redraw must be called to do that
+        :param x: The x-offset which should be added 
+        :param y: The y-offset which should be added
+        :return: 
+        """
         # update current position
         self.position.x += x
         self.position.y += y
-        # update current canvas position
-        # self.canvas.move(self.canvas_id, x, y)
-        # self.canvas.move(self.canvas_text_id, x, y)
+        # TODO WTF!! Das kann nicht stimmen, das neuerstellen in redraw_graph ist schneller als
+        # TODO das verschieben via config, das waere sehr interessant
+        # self.canvas.coords(self.canvas_id, self.position.x - self.graphNodeRadius / 1.5,
+        #                                         self.position.y - self.graphNodeRadius / 1.5,
+        #                                         self.position.x + self.graphNodeRadius,
+        #                                         self.position.y + self.graphNodeRadius)
+        # self.canvas.coords(self.canvas_text_id)
+
+
+
+
 
 
 class Graph:
-    def __init__(self, width: int=None, height: int=None, filepath: str=None, adjacency_list: AdjacencyList=None,
+    """
+    Class for representing graphs
+    """
+    def __init__(self, filepath: str=None, adjacency_list: AdjacencyList=None,
                  adjacency_matrix: AdjacencyMatrix=None):
+        """
+        Note: All the variables are exlusive, that means if on is supplied the others should not be used
+        :param filepath: The path from which the graph should be loaded 
+        :param adjacency_list: The ajd. list from which the graph should be load 
+        :param adjacency_matrix: 
+        """
         # Filepath to the grad which should be loaded
         self.filepath = filepath
         # dict. which holds all adjacent nodes in the form of and adjacency list
-        self.adjacency_list = None
+        self.adjacency_list = adjacency_list
         # dict. which holds all adjacent nodes in the form of and adjacency matrix
-        self.adjacency_matrix = None
+        self.adjacency_matrix = adjacency_matrix
         # Total number of vertices
         self.vertice_count = None
-        # Heigth of the canvas in pixel
-        self.canvas_height = height
-        # Width of the canvas in pixel
-        self.canvas_width = width
 
         # Load from a file
         #TODO in try catch verpacken
@@ -107,53 +156,71 @@ class Graph:
             print("TODO exception")
 
     @classmethod
-    def from_file(cls, width, height, filepath):
-        return cls(width=width, height=height, filepath=filepath)
+    def from_file(cls, filepath: str) -> 'Graph':
+        """
+        :param filepath: The file from which the graph sould be loaded
+        :return:  A new graph instance 
+        """
+        return cls(filepath=filepath)
 
     @classmethod
-    def from_adjacency_list(cls, width, height, adjacency_list):
-        return cls(width=width, height=height, adjacency_list=adjacency_list)
+    def from_adjacency_list(cls, adjacency_list: AdjacencyList) -> 'Graph':
+        """
+        :param adjacency_list: The adj. list from which the graph sould be loaded
+        :return:  A new graph instance
+        """
+        return cls(adjacency_list=adjacency_list)
 
     @classmethod
-    def from_adjacency_matrix(cls, width, height, adjacency_matrix):
-        return cls(width=width, height=height, adjacency_matrix=adjacency_matrix)
+    def from_adjacency_matrix(cls,  adjacency_matrix: AdjacencyMatrix) -> 'Graph':
+        """ 
+        :param adjacency_matrix: The adj. matrix from which the graph sould be loaded
+        :return: A new graph instance 
+        """
+        return cls(adjacency_matrix=adjacency_matrix)
 
-    def adjacent_to(self, node: GraphNode=None):
+    def adjacent_to(self, node: GraphNode) -> AdjacencyListEntry:
+        """
+        :param node: The node from which you want the ajd. list
+        :return: adjacency_list from the give node
+        """
         return self.adjacency_list[node.id]
 
 
-# TODO Edges sollte wissen zu wem sie inzident sind
+# TODO Edges sollte wissen zu wem sie inzident sind(Sollten sie das?)
 class GraphEdge:
     """
-    Graph Edge class
+    The class reprents a graph edge
     """
-    def __init__(self, canvas, x0, y0, xn, yn):
+    def __init__(self, canvas: tk.Canvas, x0: float, y0: float, xn: float, yn: float):
         """
         :param canvas: The canvas on which the edge should be drawn
-        :type canvas: A canvas type which must support creating a line like this:
-         <canvas>.create_line(xstart:float, ytart:float, xend:float, yend:float, smoothing:bool
+        :type canvas: tk.Canvas
         :param x0: The start on the x coordinate
+        :type x0 float
         :param y0: The start on the y coordinate
+        :type y0 float
         :param xn: The end on the x coordinate
-        :param yn: The end on the y coordinate 
+        :type xn float
+        :param yn: The end on the y coordinate
+        :type xn float
         """
-
         # Start der Kanten
         self.start = Vector(x0, y0)
-        # self.start_node = start_node
-        # self.end_node  = end_node
-
         # Ende der Kanten
         self.end = Vector(xn, yn)
         # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
     @classmethod
-    def from_nodes(cls, canvas, start_node, end_node):
+    def from_nodes(cls, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> 'GraphEdge':
         """
-        :param canvas: 
-        :param start_node: 
-        :param end_node: 
+        :param canvas:      The canvas on which the edge should be drawn
+        :type canvas:       tk.Canvas
+        :param start_node:  The node where the edge should start
+        :type start_node:   GraphNode
+        :param end_node:    The node where the edge should start
+        :type end_node:     GraphNode
         :return: 
         """
         return cls(canvas=canvas, x0=start_node.position.x,
