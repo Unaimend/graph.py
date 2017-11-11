@@ -1,8 +1,10 @@
 import graph
-from Vector import Vector
+from vector import Vector
 import math
 
 # TODO Bessere Konstanten errechnen
+# TODO Der Benutzer kann fuer die Eades KOsntanten Null eingeben, dies muss verhindert werden da Null in einigen Berechnungen ein nicht
+# zulaessiger Wert ist
 
 
 class Eades:
@@ -10,9 +12,10 @@ class Eades:
 
     # Graph konv. langsamer gegen gleichgewicht besonderns bei hoher Anzahl an Iterationen
     c1 = 2
-    # beeinflusst min. distance
+    # Beeinflust min. distance
     c2 = 200
     c3 = 300
+    # Beeinflusstt die konv. Gesch.
     c4 = 0.1
 
     # c1 = 2
@@ -61,7 +64,7 @@ class Eades:
                     displacement.y += direction.y  * attractive_force * Eades.c4
             node.move(displacement.x, displacement.y )
 
-    @staticmethod
+    # Sollte die "repelling force" ueber alle vertices berechnet werden oder nur die nicht-adjazenten
     def calculate_repelling_force_for_all_nodes_and_move_accordingly_new():
         for node in Eades.graph_visuals.graphNodes:
             displacement = Vector(0, 0)

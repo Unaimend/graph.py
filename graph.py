@@ -2,14 +2,11 @@
 .. module:: graph
    :platform: Unix, Windows, Mac
    :synopsis: This module includes classes necessary for working with graphs
-
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
-
-
 """
 from typing import List
 import json
-from Vector import Vector
+from vector import Vector
 import tkinter as tk
 
 
@@ -25,26 +22,34 @@ AdjacencyMatrix = List[List[int]]
 # TODO representation of graphs
 # TODO Redraw methoden so das nicht alles neue erstleelt werden muss
 # TODO Siehe https://stackoverflow.com/questions/13212300/how-to-reconfigure-tkinter-canvas-items
+# TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
+# TODO Natuerlich nur optional
+# TODO mit with  verpacken
 
 
 class GraphNode:
     """
     Class which represents a node in a graph
     """
-
-    #: Min. distance in pixel which nodes can be placed away from each pother from the use
+    #: Radius of the nodes
     graphNodeRadius = 12
-
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
     # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
+
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int):
         """
         :param canvas: The canvas on which the node should be drawn
+        :type x0: tk.Canvas
         :param x:  The x-position on which the node should be drawn
+        :type x: float
         :param y:  The y-position on which the node should be drawn
-        :param draw_ids: Whether to draw ids or not 
+        :type y: float
+        :param draw_ids: Whether to draw ids or not
+        :type draw_ids: bool
         :param id: The id which should be drawn in node
+        :type id: int
         """
+
         #: Canvas position for the node
         self.position = Vector(x, y)
         #: The canvas on which the node should be drawn(for multi-canvas support)
@@ -77,9 +82,9 @@ class GraphNode:
     def move_old(self, x: float, y: float):
         """
         NOTE: Does immediately change the position on the canvas
-        :param x: The x-offset which should be added 
+        :param x: The x-offset which should be added
         :param y: The y-offset which should be added
-        :return: 
+        :return:
         """
         # update current position
         self.position.x += x
@@ -93,7 +98,7 @@ class GraphNode:
         NOTE: Does not change the position on the canvas, a redraw must be called to do that
         :param x: The x-offset which should be added 
         :param y: The y-offset which should be added
-        :return: 
+        :return:
         """
         # update current position
         self.position.x += x
@@ -107,10 +112,6 @@ class GraphNode:
         # self.canvas.coords(self.canvas_text_id)
 
 
-
-
-
-
 class Graph:
     """
     Class for representing graphs
@@ -119,21 +120,20 @@ class Graph:
                  adjacency_matrix: AdjacencyMatrix=None):
         """
         Note: All the variables are exlusive, that means if on is supplied the others should not be used
-        :param filepath: The path from which the graph should be loaded 
-        :param adjacency_list: The ajd. list from which the graph should be load 
-        :param adjacency_matrix: 
+        :param filepath: The path from which the graph should be loaded
+        :param adjacency_list: The ajd. list from which the graph should be load
+        :param adjacency_matrix:
         """
         # Filepath to the grad which should be loaded
         self.filepath = filepath
-        # dict. which holds all adjacent nodes in the form of and adjacency list
+        # 2d list. which holds all adjacent nodes in the form of and adjacency list
         self.adjacency_list = adjacency_list
-        # dict. which holds all adjacent nodes in the form of and adjacency matrix
+        # 2d list. which holds all adjacent nodes in the form of and adjacency matrix
         self.adjacency_matrix = adjacency_matrix
         # Total number of vertices
         self.vertice_count = None
 
         # Load from a file
-        #TODO in try catch verpacken
         #https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
         if filepath:
             print("Loading from " + filepath)
@@ -146,20 +146,14 @@ class Graph:
             # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
             print("Adjacency list", self.adjacency_list)
-        # Load from an adjacency list
-        elif adjacency_list:
-            self.adjacency_list = adjacency_list
-        # Load from adjacency matrix
-        elif adjacency_matrix:
-            self.adjacency_matrix = adjacency_matrix
         else:
             print("TODO exception")
 
     @classmethod
-    def from_file(cls, filepath: str) -> 'Graph':
+    def from_file(cls, filepath: str) -> 'Gsquaresquareraph':
         """
         :param filepath: The file from which the graph sould be loaded
-        :return:  A new graph instance 
+        :return:  A new graph instance
         """
         return cls(filepath=filepath)
 
@@ -173,9 +167,9 @@ class Graph:
 
     @classmethod
     def from_adjacency_matrix(cls,  adjacency_matrix: AdjacencyMatrix) -> 'Graph':
-        """ 
+        """
         :param adjacency_matrix: The adj. matrix from which the graph sould be loaded
-        :return: A new graph instance 
+        :return: A new graph instance
         """
         return cls(adjacency_matrix=adjacency_matrix)
 

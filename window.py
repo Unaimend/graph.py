@@ -4,7 +4,7 @@ from tkinter import filedialog
 from tkinter import ttk
 
 from graphvisual import GraphVisual
-from Eades import Eades
+from eades import Eades
 import time
 
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
@@ -14,6 +14,11 @@ import time
 
 # TODO Pypy3 is kranker shit mal auseinandersettzen KRANK
 # TODO RESIZABLE
+# TODO Slices um das \n oder so loszuwerden beim den textfeldern(anber erst string.rstrip anschauen
+# TODO Ueberlegen ob ich die Alg. async mache
+# TODO Duck  Typing vs type hinting in python (Does type hinting eng(verhindern) duck typing)
+# TODO GUI option to start the algorithms and at leas tfor the eades a text entry(pop up) how opfen they want to start
+# TODO the algo
 # MUltishredding fuer die Algorithmen
 
 # Frozen binarie am Besten mit pypy3
@@ -217,9 +222,7 @@ class Window:
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Aktuellem Tab den Graphen zuweisen
-        current_tab.set_graph((Graph.from_file(width=Window.CANVAS_WIDTH,
-                                                     height=Window.CANVAS_HEIGHT,
-                                                     filepath=filepath)))
+        current_tab.set_graph((Graph.from_file(filepath=filepath)))
         # Aktuellem Tab die GraphVisuals zuweisen
         current_tab.set_graph_vis(GraphVisual.from_graph(
                                                      canvas=self.tabs[self.get_current_notebook_tab()].canvas,

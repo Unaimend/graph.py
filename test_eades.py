@@ -1,4 +1,4 @@
-from Eades import Eades
+from eades import Eades
 import unittest
 from graph import GraphNode
 import tkinter as tk
