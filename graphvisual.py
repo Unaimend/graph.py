@@ -7,8 +7,9 @@
 from graph import Graph, GraphEdge, GraphNode
 import random
 import tkinter as tk
+import math
 from typing import List
-
+from widgets import NodeInfo
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
 # TODO Wenn kraefte sehr klein sind = 0 setzen wegen floating point ungenauigkeit(gute idee?)
@@ -21,16 +22,16 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, canvas: tk.Canvas, width: int, height: int, graph: Graph):
+    def __init__(self, window, canvas: tk.Canvas, width: int, height: int, graph: Graph):
         """
         Ctor. for GraphVisual
-        
         :param canvas: The canvas on which the node should be drawn
         :param width: The width of the canvas
         :param height: The height of the canvas
         :param graph: The graph which should be drawn
         """
         self.canvas = canvas
+        self.window = window
         # Specifies the minimal distance two nodes are allowed to have
         # needed when user places nodes himself
         self.graphNodesMinDistance = 2 * GraphNode.graphNodeRadius
@@ -66,15 +67,25 @@ class GraphVisual:
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
+        self.current_selected_node = None
+        self.current_info = None
+
+        #print("Adjazenz Liste des Graphen in Integern")
+        #for x in self.graph.adjacency_list: print(x)
+        #print("Adjazenz auf Node Basis")
+        #for x in self.node_adjacency_list:
+        #    for y in x: print(y.id)
+
+
     @classmethod
-    def from_graph(cls, canvas: tk.Canvas, height: int=None, width: int=None, graph: Graph=None):
+    def from_graph(cls, window, canvas: tk.Canvas, height: int=None, width: int=None, graph: Graph=None):
         """
         :param canvas: The canvas on which the node should be drawn
         :param width: The width of the canvas
         :param heigth: The height of the canvas
         :param graph: The graph which should be drawn
         """
-        return cls(canvas=canvas, height=height, width=width, graph=graph)
+        return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
 
     def int_node_to_graph_node(self):
         """
@@ -85,7 +96,7 @@ class GraphVisual:
         for x in self.graph.adjacency_list:
             self.graphNodes.append(
                 GraphNode(self.canvas, random.randint(0, self.width),
-                          random.randint(0, self.height), self.drawNodeIds, self.nodeCounter))
+                          random.randint(0, self.height), self.drawNodeIds, self.nodeCounter, "black"))
             self.nodeCounter += 1
 
     def generate_adj_list(self):
@@ -119,7 +130,7 @@ class GraphVisual:
         # Redraw nodes with updated arguments
         for node in self.graphNodes:
             alternative_nodelist.append(GraphNode(self.canvas, node.position.x, node.position.y,
-                                                  self.drawNodeIds, node.id))
+                                                  self.drawNodeIds, node.id, node.colour))
         self.graphNodes = alternative_nodelist
 
     def generate_edges(self):
@@ -145,6 +156,8 @@ class GraphVisual:
         Text widget doesn't loose focus if another widget is clicked
         this function emulates this behaviour.
         """
+
+        print("Set focus got called")
         caller = event.widget
         caller.focus_set()
 
@@ -163,6 +176,37 @@ class GraphVisual:
             self.drawNodeIds = True
         else:
             self.drawNodeIds = False
+        self.redraw_graph()
+
+    def select_node(self, event):
+        x,y = event.x, event.y
+        print("x:", x,"y",y)
+        #(BUG) if list is empty
+        nearest_node = self.graphNodes[0]
+        for node in self.graphNodes:
+            x_offset = (nearest_node.position.x - x) ** 2
+            y_offset = (nearest_node.position.y - y) ** 2
+            current_smallest_dist = math.sqrt(x_offset + y_offset)
+            x_offset = (node.position.x - x) ** 2
+            y_offset = (node.position.y - y) ** 2
+            dist = math.sqrt(x_offset + y_offset)
+            if dist < current_smallest_dist:
+                nearest_node = node
+
+        if current_smallest_dist < 15:
+            nearest_node.colour = "red"
+            self.current_selected_node = nearest_node
+            self.current_info = NodeInfo(self.window, self.current_selected_node, self.node_adjacency_list[self.current_selected_node.id])
+            for node in self.graphNodes:
+                if node != self.current_selected_node:
+                    node.colour = "black"
+                    self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
+            self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="red")
+        else:
+            self.current_selected_node = None
+            for node in self.graphNodes:
+                node.colour = "black"
+                self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
         self.redraw_graph()
 
 

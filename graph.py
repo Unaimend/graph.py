@@ -25,6 +25,7 @@ AdjacencyMatrix = List[List[int]]
 # TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
 # TODO Natuerlich nur optional
 # TODO mit with  verpacken
+# TODO
 
 
 class GraphNode:
@@ -36,7 +37,7 @@ class GraphNode:
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
     # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int):
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour):
         """
         :param canvas: The canvas on which the node should be drawn
         :type x0: tk.Canvas
@@ -60,6 +61,8 @@ class GraphNode:
         self.canvas_id = 0
         #: Id to identify the text of this node
         self.canvas_text_id = "-1"
+
+        self.colour = colour
         """
         Boolean which determines if the node is represented through a black dot or
         through a circle with a number inside
@@ -72,7 +75,7 @@ class GraphNode:
                                                 self.position.y - self.graphNodeRadius / 1.5,
                                                 self.position.x + self.graphNodeRadius,
                                                 self.position.y + self.graphNodeRadius, fill="white")
-            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id)
+            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id, fill = self.colour)
         else:
             self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
                                                 self.position.y - self.graphNodeRadius / 1.5,
@@ -96,7 +99,7 @@ class GraphNode:
     def move(self, x: float, y: float):
         """
         NOTE: Does not change the position on the canvas, a redraw must be called to do that
-        :param x: The x-offset which should be added 
+        :param x: The x-offset which should be added
         :param y: The y-offset which should be added
         :return:
         """
@@ -110,6 +113,9 @@ class GraphNode:
         #                                         self.position.x + self.graphNodeRadius,
         #                                         self.position.y + self.graphNodeRadius)
         # self.canvas.coords(self.canvas_text_id)
+
+    def __str__(self):
+        return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
 
 
 class Graph:

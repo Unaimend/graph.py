@@ -1,8 +1,8 @@
-from graph import Graph
+from graph import Graph, GraphNode
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
-
+from widgets import OpenGraphDialog, NoteBookTab, NodeInfo, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
 import time
@@ -23,85 +23,6 @@ import time
 
 # Frozen binarie am Besten mit pypy3
 # Control statt Cmd verwenden
-
-
-class OpenGraphDialog:
-    def __init__(self, root):
-        self.filename = "test"
-        self.eades = tk.BooleanVar()
-
-        self.root = root
-        self.window = tk.Toplevel(self.root)
-        self.window.wm_title("Open new graph")
-
-        # self.open_new_graph_but = tk.Button(self.window, text="Open...", command=self.open_graph)
-        # self.open_new_graph_but.pack()
-
-        self.open_graph()
-        # TODO Seed auswahl fuer den RNG
-        # TODO Show menue on if graph in none empty
-
-    def open_graph(self):
-        var = tk.IntVar()
-        self.filename = filedialog.askopenfilename(title="Select file",
-                                                   filetypes=(("graph files", "*.json"), ("all files", "*.*")))
-        button = tk.Button(self.window, text="Ok", command=lambda: var.set(1))
-        button.pack()
-        label = tk.Label(self.window, text="Which layouting algorithm do you want to use")
-        label.pack()
-        # TODO Combobox statt Checkbutton oder Radiobuttons
-        c = tk.Checkbutton(self.window, text="eades", variable=self.eades, onvalue=True, offvalue=False)
-        c.pack()
-        button.wait_variable(var)
-        self.window.destroy()
-
-
-class NoteBookTab:
-    def __init__(self, canvas, graph, graph_vis):
-        self.canvas = canvas
-        self.graph = graph
-        self.graph_vis = graph_vis
-        # TODO Dynamisch statt hardcoded
-        self.original_canvas_width = 1414
-
-    def set_graph(self, graph):
-        self.graph = graph
-
-    def set_graph_vis(self, graph_vis):
-        self.graph_vis = graph_vis
-
-
-class InfoMenu(tk.Frame):
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.parent = parent
-        self.label = []
-        self.label_val = []
-        self.row_ctr = 0
-        self.parent.bind("<Command-l>", self.print)
-        self.visible = True
-
-    def add_label(self, text=""):
-        label = tk.Label(self, text=text, anchor=tk.W)
-        label.grid(row=self.row_ctr, column=0)
-        self.label.append(label)
-        label_val = tk.Label(self, text=str(self.row_ctr * 100), anchor=tk.E)
-        label_val.grid(row=self.row_ctr, column=1)
-        self.label_val.append(label_val)
-
-        self.row_ctr += 1
-
-    def toggle(self):
-        if self.visible:
-            self.visible = False
-            self.grid_remove()
-        else:
-            self.visible = True
-            self.grid()
-
-    def print(self, event=None):
-        print("TEST")
-
 
 class Window:
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
@@ -205,6 +126,9 @@ class Window:
         self.info_menu.add_label("Länge")
         self.info_menu.label_val[1]["text"] = "0"
 
+        self.info_menu.add_label("Eigenschaft 2")
+        self.info_menu.label_val[2]["text"] = "True"
+
     def toggle_info_menu(self, event=None):
         new_width = 0
         self.info_menu.toggle()
@@ -225,6 +149,7 @@ class Window:
         current_tab.set_graph((Graph.from_file(filepath=filepath)))
         # Aktuellem Tab die GraphVisuals zuweisen
         current_tab.set_graph_vis(GraphVisual.from_graph(
+                                                     window = self.root,
                                                      canvas=self.tabs[self.get_current_notebook_tab()].canvas,
                                                      width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
                                                      graph=self.tabs[self.get_current_notebook_tab()].graph))
@@ -234,16 +159,23 @@ class Window:
         current_tab.canvas.bind("<Command-g>", current_tab.graph_vis.change_node_look)
         current_tab.canvas.bind("<Command-c>", current_tab.graph_vis.redraw_graph)
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.set_focus)
+        #add="+" sorgt dafuer das die vorherige Funktion die auf der Tasten liegt nicht ueberschrieben wird
+        current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.select_node, add="+")
 
         self.del_eades_constant_widgets()
         # Show eades constant choices only if user selected eades as algorithm
+        #----------------------------------This is the the only part that should change when usign another algorithm------------------------------------------------------
         if Window.EADES:
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
             current_tab.canvas.bind("<Control-s>", self.do_eades_new)
             self.init_eades_constant_widgets()
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
+        #---------------------------------------------------------------------------------------------
 
+
+
+        #-----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event="nothing"):
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
@@ -324,13 +256,5 @@ class Window:
         self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
         self.t4.insert(tk.END, Eades.c4)
+#----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
 
-
-
-
-  # style = ttk.Style()
-        # style.theme_create("MyStyle", parent="alt", settings={
-        #     "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
-        #     "TNotebook.Tab": {"configure": {"padding": [0, 0]}, }})
-        #
-        # style.theme_use("MyStyle")
