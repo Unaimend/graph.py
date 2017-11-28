@@ -27,6 +27,7 @@ AdjacencyMatrix = List[List[int]]
 # TODO mit with  verpacken
 # TODO
 
+# BUG Die letzte Node is nicht auswaehlebar
 
 class GraphNode:
     """
@@ -36,16 +37,12 @@ class GraphNode:
     graphNodeRadius = 12
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
     # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
+    # TODO Die y-scrollbar wird nicht angezeigt
 
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour):
         """
         :param canvas: The canvas on which the node should be drawn
-        :type x0: tk.Canvas
-        :param x:  The x-position on which the node should be drawn
-        :type x: float
-        :param y:  The y-position on which the node should be drawn
-        :type y: float
-        :param draw_ids: Whether to draw ids or not
+        :type x0: tk.Canvadraw_ids: Whether to draw ids or not
         :type draw_ids: bool
         :param id: The id which should be drawn in node
         :type id: int
@@ -70,17 +67,20 @@ class GraphNode:
         self.draw_ids = draw_ids
 
         # TODO Magic number ersetzen
+
+        left_corner  = self.position -  Vector(self.graphNodeRadius/1.5, self.graphNodeRadius / 1.5)
+        right_corner  = self.position +  Vector(self.graphNodeRadius, self.graphNodeRadius)
         if draw_ids:
-            self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
-                                                self.position.y - self.graphNodeRadius / 1.5,
-                                                self.position.x + self.graphNodeRadius,
-                                                self.position.y + self.graphNodeRadius, fill="white")
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="white")
             self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id, fill = self.colour)
         else:
-            self.canvas_id = canvas.create_oval(self.position.x - self.graphNodeRadius / 1.5,
-                                                self.position.y - self.graphNodeRadius / 1.5,
-                                                self.position.x + self.graphNodeRadius,
-                                                self.position.y + self.graphNodeRadius, fill="black")
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="black")
 
     def move_old(self, x: float, y: float):
         """
