@@ -79,16 +79,16 @@ class Window:
 
         # View menu
         self.viewmenu = tk.Menu(self.menubar, tearoff=0)
-        self.viewmenu.add_command(label="Toggle ids         (g)")
-        self.viewmenu.add_command(label="Clear canvas       (c)")
-        self.viewmenu.add_command(label="Toggle Info Menue  (CMD+B)", command=self.toggle_info_menu)
+        self.viewmenu.add_command(label="Toggle ids         (Strg+g)")
+        self.viewmenu.add_command(label="Clear canvas       (Strg+c)")
+        self.viewmenu.add_command(label="Toggle Info Menue  (Strg+b)", command=self.toggle_info_menu)
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
 
         self.nb.grid(column=1, row=0, sticky=tk.E)
         # Add shortcuts
-        self.root.bind("<Command-n>", self.open_new_graph)
-        self.root.bind("<Command-t>", self.add_canvas)
-        self.root.bind("<Command-b>", self.toggle_info_menu)
+        self.root.bind("<Control-n>", self.open_new_graph)
+        self.root.bind("<Control-t>", self.add_canvas)
+        self.root.bind("<Control-b>", self.toggle_info_menu)
 
         # self.root.bind_all('<MouseWheel>', lambda x: print("oben") )
         # self.root.bind_all('<Shift-MouseWheel>', lambda x: print("links"))
@@ -156,8 +156,8 @@ class Window:
 
         # Bind actions to the last added graph_vis
         # TODO Control-w to close tab
-        current_tab.canvas.bind("<Command-g>", current_tab.graph_vis.change_node_look)
-        current_tab.canvas.bind("<Command-c>", current_tab.graph_vis.redraw_graph)
+        current_tab.canvas.bind("<Control-g>", current_tab.graph_vis.change_node_look)
+        current_tab.canvas.bind("<Control-c>", current_tab.graph_vis.redraw_graph)
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.set_focus)
         #add="+" sorgt dafuer das die vorherige Funktion die auf der Tasten liegt nicht ueberschrieben wird
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.select_node, add="+")
