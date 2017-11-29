@@ -221,7 +221,7 @@ class GraphEdge:
         :type start_node:   GraphNode
         :param end_node:    The node where the edge should start
         :type end_node:     GraphNode
-        :return: 
+        :return:
         """
         return cls(canvas=canvas, x0=start_node.position.x,
                    y0=start_node.position.y, xn=end_node.position.x, yn=end_node.position.y)
