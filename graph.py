@@ -156,7 +156,7 @@ class Graph:
             print("TODO exception")
 
     @classmethod
-    def from_file(cls, filepath: str) -> 'Gsquaresquareraph':
+    def from_file(cls, filepath: str) -> 'Graph':
         """
         :param filepath: The file from which the graph sould be loaded
         :return:  A new graph instance
@@ -186,7 +186,7 @@ class Graph:
         """
         return self.adjacency_list[node.id]
 
-
+# DAs wuerde die berechnung der repulsive_forces enorm beschleunigen
 # TODO Edges sollte wissen zu wem sie inzident sind(Sollten sie das?)
 class GraphEdge:
     """
