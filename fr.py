@@ -33,16 +33,28 @@ class Fruchterman_Reingold:
            raise ValueError("Area and k must be precalculated")
         else:
             return (z ** 2)/ k
+    def fa(z):
+        if k == None:
+           raise ValueError("Area and k must be precalculated")
+        else:
+            return (k ** 2)/z
 
-    def calc_attractive_forces
-    # Diese MEthode berechnet die abstossenden Kraefte
-    dispalcement_list = [len(Fruchterman_Reingold.graph_visuals.graphNodes)]
-    #BUG  Ist diese Liste hier moeglicherweise mit nicht nullwerete gefuellt was den algo. kaputmacht
-    for node in Fruchterman_Reingold.graph_visuals.graphNodes:
-        for nodes in Fruchterman_Reingold.graph_visuals.graphNodes:
-            if node.id != nodes.id:
-                diff = node - nodes
-                diff_length = math.sqrt(diff.x ** 2 + diff.y ** 2)
-                dispalcement_list[node.id] = dispalcement_list[node.id] + diff.to_unit() * fr(diff_length)
+
+
+
+    def calc_attractive_forces:
+
+        #TODO WIe sorgge ich dafuer das die dispalcement lsite hier garantiert lange genug ist
+        # Diese MEthode berechnet die abstossenden Kraefte
+        #BUG  Ist diese Liste hier moeglicherweise mit nicht nullwerete gefuellt was den algo. kaputmacht
+        for node in Fruchterman_Reingold.graph_visuals.graphNodes:
+            for nodes in Fruchterman_Reingold.graph_visuals.graphNodes:
+                if node.id != nodes.id:
+                    diff = node - nodes
+                    diff_length = math.sqrt(diff.x ** 2 + diff.y ** 2)
+                    dispalcement_list[node.id] = dispalcement_list[node.id] + diff.to_unit() * fr(diff_length)
+
+
+
 
 
