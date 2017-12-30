@@ -11,6 +11,14 @@ class Vector:
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
 
-    def to_unit():
-        norm = math.sqrt(x ** 2 + y ** 2)
-        return Vector(x * norm, y * norm)
+
+
+    def to_unit(self):
+        norm = math.sqrt(self.x ** 2 + self.y ** 2)
+        return Vector(self.x / norm, self.y / norm)
+
+    def abs(self):
+        return math.sqrt(self.x ** 2 + self.y ** 2)
+
+    def __repr__(self):
+        return "x:" + str(self.x) + "y:" + str(self.y)

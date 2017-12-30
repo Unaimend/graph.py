@@ -192,7 +192,7 @@ class GraphEdge:
     """
     The class reprents a graph edge
     """
-    def __init__(self, canvas: tk.Canvas, x0: float, y0: float, xn: float, yn: float):
+    def __init__(self, canvas: tk.Canvas, start_node, end_node):
         """
         :param canvas: The canvas on which the edge should be drawn
         :type canvas: tk.Canvas
@@ -205,10 +205,12 @@ class GraphEdge:
         :param yn: The end on the y coordinate
         :type xn float
         """
+        self.start_node = start_node
+        self.end_node = end_node
         # Start der Kanten
-        self.start = Vector(x0, y0)
+        self.start = Vector(start_node.position.x, start_node.position.y)
         # Ende der Kanten
-        self.end = Vector(xn, yn)
+        self.end = Vector(end_node.position.x, end_node.position.y)
         # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
@@ -223,7 +225,6 @@ class GraphEdge:
         :type end_node:     GraphNode
         :return:
         """
-        return cls(canvas=canvas, x0=start_node.position.x,
-                   y0=start_node.position.y, xn=end_node.position.x, yn=end_node.position.y)
+        return cls(canvas=canvas, start_node=start_node, end_node=end_node)
 
 

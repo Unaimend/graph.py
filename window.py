@@ -5,7 +5,10 @@ from tkinter import ttk
 from widgets import OpenGraphDialog, NoteBookTab, NodeInfo, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
+from fr import FruchtermanReingold
 import time
+import math
+from vector import Vector
 
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Bind mac touchbad to scrollbars
@@ -31,6 +34,8 @@ class Window:
     # TODO In graph_visuals auslagern da dies jetzt pro tab also pro graph_visuals gespeichert werden muss
     # TODO Jeder Tab hat ja die moeglichkeit einen anderen Algorithmus zu verwenden
     EADES = False
+    FRUCHTERMAN_REINGOLD = False
+
     def __init__(self, root):
         self.root = root
         # Four textboxes and labels for the eades constants
@@ -114,6 +119,7 @@ class Window:
     def open_new_graph(self, event="nothing"):
         current_instance = OpenGraphDialog(self.root)
         Window.EADES = current_instance.eades.get()
+        Window.FRUCHTERMAN_REINGOLD = current_instance.fruchterman_reingold.get()
         self.load_graph(current_instance.filename)
 
     def add_info_menu(self):
@@ -169,9 +175,57 @@ class Window:
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
             current_tab.canvas.bind("<Control-s>", self.do_eades_new)
             self.init_eades_constant_widgets()
+        if Window.FRUCHTERMAN_REINGOLD:
+            current_tab.canvas.bind("<Control-s>", self.do_fruchterman_reingold)
+
+
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
         #---------------------------------------------------------------------------------------------
+
+
+    def do_fruchterman_reingold(self, event="nothing"):
+        # Herausfinden in welchem Tab man sich befindet
+        current_tab = self.tabs[self.get_current_notebook_tab()]
+        # Graphen auf dem gearbeitet wird zuweisen
+        FruchtermanReingold.graph_visuals = current_tab.graph_vis
+
+        FruchtermanReingold.area = Window.CANVAS_HEIGHT * Window.CANVAS_WIDTH
+
+        FruchtermanReingold.k = math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
+
+        # print("COUNTER", FruchtermanReingold.graph_visuals.nodeCounter)
+        #TODO BUGGY AS FUCK
+
+        # print("LENGTH1", len(FruchtermanReingold.displacement_list))
+        FruchtermanReingold.t = 100
+        for x in range(0, 100):
+            FruchtermanReingold.displacement_list = [Vector(0, 0), Vector(0, 0), Vector(0, 0), Vector(0, 0),
+                                                     Vector(0, 0), Vector(0, 0)]
+            FruchtermanReingold.calc_attractive_forces()
+            # print("DISP LIST1", FruchtermanReingold.displacement_list, "DISP LIST LENGTH", len(FruchtermanReingold.displacement_list))
+            FruchtermanReingold.calc_repelling_forces()
+            # print("DISP LIST2", FruchtermanReingold.displacement_list, "DISP LIST LENGTH", len(FruchtermanReingold.displacement_list) )
+
+            i = 0
+            for disp in FruchtermanReingold.displacement_list:
+                v = min(disp.abs(), FruchtermanReingold.t)
+                print("V", v)
+                direction = Vector(disp.to_unit().x * v, disp.to_unit().y * v )
+                FruchtermanReingold.graph_visuals.graphNodes[i].move(direction.x, direction.y)
+                i = i + 1
+            FruchtermanReingold.cool()
+            for y in FruchtermanReingold.displacement_list:
+                print(y.x, "----", y.y)
+
+
+
+        current_tab.graph_vis.redraw_nodes()
+
+        # Update adjacency list
+        current_tab.graph_vis.generate_adj_list()
+        # Update edges between nodes
+        current_tab.graph_vis.generate_edges()
 
 
 
@@ -181,6 +235,8 @@ class Window:
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
         Eades.graph_visuals = current_tab.graph_vis
+
+
 
         text = str()
 

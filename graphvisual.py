@@ -149,6 +149,11 @@ class GraphVisual:
                 # Draw an edge between two nodes
                 edge = GraphEdge.from_nodes(canvas=self.canvas, start_node=node, end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
+                # TODO Ich haette gerne jede Kante nur einmal in der Liste, da ich micht nicht sicher bin
+                # TODO welche Auswirkungen das auf den Algorithmus von Fruchterman-Reingold hat
+                # TODO aber es muesste mathematisch korrekt sein das jede Kante 2mal vorkomment
+                # TODO da sie ja eig. versch. Kanten darstellen
+
                 self.graphEdges.append(edge)
 
     def set_focus(self, event):

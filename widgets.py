@@ -8,6 +8,7 @@ class OpenGraphDialog:
     def __init__(self, root):
         self.filename = "test"
         self.eades = tk.BooleanVar()
+        self.fruchterman_reingold = tk.BooleanVar()
 
         self.root = root
         self.window = tk.Toplevel(self.root)
@@ -31,6 +32,8 @@ class OpenGraphDialog:
         # TODO Combobox statt Checkbutton oder Radiobuttons
         c = tk.Checkbutton(self.window, text="eades", variable=self.eades, onvalue=True, offvalue=False)
         c.pack()
+        c1 = tk.Checkbutton(self.window, text="Fruchterman-Reingold", variable=self.fruchterman_reingold, onvalue=True, offvalue=False)
+        c1.pack()
         button.wait_variable(var)
         self.window.destroy()
 
