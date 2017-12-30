@@ -187,6 +187,7 @@ class GraphVisual:
         x,y = event.x, event.y
         print("x:", x,"y",y)
         #(BUG) if list is empty
+        # BUG Man kann die letzte Note nicht anwaehlen
         nearest_node = self.graphNodes[0]
         for node in self.graphNodes:
             x_offset = (nearest_node.position.x - x) ** 2
@@ -212,7 +213,6 @@ class GraphVisual:
             for node in self.graphNodes:
                 node.colour = "black"
                 self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
-        self.redraw_graph()
 
 
         # def clear_graph(self, event="nothing"):
