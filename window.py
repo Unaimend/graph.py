@@ -1,13 +1,11 @@
 from graph import Graph, GraphNode
 import tkinter as tk
-from tkinter import filedialog
 from tkinter import ttk
 from widgets import OpenGraphDialog, NoteBookTab, NodeInfo, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
 from fr import FruchtermanReingold
 import time
-import math
 from vector import Vector
 
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
@@ -22,7 +20,9 @@ from vector import Vector
 # TODO Duck  Typing vs type hinting in python (Does type hinting eng(verhindern) duck typing)
 # TODO GUI option to start the algorithms and at leas tfor the eades a text entry(pop up) how opfen they want to start
 # TODO the algo
-
+# TODO DIe Widgets werden nicht wieder angezeigt von eades
+# SOL Jedem Tab mitgeben welchen algo er verwendet und bei wechsel checken ob eades falls ja dann
+# Widgets init.
 # BUG Die Scrollbars scrollen alle nur den ersten Tab und nicht den zz. ausgewaelten
 # MUltishredding fuer die Algorithmen
 
@@ -66,7 +66,6 @@ class Window:
         self.yscrollbar = tk.Scrollbar(self.root, orient=tk.VERTICAL)
         self.yscrollbar.grid(column=2, row=0, sticky=tk.S + tk.N, rowspan=1)
 
-
         self.add_canvas()
         self.add_info_menu()
         self.xscrollbar.config(command=self.tabs[0].canvas.xview)
@@ -102,11 +101,6 @@ class Window:
 
     def get_current_notebook_tab(self, event=None):
         return self.nb.index("current")
-
-
-    def renew_info_menu_data(self, event=None):
-        self.toggle_info_menu()
-        self.toggle_info_menu()
 
     def add_canvas(self, event=None):
         # Anzahl der Tabs herausfinden
@@ -153,6 +147,7 @@ class Window:
         if self.info_menu.visible:
             new_width = self.tabs[self.get_current_notebook_tab()].original_canvas_width
             try:
+                # HIER KOMMEN DIE ZUWEISUNGEN FUER DATEN DES INFO MENUES HIN
                 self.info_menu.label_val[1]["text"] = str(self.tabs[self.get_current_notebook_tab()].graph.vertice_count)
             except AttributeError:
                 self.info_menu.label_val[1]["text"] = ""
@@ -161,6 +156,10 @@ class Window:
             new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab()].canvas.winfo_width() - 28
 
         self.tabs[self.get_current_notebook_tab()].canvas.configure(width=new_width)
+
+    def renew_info_menu_data(self, event=None):
+        self.toggle_info_menu()
+        self.toggle_info_menu()
 
     def load_graph(self, filepath):
         print("Loading graph...")
@@ -180,19 +179,18 @@ class Window:
         current_tab.canvas.bind("<Control-g>", current_tab.graph_vis.change_node_look)
         current_tab.canvas.bind("<Control-c>", current_tab.graph_vis.redraw_graph)
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.set_focus)
-        #add="+" sorgt dafuer das die vorherige Funktion die auf der Tasten liegt nicht ueberschrieben wird
+        # add="+" sorgt dafuer das die vorherige Funktion die auf der Tasten liegt nicht ueberschrieben wird
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.select_node, add="+")
 
         self.del_eades_constant_widgets()
         # Show eades constant choices only if user selected eades as algorithm
-        #----------------------------------This is the the only part that should change when usign another algorithm------------------------------------------------------
+        # ----------------------------------This is the the only part that should change when usign another algorithm------------------------------------------------------
         if Window.EADES:
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
             current_tab.canvas.bind("<Control-s>", self.do_eades_new)
             self.init_eades_constant_widgets()
         if Window.FRUCHTERMAN_REINGOLD:
             current_tab.canvas.bind("<Control-s>", self.do_fruchterman_reingold)
-
 
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
@@ -208,17 +206,14 @@ class Window:
         # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
         FruchtermanReingold.k = 50
         # print("COUNTER", FruchtermanReingold.graph_visuals.nodeCounter)
-        #TODO BUGGY AS FUCK
-
         # print("LENGTH1", len(FruchtermanReingold.displacement_list))
         FruchtermanReingold.t = 100
+        start = time.time()
         for x in range(0, 100):
             FruchtermanReingold.displacement_list = [Vector(0, 0)] * FruchtermanReingold.graph_visuals.nodeCounter
             FruchtermanReingold.calc_attractive_forces()
-            # print("DISP LIST1", FruchtermanReingold.displacement_list, "DISP LIST LENGTH", len(FruchtermanReingold.displacement_list))
-            FruchtermanReingold.calc_repelling_forces()
-            # print("DISP LIST2", FruchtermanReingold.displacement_list, "DISP LIST LENGTH", len(FruchtermanReingold.displacement_list) )
 
+            FruchtermanReingold.calc_repelling_forces()
             i = 0
             for disp in FruchtermanReingold.displacement_list:
                 v = min(disp.abs(), FruchtermanReingold.t)
@@ -227,8 +222,9 @@ class Window:
                 FruchtermanReingold.graph_visuals.graphNodes[i].move(direction.x, direction.y)
                 i = i + 1
             FruchtermanReingold.cool()
-            for y in FruchtermanReingold.displacement_list:
-                print(y.x, "----", y.y)
+            end = time.time()
+        print("Elapsed Time", end - start)
+
 
         current_tab.graph_vis.redraw_nodes()
 
@@ -239,7 +235,7 @@ class Window:
 
 
 
-    #-----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
+    # -----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event="nothing"):
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
@@ -267,10 +263,10 @@ class Window:
             Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
             Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
         end = time.time()
-
+        print("Elapsed Time", end - start)
         # Update positions
         current_tab.graph_vis.redraw_nodes()
-        print("Elapsed Time", end - start)
+
         # Update adjacency list
         current_tab.graph_vis.generate_adj_list()
         # Update edges between nodes

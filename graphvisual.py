@@ -153,11 +153,10 @@ class GraphVisual:
                 # TODO welche Auswirkungen das auf den Algorithmus von Fruchterman-Reingold hat
                 # TODO aber es muesste mathematisch korrekt sein das jede Kante 2mal vorkomment
                 # TODO da sie ja eig. versch. Kanten darstellen
-
                 self.graphEdges.append(edge)
 
-
-    def set_focus(self, event = None):
+    @staticmethod
+    def set_focus(event=None):
         """
         Text widget doesn't loose focus if another widget is clicked
         this function emulates this behaviour.
@@ -176,7 +175,7 @@ class GraphVisual:
         self.generate_edges()
 
     def change_node_look(self, event=None):
-        """Toggles the node look from black dots to whtie circles white text inside"""
+        """Toggles the node look from black dots to white circles white text inside and the other way around"""
         if not self.drawNodeIds:
             self.drawNodeIds = True
         else:
@@ -184,10 +183,11 @@ class GraphVisual:
         self.redraw_graph()
 
     def select_node(self, event):
+        """Selects a node and opens a window with important informatoion about the selected node"""
         x, y = event.x, event.y
-        print("x:", x, "y", y)
-        #(BUG) if list is empty
-        # BUG Man kann die letzte Note nicht anwaehlen
+        # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
+        current_smallest_dist = 16
+
         nearest_node = self.graphNodes[0]
 
         for node in self.graphNodes:
@@ -201,17 +201,21 @@ class GraphVisual:
                 nearest_node = node
                 current_smallest_dist = dist
 
-        # (BUG)
         if current_smallest_dist < 15:
+            # Node die ausgewaehlt wurde rot farben
+            self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="red")
             nearest_node.colour = "red"
+
             self.current_selected_node = nearest_node
+            # Infofenster erstellen und oeffnen
             self.current_info = NodeInfo(self.window, self.current_selected_node, self.node_adjacency_list[self.current_selected_node.id])
             for node in self.graphNodes:
+                # Alle nodes die nicht ausgeaehlt wurden schwarz faerben
                 if node != self.current_selected_node:
                     node.colour = "black"
                     self.canvas.itemconfigure(node.canvas_text_id, fill="black")
-            self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="red")
         else:
+            # Falls keine Node ausgewaehlt wurde sollen alle Nodes schwarz sein
             self.current_selected_node = None
             for node in self.graphNodes:
                 node.colour = "black"

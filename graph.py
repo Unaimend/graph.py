@@ -11,7 +11,7 @@ import tkinter as tk
 
 
 
-#typedefs
+# typedefs
 AdjacencyList = List[List[int]]
 AdjacencyListEntry = List[int]
 AdjacencyMatrix = List[List[int]]
@@ -68,8 +68,8 @@ class GraphNode:
 
         # TODO Magic number ersetzen
 
-        left_corner  = self.position -  Vector(self.graphNodeRadius/1.5, self.graphNodeRadius / 1.5)
-        right_corner  = self.position +  Vector(self.graphNodeRadius, self.graphNodeRadius)
+        left_corner = self.position - Vector(self.graphNodeRadius/1.5, self.graphNodeRadius / 1.5)
+        right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
         if draw_ids:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
@@ -140,7 +140,7 @@ class Graph:
         self.vertice_count = None
 
         # Load from a file
-        #https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
+        # https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
         if filepath:
             print("Loading from " + filepath)
             # Get file descriptor

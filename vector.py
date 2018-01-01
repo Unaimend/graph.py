@@ -5,17 +5,17 @@ class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
 
-
-
     def to_unit(self):
         norm = math.sqrt(self.x ** 2 + self.y ** 2)
-        return Vector(self.x / norm, self.y / norm)
+        a = Vector(self.x / norm, self.y / norm)
+        return a
 
     def abs(self):
         return math.sqrt(self.x ** 2 + self.y ** 2)

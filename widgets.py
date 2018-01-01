@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 
+
 class OpenGraphDialog:
     def __init__(self, root):
         self.filename = "test"
@@ -39,7 +40,7 @@ class OpenGraphDialog:
 
 
 class NoteBookTab:
-    def __init__(self, canvas, graph, graph_vis):
+    def __init__(self, canvas, graph, graph_vis ):
         self.canvas = canvas
         self.graph = graph
         self.graph_vis = graph_vis
@@ -85,21 +86,21 @@ class InfoMenu(tk.Frame):
         print("TEST")
 
 
-class NodeInfo():
+class NodeInfo:
     def __init__(self,root,node: GraphNode, adjacent_nodes: List[GraphNode]):
         self.root = root
         self.window = tk.Toplevel(self.root)
-        #Sorgt dafuer das die Info Fenster nicht durch das "Main"-Fenster verdeckt
+        # Sorgt dafuer das die Info Fenster nicht durch das "Main"-Fenster verdeckt
         self.window.attributes("-topmost", True)
         self.info_menu = InfoMenu(self.window)
         self.info_menu.pack()
         self.info_menu.add_label("Id")
-        self.info_menu.label_val[0]["text"] =  str(node.id)
+        self.info_menu.label_val[0]["text"] =  str(node.id )
         self.info_menu.add_label("Position")
         self.info_menu.label_val[1]["text"] = "x:" + str(node.position.x) + " y: " + str(node.position.y)
 
         adjacent_nodes_text = ""
-        for x in adjacent_nodes: adjacent_nodes_text += (" " + str(x.id+1))
+        for x in adjacent_nodes: adjacent_nodes_text += (" " + str(x.id))
 
         self.info_menu.add_label("Adj. Nodes")
         self.info_menu.label_val[2]["text"] =  adjacent_nodes_text
