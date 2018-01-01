@@ -22,10 +22,12 @@ from vector import Vector
 # TODO Duck  Typing vs type hinting in python (Does type hinting eng(verhindern) duck typing)
 # TODO GUI option to start the algorithms and at leas tfor the eades a text entry(pop up) how opfen they want to start
 # TODO the algo
+
+# BUG Die Scrollbars scrollen alle nur den ersten Tab und nicht den zz. ausgewaelten
 # MUltishredding fuer die Algorithmen
 
 # Frozen binarie am Besten mit pypy3
-# Control statt Cmd verwenden
+
 
 class Window:
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
@@ -53,8 +55,6 @@ class Window:
         # Init. canvas
         self.tabs = {}
 
-
-
         self.nb = ttk.Notebook(self.root)
 
         self.menubar = tk.Menu(self.root)
@@ -66,9 +66,9 @@ class Window:
         self.yscrollbar = tk.Scrollbar(self.root, orient=tk.VERTICAL)
         self.yscrollbar.grid(column=2, row=0, sticky=tk.S + tk.N, rowspan=1)
 
-        self.add_info_menu()
-        self.add_canvas()
 
+        self.add_canvas()
+        self.add_info_menu()
         self.xscrollbar.config(command=self.tabs[0].canvas.xview)
         self.yscrollbar.config(command=self.tabs[0].canvas.yview)
         # File menu
@@ -95,11 +95,18 @@ class Window:
         self.root.bind("<Control-t>", self.add_canvas)
         self.root.bind("<Control-b>", self.toggle_info_menu)
 
+        self.nb.bind("<<NotebookTabChanged>>", self.renew_info_menu_data)
+
         # self.root.bind_all('<MouseWheel>', lambda x: print("oben") )
         # self.root.bind_all('<Shift-MouseWheel>', lambda x: print("links"))
 
     def get_current_notebook_tab(self, event=None):
         return self.nb.index("current")
+
+
+    def renew_info_menu_data(self, event=None):
+        self.toggle_info_menu()
+        self.toggle_info_menu()
 
     def add_canvas(self, event=None):
         # Anzahl der Tabs herausfinden
@@ -112,6 +119,7 @@ class Window:
                                                   yscrollcommand=self.yscrollbar.set), None, None))
         # Erstellten Tab zum Canvas hizufuegen
         self.nb.add(self.tabs[index].canvas,  text="Canvas " + str(index))
+        # Damit die Daten aktualisiert werden
 
     def run(self):
         self.root.mainloop()
@@ -121,6 +129,8 @@ class Window:
         Window.EADES = current_instance.eades.get()
         Window.FRUCHTERMAN_REINGOLD = current_instance.fruchterman_reingold.get()
         self.load_graph(current_instance.filename)
+        self.toggle_info_menu()
+        self.toggle_info_menu()
 
     def add_info_menu(self):
         """In dieser Methoden koennen dem Info Menu widgets hinzugefuegt werden"""
@@ -129,8 +139,8 @@ class Window:
 
         self.info_menu.add_label("Zusammenhängend")
         self.info_menu.label_val[0]["text"] = "----"
-        self.info_menu.add_label("Länge")
-        self.info_menu.label_val[1]["text"] = "0"
+        self.info_menu.add_label("Anzahl der Knoten")
+        self.info_menu.label_val[1]["text"] = ""
 
         self.info_menu.add_label("Eigenschaft 2")
         self.info_menu.label_val[2]["text"] = "True"
@@ -138,9 +148,14 @@ class Window:
     def toggle_info_menu(self, event=None):
         new_width = 0
         self.info_menu.toggle()
+
         # Neue Breite berechnen(abhaengig davon ob das info_menu zu sehen ist oder nicht)
         if self.info_menu.visible:
             new_width = self.tabs[self.get_current_notebook_tab()].original_canvas_width
+            try:
+                self.info_menu.label_val[1]["text"] = str(self.tabs[self.get_current_notebook_tab()].graph.vertice_count)
+            except AttributeError:
+                self.info_menu.label_val[1]["text"] = ""
         else:
             # Magic 28 sorgt dafuer das canvas nicht an Breite waechst
             new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab()].canvas.winfo_width() - 28
@@ -181,8 +196,7 @@ class Window:
 
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
-        #---------------------------------------------------------------------------------------------
-
+        # ---------------------------------------------------------------------------------------------
 
     def do_fruchterman_reingold(self, event="nothing"):
         # Herausfinden in welchem Tab man sich befindet
@@ -191,17 +205,15 @@ class Window:
         FruchtermanReingold.graph_visuals = current_tab.graph_vis
 
         FruchtermanReingold.area = Window.CANVAS_HEIGHT * Window.CANVAS_WIDTH
-
-        FruchtermanReingold.k = math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
-
+        # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
+        FruchtermanReingold.k = 50
         # print("COUNTER", FruchtermanReingold.graph_visuals.nodeCounter)
         #TODO BUGGY AS FUCK
 
         # print("LENGTH1", len(FruchtermanReingold.displacement_list))
         FruchtermanReingold.t = 100
         for x in range(0, 100):
-            FruchtermanReingold.displacement_list = [Vector(0, 0), Vector(0, 0), Vector(0, 0), Vector(0, 0),
-                                                     Vector(0, 0), Vector(0, 0)]
+            FruchtermanReingold.displacement_list = [Vector(0, 0)] * FruchtermanReingold.graph_visuals.nodeCounter
             FruchtermanReingold.calc_attractive_forces()
             # print("DISP LIST1", FruchtermanReingold.displacement_list, "DISP LIST LENGTH", len(FruchtermanReingold.displacement_list))
             FruchtermanReingold.calc_repelling_forces()
@@ -218,8 +230,6 @@ class Window:
             for y in FruchtermanReingold.displacement_list:
                 print(y.x, "----", y.y)
 
-
-
         current_tab.graph_vis.redraw_nodes()
 
         # Update adjacency list
@@ -229,14 +239,12 @@ class Window:
 
 
 
-        #-----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
+    #-----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event="nothing"):
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
         Eades.graph_visuals = current_tab.graph_vis
-
-
 
         text = str()
 
