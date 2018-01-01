@@ -209,7 +209,7 @@ class GraphVisual:
             for node in self.graphNodes:
                 if node != self.current_selected_node:
                     node.colour = "black"
-                    self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
+                    self.canvas.itemconfigure(node.canvas_text_id, fill="black")
             self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="red")
         else:
             self.current_selected_node = None
