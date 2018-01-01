@@ -156,12 +156,12 @@ class GraphVisual:
 
                 self.graphEdges.append(edge)
 
-    def set_focus(self, event):
+
+    def set_focus(self, event = None):
         """
         Text widget doesn't loose focus if another widget is clicked
         this function emulates this behaviour.
         """
-
         print("Set focus got called")
         caller = event.widget
         caller.focus_set()
@@ -184,11 +184,12 @@ class GraphVisual:
         self.redraw_graph()
 
     def select_node(self, event):
-        x,y = event.x, event.y
-        print("x:", x,"y",y)
+        x, y = event.x, event.y
+        print("x:", x, "y", y)
         #(BUG) if list is empty
         # BUG Man kann die letzte Note nicht anwaehlen
         nearest_node = self.graphNodes[0]
+
         for node in self.graphNodes:
             x_offset = (nearest_node.position.x - x) ** 2
             y_offset = (nearest_node.position.y - y) ** 2
@@ -198,7 +199,9 @@ class GraphVisual:
             dist = math.sqrt(x_offset + y_offset)
             if dist < current_smallest_dist:
                 nearest_node = node
+                current_smallest_dist = dist
 
+        # (BUG)
         if current_smallest_dist < 15:
             nearest_node.colour = "red"
             self.current_selected_node = nearest_node
