@@ -2,8 +2,10 @@ import graph
 from vector import Vector
 import math
 
-#Dises Modul implementiert den Layouting-Algorithmus von T. Fruchterman und E. Reingold
-#aus dem Paper Graph Drawing by Force-directed Placement [FR91]
+# Dises Modul implementiert den Layouting-Algorithmus von T. Fruchterman und E. Reingold
+# aus dem Paper Graph Drawing by Force-directed Placement [FR91]
+
+
 class FruchtermanReingold:
     graph_visuals = None
     canvas_width = None
