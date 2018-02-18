@@ -7,27 +7,23 @@ from eades import Eades
 from fr import FruchtermanReingold
 import time
 from vector import Vector
-
+from depthFirstSearch import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Bind mac touchbad to scrollbars
 # TODO Siehe Shift-MouseWheel MouseWheel
 # TODO Wenn graph gezeichnet wird sollten scrollsbars auf anfang gesetzt werden damit man den graphen sieht
 
-# TODO Pypy3 is kranker shit mal auseinandersettzen KRANK
 # TODO RESIZABLE
 # TODO Slices um das \n oder so loszuwerden beim den textfeldern(anber erst string.rstrip anschauen
+# Passiert falls man mit Enter versucht die Textfield eingabe zu bestaetigen,
+# Das Emter drucken in einem Label sollte dafuer sorgen dass das Canvas ausgewaehlt wird
 # TODO Ueberlegen ob ich die Alg. async mache
-# TODO Duck  Typing vs type hinting in python (Does type hinting eng(verhindern) duck typing)
-# TODO GUI option to start the algorithms and at leas tfor the eades a text entry(pop up) how opfen they want to start
-# TODO the algo
-# TODO DIe Widgets werden nicht wieder angezeigt von eades
-# SOL Jedem Tab mitgeben welchen algo er verwendet und bei wechsel checken ob eades falls ja dann
-# Widgets init.
 # BUG Die Scrollbars scrollen alle nur den ersten Tab und nicht den zz. ausgewaelten
-# MUltishredding fuer die Algorithmen
 
 # Frozen binarie am Besten mit pypy3
 
+# TODO Eigentlich war es vollieg retarded die Layoutingklassen static zu machen denn
+# TODo jetzt kann man  nichtmal in zwei Tabs den gleichen Algorithmus mit versch. Parametern starten
 
 class Window:
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
@@ -83,7 +79,7 @@ class Window:
 
         # View menu
         self.viewmenu = tk.Menu(self.menubar, tearoff=0)
-        self.viewmenu.add_command(label="Toggle ids         (Strg+g)")
+        self.viewmenu.add_command(label="Toggle ids")
         self.viewmenu.add_command(label="Clear canvas       (Strg+c)")
         self.viewmenu.add_command(label="Toggle Info Menue  (Strg+b)", command=self.toggle_info_menu)
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
@@ -131,13 +127,17 @@ class Window:
         self.info_menu = InfoMenu(self.root)
         self.info_menu.grid(column=0, row=0, sticky=tk.N)
 
-        self.info_menu.add_label("Zusammenhängend")
-        self.info_menu.label_val[0]["text"] = "----"
         self.info_menu.add_label("Anzahl der Knoten")
+        self.info_menu.label_val[0]["text"] = ""
+
+        self.info_menu.add_label("Anzahl der Kanten")
         self.info_menu.label_val[1]["text"] = ""
 
-        self.info_menu.add_label("Eigenschaft 2")
-        self.info_menu.label_val[2]["text"] = "True"
+        self.info_menu.add_label("Azyklisch")
+        self.info_menu.label_val[2]["text"] = ""
+
+        self.info_menu.add_label("Zusammenhängend")
+        self.info_menu.label_val[3]["text"] = ""
 
     def toggle_info_menu(self, event=None):
         new_width = 0
@@ -148,18 +148,33 @@ class Window:
             new_width = self.tabs[self.get_current_notebook_tab()].original_canvas_width
             try:
                 # HIER KOMMEN DIE ZUWEISUNGEN FUER DATEN DES INFO MENUES HIN
-                self.info_menu.label_val[1]["text"] = str(self.tabs[self.get_current_notebook_tab()].graph.vertice_count)
+                self.info_menu.label_val[0]["text"] = str(self.tabs[self.get_current_notebook_tab()].graph.vertice_count)
+
             except AttributeError:
-                self.info_menu.label_val[1]["text"] = ""
+                self.info_menu.label_val[0]["text"] = ""
+            try:
+                pass
+            except AttributeError:
+                pass
         else:
             # Magic 28 sorgt dafuer das canvas nicht an Breite waechst
+            # TODO: Gehts locker kaputt wenn ich die Aufloesung aendere
             new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab()].canvas.winfo_width() - 28
 
         self.tabs[self.get_current_notebook_tab()].canvas.configure(width=new_width)
 
     def renew_info_menu_data(self, event=None):
+        # Beim toggeln werden die Daten aktualisiert deswegen toggeln wir hier 2x mal
+        # um den Anzeigestatus beizubehalten aber die Daten zu aktualiseren
         self.toggle_info_menu()
         self.toggle_info_menu()
+        # Check ob der in diesem Tab verwendete Algorithmus des von Eades ist oder nicht
+        if self.tabs[self.get_current_notebook_tab()].algorithm == "eades":
+            # Falls der Algorithmus von Eades verwenet wird muessen die Gui Widgets neu initialisert werden
+            self.init_eades_constant_widgets()
+        else:
+            # Falls nicht, sollen die Widgets geloescht werden damit sie nicht angezeigt werden
+            self.del_eades_constant_widgets()
 
     def load_graph(self, filepath):
         print("Loading graph...")
@@ -173,7 +188,27 @@ class Window:
                                                      canvas=self.tabs[self.get_current_notebook_tab()].canvas,
                                                      width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
                                                      graph=self.tabs[self.get_current_notebook_tab()].graph))
+        # Zueweisen welcher Algo. verwendet wird um mit Hilfe dieser Information
+        # zu bestimmen welche Gui Widgets gezeichnet werden sollen.
+        if Window.EADES:
+            current_tab.algorithm = "eades"
+        elif Window.FRUCHTERMAN_REINGOLD:
+            current_tab.algorithm = "fr"
 
+
+        #     ALGORITHM TEST AREA
+        test = DepthFirstSearch(current_tab.graph, 0)
+
+        for x in range(current_tab.graph.vertice_count):
+            print("IS connected to", test.has_path_to(x))
+
+        print(test.path_to(4))
+
+
+
+
+
+        # ALL ACTIONS WHICH ARE ON TAB LEVEL SHOULD BE ADDED HERE
         # Bind actions to the last added graph_vis
         # TODO Control-w to close tab
         current_tab.canvas.bind("<Control-g>", current_tab.graph_vis.change_node_look)
@@ -183,30 +218,31 @@ class Window:
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.select_node, add="+")
 
         self.del_eades_constant_widgets()
-        # Show eades constant choices only if user selected eades as algorithm
-        # ----------------------------------This is the the only part that should change when usign another algorithm------------------------------------------------------
+
+        # ----------------------------------This is the the only part that should change when usign another algorithm--
         if Window.EADES:
+            # Show eades constant choices only if user selected eades as algorithm
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
             current_tab.canvas.bind("<Control-s>", self.do_eades_new)
             self.init_eades_constant_widgets()
-        if Window.FRUCHTERMAN_REINGOLD:
+        elif Window.FRUCHTERMAN_REINGOLD:
             current_tab.canvas.bind("<Control-s>", self.do_fruchterman_reingold)
 
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
         # ---------------------------------------------------------------------------------------------
 
-    def do_fruchterman_reingold(self, event="nothing"):
+    def do_fruchterman_reingold(self, event=None):
+        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
         FruchtermanReingold.graph_visuals = current_tab.graph_vis
-
+        # Flaeche der Zeichenflaeche berechnen
         FruchtermanReingold.area = Window.CANVAS_HEIGHT * Window.CANVAS_WIDTH
         # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
         FruchtermanReingold.k = 50
-        # print("COUNTER", FruchtermanReingold.graph_visuals.nodeCounter)
-        # print("LENGTH1", len(FruchtermanReingold.displacement_list))
+        # Startwert fuers cooling
         FruchtermanReingold.t = 100
         start = time.time()
         for x in range(0, 100):
@@ -217,14 +253,13 @@ class Window:
             i = 0
             for disp in FruchtermanReingold.displacement_list:
                 v = min(disp.abs(), FruchtermanReingold.t)
-                print("V", v)
+         #       print("V", v)
                 direction = Vector(disp.to_unit().x * v, disp.to_unit().y * v )
                 FruchtermanReingold.graph_visuals.graphNodes[i].move(direction.x, direction.y)
                 i = i + 1
             FruchtermanReingold.cool()
-            end = time.time()
-        print("Elapsed Time", end - start)
-
+        end = time.time()
+        #print("Elapsed Time", end - start)
 
         current_tab.graph_vis.redraw_nodes()
 
@@ -233,10 +268,9 @@ class Window:
         # Update edges between nodes
         current_tab.graph_vis.generate_edges()
 
-
-
     # -----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
-    def do_eades_new(self, event="nothing"):
+    def do_eades_new(self, event=None):
+        """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
@@ -316,5 +350,5 @@ class Window:
         self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
         self.t4.insert(tk.END, Eades.c4)
-#----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
+# ----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
 

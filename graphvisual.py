@@ -82,7 +82,7 @@ class GraphVisual:
         """
         :param canvas: The canvas on which the node should be drawn
         :param width: The width of the canvas
-        :param heigth: The height of the canvas
+        :param height: The height of the canvas
         :param graph: The graph which should be drawn
         """
         return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
@@ -112,7 +112,7 @@ class GraphVisual:
                 self.node_adjacency_list[counter].append(self.graphNodes[y])
             counter += 1
 
-    def to_pixel_pos(self, x, y):
+    def to_pixel_pos(self, x: float, y: float) -> float:
         pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
         return pos
 

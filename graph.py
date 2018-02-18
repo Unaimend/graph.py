@@ -25,9 +25,12 @@ AdjacencyMatrix = List[List[int]]
 # TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
 # TODO Natuerlich nur optional
 # TODO mit with  verpacken
-# TODO
+
+# TODO Schauen wo ich list comprrhension anwenden kann
 
 # BUG Die letzte Node is nicht auswaehlebar
+# TODO DFS Visualisierung und ueberlegen wie ich mit Graphen umgehe die nicht integer vertices haben
+# IDEE Als isomorphen graphen zu einem integer graphen betrachtemn
 
 class GraphNode:
     """
@@ -37,7 +40,6 @@ class GraphNode:
     graphNodeRadius = 12
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
     # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
-    # TODO Die y-scrollbar wird nicht angezeigt
 
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour):
         """
@@ -186,24 +188,17 @@ class Graph:
         """
         return self.adjacency_list[node.id]
 
-# DAs wuerde die berechnung der repulsive_forces enorm beschleunigen
-# TODO Edges sollte wissen zu wem sie inzident sind(Sollten sie das?)
+
 class GraphEdge:
     """
     The class reprents a graph edge
     """
-    def __init__(self, canvas: tk.Canvas, start_node, end_node):
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode):
         """
         :param canvas: The canvas on which the edge should be drawn
         :type canvas: tk.Canvas
-        :param x0: The start on the x coordinate
-        :type x0 float
-        :param y0: The start on the y coordinate
-        :type y0 float
-        :param xn: The end on the x coordinate
-        :type xn float
-        :param yn: The end on the y coordinate
-        :type xn float
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
         """
         self.start_node = start_node
         self.end_node = end_node

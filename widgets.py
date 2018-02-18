@@ -46,12 +46,15 @@ class NoteBookTab:
         self.graph_vis = graph_vis
         # TODO Dynamisch statt hardcoded
         self.original_canvas_width = 1414
+        self.algorithm = ""
+
 
     def set_graph(self, graph):
         self.graph = graph
 
     def set_graph_vis(self, graph_vis):
         self.graph_vis = graph_vis
+
 
 
 class InfoMenu(tk.Frame):
