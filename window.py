@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 from graph import Graph, GraphNode
 import tkinter as tk
 from tkinter import ttk
@@ -136,7 +137,7 @@ class Window:
         self.info_menu.add_label("Azyklisch")
         self.info_menu.label_val[2]["text"] = ""
 
-        self.info_menu.add_label("ZusammenhÃ¤ngend")
+        self.info_menu.add_label("Zusammenhängend")
         self.info_menu.label_val[3]["text"] = ""
 
     def toggle_info_menu(self, event=None):
@@ -233,7 +234,7 @@ class Window:
         # ---------------------------------------------------------------------------------------------
 
     def do_fruchterman_reingold(self, event=None):
-        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszufÃ¼hren"""
+        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
@@ -270,7 +271,7 @@ class Window:
 
     # -----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event=None):
-        """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszufÃ¼hren"""
+        """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
@@ -292,7 +293,7 @@ class Window:
         Eades.c4 = float(text)
 
         start = time.time()
-        # 100x den Algorithmus ausfÃ¼hren(siehe [EAD84] Paper)
+        # 100x den Algorithmus ausführen(siehe [EAD84] Paper)
         for x in range(0, 100):
             Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
             Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
@@ -321,7 +322,7 @@ class Window:
             self.l4.destroy()
 
     def init_eades_constant_widgets(self):
-        # Frame der die Label und TextInputs hÃ¤lt
+        # Frame der die Label und TextInputs hält
         self.eades_options_frame = tk.Frame(self.root)
         # Position des Frames in der GUI setzen
         self.eades_options_frame.grid(column=1, row=3)
