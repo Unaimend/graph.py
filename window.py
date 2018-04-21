@@ -26,6 +26,7 @@ from depthFirstSearch import DepthFirstSearch
 # TODO Eigentlich war es vollieg retarded die Layoutingklassen static zu machen denn
 # TODo jetzt kann man  nichtmal in zwei Tabs den gleichen Algorithmus mit versch. Parametern starten
 
+
 class Window:
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
     CANVAS_WIDTH = 1400
@@ -51,6 +52,8 @@ class Window:
         self.root.geometry("1920x1080")
         # Init. canvas
         self.tabs = {}
+
+        self.current_algo = None
 
         self.nb = ttk.Notebook(self.root)
 
@@ -203,12 +206,6 @@ class Window:
         for x in range(current_tab.graph.vertice_count):
             print("IS connected to", test.has_path_to(x))
 
-        print(test.path_to(4))
-
-
-
-
-
         # ALL ACTIONS WHICH ARE ON TAB LEVEL SHOULD BE ADDED HERE
         # Bind actions to the last added graph_vis
         # TODO Control-w to close tab
@@ -222,6 +219,8 @@ class Window:
 
         # ----------------------------------This is the the only part that should change when usign another algorithm--
         if Window.EADES:
+            # Graphen auf dem gearbeitet wird zuweisenr
+            self.current_algo = Eades(current_tab.graph_vis)
             # Show eades constant choices only if user selected eades as algorithm
             # Dem Algorithmus eine Zeichenflaeche zuweisen mit der er arbeiten soll
             current_tab.canvas.bind("<Control-s>", self.do_eades_new)
@@ -274,29 +273,27 @@ class Window:
         """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
-        # Graphen auf dem gearbeitet wird zuweisen
-        Eades.graph_visuals = current_tab.graph_vis
 
         text = str()
 
         # Aktuelle Werte der Konstante laden
         text = self.t1.get("1.0", 'end-1c')
-        Eades.c1 = float(text)
+        self.current_algo.c1 = float(text)
 
         text = self.t2.get("1.0", 'end-1c')
-        Eades.c2 = float(text)
+        self.current_algo.c2 = float(text)
 
         text = self.t3.get("1.0", 'end-1c')
-        Eades.c3 = float(text)
+        self.current_algo.c3 = float(text)
 
         text = self.t4.get("1.0", 'end-1c')
-        Eades.c4 = float(text)
+        self.current_algo.c4 = float(text)
 
         start = time.time()
         # 100x den Algorithmus ausführen(siehe [EAD84] Paper)
         for x in range(0, 100):
-            Eades.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
-            Eades.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
+           self.current_algo.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
+           self.current_algo.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
         end = time.time()
         print("Elapsed Time", end - start)
         # Update positions
@@ -332,24 +329,24 @@ class Window:
         # Textfield for c1 Eades constant
         self.t1 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t1.pack(side=tk.LEFT)
-        self.t1.insert(tk.END, Eades.c1)
+        self.t1.insert(tk.END, self.current_algo.c1)
         self.l2 = tk.Label(self.eades_options_frame, text="c2")
         self.l2.pack(side=tk.LEFT)
         # Textfield for c2 Eades constant
         self.t2 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t2.pack(side=tk.LEFT)
-        self.t2.insert(tk.END, Eades.c2)
+        self.t2.insert(tk.END, self.current_algo.c2)
         self.l3 = tk.Label(self.eades_options_frame, text="c3")
         self.l3.pack(side=tk.LEFT)
         # Textfield for c3 Eades constant
         self.t3 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t3.pack(side=tk.LEFT)
-        self.t3.insert(tk.END, Eades.c3)
+        self.t3.insert(tk.END, self.current_algo.c3)
         self.l4 = tk.Label(self.eades_options_frame, text="c4")
         self.l4.pack(side=tk.LEFT)
         # Textfield for c4 Eades constant
         self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
-        self.t4.insert(tk.END, Eades.c4)
+        self.t4.insert(tk.END, self.current_algo.c4)
 # ----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
 
