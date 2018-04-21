@@ -40,21 +40,19 @@ class OpenGraphDialog:
 
 
 class NoteBookTab:
-    def __init__(self, canvas, graph, graph_vis ):
+    def __init__(self, canvas, graph, graph_vis, algo=""):
         self.canvas = canvas
         self.graph = graph
         self.graph_vis = graph_vis
         # TODO Dynamisch statt hardcoded
         self.original_canvas_width = 1414
-        self.algorithm = ""
-
+        self.algorithm = algo
 
     def set_graph(self, graph):
         self.graph = graph
 
     def set_graph_vis(self, graph_vis):
         self.graph_vis = graph_vis
-
 
 
 class InfoMenu(tk.Frame):
@@ -98,16 +96,16 @@ class NodeInfo:
         self.info_menu = InfoMenu(self.window)
         self.info_menu.pack()
         self.info_menu.add_label("Id")
-        self.info_menu.label_val[0]["text"] =  str(node.id )
+        self.info_menu.label_val[0]["text"] = str(node.id)
         self.info_menu.add_label("Position")
-        self.info_menu.label_val[1]["text"] = "x:" + str(node.position.x) + " y: " + str(node.position.y)
+        self.info_menu.label_val[1]["text"] = "x: %d y: %d " % (int(node.position.x), int(node.position.y))
 
         adjacent_nodes_text = ""
         for x in adjacent_nodes: adjacent_nodes_text += (" " + str(x.id))
 
         self.info_menu.add_label("Adj. Nodes")
-        self.info_menu.label_val[2]["text"] =  adjacent_nodes_text
+        self.info_menu.label_val[2]["text"] = adjacent_nodes_text
 
         self.info_menu.toggle()
-        button = tk.Button(self.window, text="Close", command = self.window.destroy)
+        button = tk.Button(self.window, text="Close", command=self.window.destroy)
         button.pack()

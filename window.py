@@ -53,6 +53,7 @@ class Window:
         # Init. canvas
         self.tabs = {}
 
+        # TODO Current_algo solt eine
         self.current_algo = None
 
         self.nb = ttk.Notebook(self.root)
@@ -143,6 +144,9 @@ class Window:
         self.info_menu.add_label("Zusammenhängend")
         self.info_menu.label_val[3]["text"] = ""
 
+        self.info_menu.add_label("Algorithmus")
+        self.info_menu.label_val[4]["text"] = self.tabs[self.get_current_notebook_tab()].algorithm
+
     def toggle_info_menu(self, event=None):
         new_width = 0
         self.info_menu.toggle()
@@ -198,13 +202,16 @@ class Window:
             current_tab.algorithm = "eades"
         elif Window.FRUCHTERMAN_REINGOLD:
             current_tab.algorithm = "fr"
+        else:
+            current_tab.algorithm = "None"
+        self.info_menu.label_val[4]["text"] = current_tab.algorithm
 
 
         #     ALGORITHM TEST AREA
         test = DepthFirstSearch(current_tab.graph, 0)
 
         for x in range(current_tab.graph.vertice_count):
-            print("IS connected to", test.has_path_to(x))
+            print("IS connected to" + x, test.has_path_to(x))
 
         # ALL ACTIONS WHICH ARE ON TAB LEVEL SHOULD BE ADDED HERE
         # Bind actions to the last added graph_vis
