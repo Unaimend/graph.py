@@ -1,3 +1,5 @@
-os: osx
-    language: generic
-    env: PYTHON=3.5.1
+language: Python
+python:
+  - "3.6"
+script:
+- python main.py
