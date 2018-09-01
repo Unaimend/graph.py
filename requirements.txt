@@ -50,7 +50,6 @@ prompt-toolkit==1.0.15
 ptyprocess==0.5.2
 pyasn1==0.3.2
 pyasn1-modules==0.0.11
-PyAudio==0.2.11
 pygame==1.9.3
 Pygments==2.2.0
 pylint==1.7.1
@@ -88,4 +87,3 @@ webencodings==0.5.1
 Werkzeug==0.12.2
 widgetsnbextension==3.0.0
 wrapt==1.10.10
-wxPython==4.0.0b1
