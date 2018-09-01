@@ -76,7 +76,6 @@ class GraphVisual:
         #for x in self.node_adjacency_list:
         #    for y in x: print(y.id)
 
-
     @classmethod
     def from_graph(cls, window, canvas: tk.Canvas, height: int=None, width: int=None, graph: Graph=None):
         """

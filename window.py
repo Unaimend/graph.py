@@ -211,7 +211,7 @@ class Window:
         test = DepthFirstSearch(current_tab.graph, 0)
 
         for x in range(current_tab.graph.vertice_count):
-            print("IS connected to" + x, test.has_path_to(x))
+            print("IS connected to", test.has_path_to(x))
 
         # ALL ACTIONS WHICH ARE ON TAB LEVEL SHOULD BE ADDED HERE
         # Bind actions to the last added graph_vis
@@ -248,6 +248,7 @@ class Window:
         # Flaeche der Zeichenflaeche berechnen
         FruchtermanReingold.area = Window.CANVAS_HEIGHT * Window.CANVAS_WIDTH
         # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
+        # TODO Warum ist das hardgecoded
         FruchtermanReingold.k = 50
         # Startwert fuers cooling
         FruchtermanReingold.t = 100
