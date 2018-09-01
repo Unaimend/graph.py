@@ -8,7 +8,7 @@ from eades import Eades
 from fr import FruchtermanReingold
 import time
 from vector import Vector
-from depthFirstSearch import DepthFirstSearch
+# from depthFirstSearch import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Bind mac touchbad to scrollbars
 # TODO Siehe Shift-MouseWheel MouseWheel
