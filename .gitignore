@@ -104,3 +104,9 @@ ENV/
 .mypy_cache/
 
 
+
+TAGS
+
+default_graph Kopie\.json
+
+\.projectile
