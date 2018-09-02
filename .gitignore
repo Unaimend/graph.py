@@ -104,3 +104,15 @@ ENV/
 .mypy_cache/
 
 
+
+doc/
+
+TAGS
+
+\.projectile
+
+default_graph Kopie\.json
+
+\.graph_h\.json\.swp
+
+etags\.exe
