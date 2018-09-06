@@ -4,13 +4,6 @@ import math
 import graph
 from vector import Vector
 
-
-# TODO Bessere Konstanten errechnen
-# TODO Der Benutzer kann fuer die self KOsntanten Null eingeben,
-# dies muss verhindert werden da Null in einigen Berechnungen ein nicht
-# zulaessiger Wert ist
-
-
 class Eades:
     """ Class which implements the layouting-algorithm from EAD[84]
     """
@@ -61,7 +54,7 @@ class Eades:
         """
         # pylint: disable= W0613
         # TODO Exception falls self.graph == None
-        for node in self.graph_visuals.graphNodes:
+        for node in self.graph_visuals.graph_nodes:
             displacement = Vector(0, 0)
             for nodes in self.graph_visuals.node_adjacency_list[node.id]:
                 # If if would calc. the distance between two node which have the same id,
@@ -79,9 +72,9 @@ class Eades:
         :param event: Only there because the tkinter bind functions expects the function to have one parameter
         """
         # pylint: disable= W0613
-        for node in self.graph_visuals.graphNodes:
+        for node in self.graph_visuals.graph_nodes:
             displacement = Vector(0, 0)
-            for nodes in self.graph_visuals.graphNodes:
+            for nodes in self.graph_visuals.graph_nodes:
                 # If if would calc. the distance between two node which have the same id,
                 # the distance would be 0  and that would mean that I would divide by 0 in the
                 # attractive_force calculation
@@ -92,19 +85,3 @@ class Eades:
                     displacement.x += direction.x * repelling_force * self.constant_4
                     displacement.y += direction.y * repelling_force * self.constant_4
             node.move(displacement.x, displacement.y)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
