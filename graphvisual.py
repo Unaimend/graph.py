@@ -77,6 +77,19 @@ class GraphVisual:
         #for x in self.node_adjacency_list:
         #    for y in x: print(y.id)
 
+        self.coordinate_fuckery: Vector(float, float) = Vector(1, 1)
+
+    def inc_zoomlevel(self, event):
+        self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
+        self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
+
+
+    def dec_zoomlevel(self, event):
+        self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
+        self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
+
+
+
     @classmethod
     def from_graph(cls, window, canvas: tk.Canvas, height: int = None, width: int = None, graph: Graph = None):
         """
@@ -190,26 +203,34 @@ class GraphVisual:
         current_smallest_dist = 16
 
         nearest_node = self.graph_nodes[0]
-
+        distance_dic = {}
         for node in self.graph_nodes:
             x_offset = (nearest_node.position.x - x) ** 2
             y_offset = (nearest_node.position.y - y) ** 2
             current_smallest_dist = math.sqrt(x_offset + y_offset)
-            x_offset = (node.position.x - x) ** 2
-            y_offset = (node.position.y - y) ** 2
+            adjusted_node_pos  = Vector(0,0)
+            adjusted_node_pos.x = (node.position.x-self.width/2)*self.coordinate_fuckery.x+self.width/2
+            adjusted_node_pos.y = (node.position.y-self.height/2)*self.coordinate_fuckery.y+self.height / 2
+
+            x_offset = (adjusted_node_pos.x - x) ** 2
+            y_offset = (adjusted_node_pos.y - y) ** 2
             dist = math.sqrt(x_offset + y_offset)
+            print("OFF", x_offset, "\ ", y_offset, '\ ', dist, "|", current_smallest_dist)
             if dist < current_smallest_dist:
                 nearest_node = node
-                current_smallest_dist = dist
+                distance_dic[dist] = node.canvas_text_id
 
-        if current_smallest_dist < 15:
+        nearest_node_distance = min(distance_dic.keys())
+        nearest_node_canvas_text_id = distance_dic[nearest_node_distance]
+        if nearest_node_distance < 15:
             # Node die ausgewaehlt wurde rot farben
-            self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="red")
+            self.canvas.itemconfigure(nearest_node_canvas_text_id, fill="red")
             nearest_node.colour = "red"
 
             self.current_selected_node = nearest_node
             # Infofenster erstellen und oeffnen
-            self.current_info = NodeInfo(self.window, self.current_selected_node, self.node_adjacency_list[self.current_selected_node.id])
+            self.current_info = NodeInfo(self.window, self.current_selected_node,
+                                         self.node_adjacency_list[self.current_selected_node.id])
             for node in self.graph_nodes:
                 # Alle nodes die nicht ausgeaehlt wurden schwarz faerben
                 if node != self.current_selected_node:
