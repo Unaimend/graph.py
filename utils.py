@@ -1,9 +1,13 @@
-""" """
+"""
+This module cotains different useful functions
+"""
 import time
 
-
-def timeit(func) -> None:
+"""
+param func: The function which should be executed
+"""
+def timeit(func, *args) -> None:
     start = time.time()
-    func()
+    func(*args)
     end = time.time()
     print("Elapsed Time of", func.__name__, ":", end - start)
