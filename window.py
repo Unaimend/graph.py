@@ -251,7 +251,7 @@ class Window:
         fr = FruchtermanReingold(graph_visuals=current_tab.graph_vis, canvas_width=Window.CANVAS_WIDTH,
                                  canvas_height=Window.CANVAS_HEIGHT, k=50, t=100 )
 
-        timeit(fr.do_fr)
+        timeit(fr.do_fr, 100)
 
         current_tab.graph_vis.redraw_nodes()
 

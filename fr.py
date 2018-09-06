@@ -59,8 +59,8 @@ class FruchtermanReingold:
         return unit_vec
 
 
-    def do_fr(self):
-        for x in range(0, 100):
+    def do_fr(self, how_often: int):
+        for x in range(0, how_often):
             # Das hier in Funk. do_fr_one_iter
             self.displacement_list = [Vector(0, 0)] * self.graph_visuals.nodeCounter
             self.calc_attractive_forces()
