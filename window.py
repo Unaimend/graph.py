@@ -92,6 +92,7 @@ class Window:
         self.root.bind("<Control-n>", self.open_new_graph)
         self.root.bind("<Control-t>", self.add_canvas)
         self.root.bind("<Control-b>", self.toggle_info_menu)
+        self.root.bind("<Control-w>", self.delete_tab)
 
         self.nb.bind("<<NotebookTabChanged>>", self.renew_info_menu_data)
 
@@ -139,7 +140,7 @@ class Window:
         self.info_menu.add_label("Azyklisch")
         self.info_menu.label_val[2]["text"] = ""
 
-        self.info_menu.add_label("Zusammenhängend")
+        self.info_menu.add_label("Zusammenhï¿½ngend")
         self.info_menu.label_val[3]["text"] = ""
 
         self.info_menu.add_label("Algorithmus")
@@ -238,7 +239,7 @@ class Window:
         # ---------------------------------------------------------------------------------------------
 
     def do_fruchterman_reingold(self, event=None):
-        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
+        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszufï¿½hren"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
@@ -277,7 +278,7 @@ class Window:
 
     # -----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event=None):
-        """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuführen"""
+        """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszufï¿½hren"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
 
@@ -297,7 +298,7 @@ class Window:
         self.current_algo.c4 = float(text)
 
         start = time.time()
-        # 100x den Algorithmus ausführen(siehe [EAD84] Paper)
+        # 100x den Algorithmus ausfï¿½hren(siehe [EAD84] Paper)
         for x in range(0, 100):
            self.current_algo.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
            self.current_algo.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
@@ -326,7 +327,7 @@ class Window:
             self.l4.destroy()
 
     def init_eades_constant_widgets(self):
-        # Frame der die Label und TextInputs hält
+        # Frame der die Label und TextInputs hï¿½lt
         self.eades_options_frame = tk.Frame(self.root)
         # Position des Frames in der GUI setzen
         self.eades_options_frame.grid(column=1, row=3)
