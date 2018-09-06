@@ -53,6 +53,18 @@ class NoteBookTab:
     def set_graph_vis(self, graph_vis):
         self.graph_vis = graph_vis
 
+    def zoom_in(self, event=None):
+        # 0.9 if event.delta < 0 else 1.1
+        amount = 1.1
+        # DIe Null sollte width/2, height/2 sein aber das fuckt die berechnugn ab,
+        # self.canvas.scale(tk.ALL, 0, 0, amount, amount)
+        self.canvas.scale(tk.ALL, self.graph_vis.width/2, self.graph_vis.height/2, amount, amount)
+
+    def zoom_out(self, event=None):
+        print("WOOT")
+        # 0.9 if event.delta < 0 else 1.1
+        amount = 0.9
+        self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
 
 class InfoMenu(tk.Frame):
     def __init__(self, parent) -> None:
