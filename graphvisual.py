@@ -8,8 +8,8 @@ from graph import Graph, GraphEdge, GraphNode
 import random
 import tkinter as tk
 import math
-from typing import List
 from widgets import NodeInfo
+from typing import Dict, List
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
 # TODO Wenn kraefte sehr klein sind = 0 setzen wegen floating point ungenauigkeit(gute idee?)
@@ -22,7 +22,7 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int, height: int, graph: Graph):
+    def __init__(self, window, canvas: tk.Canvas, width: int, height: int, graph: Graph) -> None:
         """
         Ctor. for GraphVisual
         :param canvas: The canvas on which the node should be drawn
@@ -42,17 +42,17 @@ class GraphVisual:
         # Adjacency list but with nodes instead of integers
         # Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drinnen die zu x adj. sind.,
         # x ist zurzeit die id der node von der die adjazenz ausgehen soll
-        self.node_adjacency_list = []
+        self.node_adjacency_list: List[GraphNode] = []
 
         # Höhe und Breite des Canvas
-        self.width = width
-        self.height = height
-        self.graph = None
+        self.width: float = width
+        self.height: float = height
+        self.graph: Graph = None
 
         # Saves the coordinates of the last two clicked notes
-        self.clickedNodes = []
+        self.clickedNodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
-        self.drawNodeIds = False
+        self.drawNodeIds: bool = False
         # Helper variable for the node id
         self.nodeCounter = 0
         random.seed(GraphVisual.seed)
@@ -77,8 +77,9 @@ class GraphVisual:
         #    for y in x: print(y.id)
 
     @classmethod
-    def from_graph(cls, window, canvas: tk.Canvas, height: int=None, width: int=None, graph: Graph=None):
+    def from_graph(cls, window, canvas: tk.Canvas, height: int = None, width: int = None, graph: Graph = None):
         """
+        :param window: 
         :param canvas: The canvas on which the node should be drawn
         :param width: The width of the canvas
         :param height: The height of the canvas
@@ -111,7 +112,7 @@ class GraphVisual:
                 self.node_adjacency_list[counter].append(self.graphNodes[y])
             counter += 1
 
-    def to_pixel_pos(self, x: float, y: float) -> float:
+    def to_pixel_pos(self, x: float, y: float) -> Dict[str, float]:
         pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
         return pos
 
@@ -233,23 +234,22 @@ class GraphVisual:
     #     # Check for all the nodes if position of the click is in another node
     #     for node in self.graphNodes:
     #         if abs(
-    #             (node.x - event.x)) <= GraphNode.graphNodeRadius and abs(
-    #                 (node.y - event.y)) <= GraphNode.graphNodeRadius:
+    #             (node.position.x - event.x)) <= GraphNode.graphNodeRadius and abs(
+    #                 (node.position.y - event.y)) <= GraphNode.graphNodeRadius:
     #             is_in_circle = True
     #
     #     is_far_enough = True
     #     # Check for all the nodes if position of the click is far enough away from all the other nodes
     #     for node in self.graphNodes:
-    #         if (abs((node.x - event.x)) <= self.graphNodesMinDistance and abs(
-    #             (node.y - event.y)) <= self.graphNodesMinDistance):
+    #         if (abs((node.position.x - event.x)) <= self.graphNodesMinDistance and abs(
+    #             (node.position.y - event.y)) <= self.graphNodesMinDistance):
     #             is_far_enough = False
     #
     #     # If distance is big enough and I clicked not int a circle draw a node
     #     if is_far_enough and not is_in_circle:
     #         self.nodeCounter += 1
     #         self.graphNodes.append(
-    #             GraphNode(self.canvas, event.x, event.y,
-    #                             self.drawNodeIds, self.nodeCounter))
+    #             GraphNode(self.canvas, event.x, event.y, self.drawNodeIds, self.nodeCounter, "blue"))
     #
     #     # If distance is small(in another node) and I clicked in a node remember this node
     #     # to draw an edge
