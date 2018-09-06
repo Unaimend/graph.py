@@ -17,10 +17,6 @@ from depth_first_search import DepthFirstSearch
 # TODO Slices um das \n oder so loszuwerden beim den textfeldern(anber erst string.rstrip anschauen
 # Passiert falls man mit Enter versucht die Textfield eingabe zu bestaetigen,
 # Das Emter drucken in einem Label sollte dafuer sorgen dass das Canvas ausgewaehlt wird
-
-
-# Frozen binarie am Besten mit pypy3
-
 # TODO Eigentlich war es vollieg retarded die Layoutingklassen static zu machen denn
 # TODo jetzt kann man  nichtmal in zwei Tabs den gleichen Algorithmus mit versch. Parametern starten
 
@@ -38,14 +34,14 @@ class Window:
         self.root = root
         # Four textboxes and labels for the eades constants
         self.eades_options_frame = None
-        self.t1 = None
-        self.t2 = None
-        self.t3 = None
-        self.t4 = None
-        self.l1 = None
-        self.l2 = None
-        self.l3 = None
-        self.l4 = None
+        self.tb_1 = None
+        self.tb_2 = None
+        self.tb_3 = None
+        self.tb_4 = None
+        self.label_1 = None
+        self.label_2 = None
+        self.label_3 = None
+        self.label_4 = None
         self.info_menu = None
         self.root.geometry("1920x1080")
         # Init. canvas
@@ -99,7 +95,11 @@ class Window:
         # self.root.bind_all('<MouseWheel>', lambda x: print("oben") )
         # self.root.bind_all('<Shift-MouseWheel>', lambda x: print("links"))
 
-    def get_current_notebook_tab(self, event=None):
+    def get_current_notebook_tab_index(self, event=None):
+        """
+        :param event: 
+        :return: Return the index of the current Notebook Tab
+        """
         return self.nb.index("current")
 
     def add_canvas(self, event=None):
@@ -115,13 +115,25 @@ class Window:
         self.nb.add(self.tabs[index].canvas,  text="Canvas " + str(index))
         # Damit die Daten aktualisiert werden
 
-    def delete_tab(self, event=None):
+    def delete_tab(self, event=None) -> None:
+        """
+        Functons which closes the current ttk Notebook Tab
+        :param event: --- 
+        :return: 
+        """
         self.nb.forget("current")
 
     def run(self):
         self.root.mainloop()
 
     def open_new_graph(self, event="nothing"):
+        """
+        Funktion welche das Oeffnen eines neuen Graphen regelt, also das Auswehlen
+        des json datei, das Auswaehlen des Algos und das setzen der Konstanten und Informationen 
+        ueber den Graphen
+        :param event: 
+        :return: 
+        """
         current_instance = OpenGraphDialog(self.root)
         Window.EADES = current_instance.eades.get()
         Window.FRUCHTERMAN_REINGOLD = current_instance.fruchterman_reingold.get()
@@ -129,8 +141,8 @@ class Window:
         self.toggle_info_menu()
         self.toggle_info_menu()
 
-    def add_info_menu(self):
-        """In dieser Methoden koennen dem Info Menu widgets hinzugefuegt werden"""
+    def add_info_menu(self) -> None:
+        """Creates the Info Sidebar and also adds the different menue entries"""
         self.info_menu = InfoMenu(self.root)
         self.info_menu.grid(column=0, row=0, sticky=tk.N)
 
@@ -147,18 +159,22 @@ class Window:
         self.info_menu.label_val[3]["text"] = ""
 
         self.info_menu.add_label("Algorithmus")
-        self.info_menu.label_val[4]["text"] = self.tabs[self.get_current_notebook_tab()].algorithm
+        self.info_menu.label_val[4]["text"] = self.tabs[self.get_current_notebook_tab_index()].algorithm
 
-    def toggle_info_menu(self, event=None):
+    def toggle_info_menu(self, event=None) -> None:
+        """
+        Toggles the Info Menue
+        :param event: 
+        """
         new_width = 0
         self.info_menu.toggle()
 
         # Neue Breite berechnen(abhaengig davon ob das info_menu zu sehen ist oder nicht)
         if self.info_menu.visible:
-            new_width = self.tabs[self.get_current_notebook_tab()].original_canvas_width
+            new_width = self.tabs[self.get_current_notebook_tab_index()].original_canvas_width
             try:
                 # HIER KOMMEN DIE ZUWEISUNGEN FUER DATEN DES INFO MENUES HIN
-                self.info_menu.label_val[0]["text"] = str(self.tabs[self.get_current_notebook_tab()].graph.vertice_count)
+                self.info_menu.label_val[0]["text"] = str(self.tabs[self.get_current_notebook_tab_index()].graph.vertice_count)
 
             except AttributeError:
                 self.info_menu.label_val[0]["text"] = ""
@@ -169,17 +185,21 @@ class Window:
         else:
             # Magic 28 sorgt dafuer das canvas nicht an Breite waechst
             # TODO: Gehts locker kaputt wenn ich die Aufloesung aendere
-            new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab()].canvas.winfo_width() - 28
+            new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab_index()].canvas.winfo_width() - 28
 
-        self.tabs[self.get_current_notebook_tab()].canvas.configure(width=new_width)
+        self.tabs[self.get_current_notebook_tab_index()].canvas.configure(width=new_width)
 
-    def renew_info_menu_data(self, event=None):
+    def renew_info_menu_data(self, event=None) -> None:
+        """
+        Reloads the Info-Menue-Data when the Info Menue got toggled
+        :param event: 
+        """
         # Beim toggeln werden die Daten aktualisiert deswegen toggeln wir hier 2x mal
         # um den Anzeigestatus beizubehalten aber die Daten zu aktualiseren
         self.toggle_info_menu()
         self.toggle_info_menu()
         # Check ob der in diesem Tab verwendete Algorithmus des von Eades ist oder nicht
-        if self.tabs[self.get_current_notebook_tab()].algorithm == "eades":
+        if self.tabs[self.get_current_notebook_tab_index()].algorithm == "eades":
             # Falls der Algorithmus von Eades verwenet wird muessen die Gui Widgets neu initialisert werden
             self.init_eades_constant_widgets()
         else:
@@ -194,15 +214,15 @@ class Window:
         """
         print("Loading graph...")
         # Herausfinden in welchem Tab man sich befindet
-        current_tab = self.tabs[self.get_current_notebook_tab()]
+        current_tab = self.tabs[self.get_current_notebook_tab_index()]
         # Aktuellem Tab den Graphen zuweisen
         current_tab.set_graph((Graph.from_file(filepath=filepath)))
         # Aktuellem Tab die GraphVisuals zuweisen
         current_tab.set_graph_vis(GraphVisual.from_graph(
-                                                     window = self.root,
-                                                     canvas=self.tabs[self.get_current_notebook_tab()].canvas,
-                                                     width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
-                                                     graph=self.tabs[self.get_current_notebook_tab()].graph))
+            window=self.root,
+            canvas=self.tabs[self.get_current_notebook_tab_index()].canvas,
+            width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
+            graph=self.tabs[self.get_current_notebook_tab_index()].graph))
         # Zueweisen welcher Algo. verwendet wird um mit Hilfe dieser Information
         # zu bestimmen welche Gui Widgets gezeichnet werden sollen.
         if Window.EADES:
@@ -211,6 +231,7 @@ class Window:
             current_tab.algorithm = "fr"
         else:
             current_tab.algorithm = "None"
+
         self.info_menu.label_val[4]["text"] = current_tab.algorithm
 
 
@@ -246,15 +267,15 @@ class Window:
         current_tab.graph_vis.redraw_graph()
         # ---------------------------------------------------------------------------------------------
 
-    def do_fruchterman_reingold(self, event=None):
+    def do_fruchterman_reingold(self, event=None) -> None:
         """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
         # Herausfinden in welchem Tab man sich befindet
-        current_tab = self.tabs[self.get_current_notebook_tab()]
+        current_tab = self.tabs[self.get_current_notebook_tab_index()]
         # Graphen auf dem gearbeitet wird zuweisen
         # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
         # TODO Warum ist das hardgecoded
         fr = FruchtermanReingold(graph_visuals=current_tab.graph_vis, canvas_width=Window.CANVAS_WIDTH,
-                                 canvas_height=Window.CANVAS_HEIGHT, k=50, t=100 )
+                                 canvas_height=Window.CANVAS_HEIGHT, k=50, t=100)
 
         timeit(fr.do_fr, 100)
 
@@ -269,28 +290,28 @@ class Window:
     def do_eades_new(self, event=None):
         """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
         # Herausfinden in welchem Tab man sich befindet
-        current_tab = self.tabs[self.get_current_notebook_tab()]
+        current_tab = self.tabs[self.get_current_notebook_tab_index()]
 
         text = str()
 
         # Aktuelle Werte der Konstante laden
-        text = self.t1.get("1.0", 'end-1c')
+        text = self.tb_1.get("1.0", 'end-1c')
         self.current_algo.c1 = float(text)
 
-        text = self.t2.get("1.0", 'end-1c')
+        text = self.tb_2.get("1.0", 'end-1c')
         self.current_algo.c2 = float(text)
 
-        text = self.t3.get("1.0", 'end-1c')
+        text = self.tb_3.get("1.0", 'end-1c')
         self.current_algo.c3 = float(text)
 
-        text = self.t4.get("1.0", 'end-1c')
+        text = self.tb_4.get("1.0", 'end-1c')
         self.current_algo.c4 = float(text)
 
         start = time.time()
         # 100x den Algorithmus ausf�hren(siehe [EAD84] Paper)
-        for x in range(0, 100):
-           self.current_algo.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
-           self.current_algo.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
+        for _ in range(0, 100):
+            self.current_algo.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
+            self.current_algo.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
         end = time.time()
         print("Elapsed Time", end - start)
         # Update positions
@@ -306,14 +327,14 @@ class Window:
         # und es is sicher .destroy zu callen
         if self.eades_options_frame is not None:
             self.eades_options_frame.destroy()
-            self.t1.destroy()
-            self.t2.destroy()
-            self.t3.destroy()
-            self.t4.destroy()
-            self.l1.destroy()
-            self.l2.destroy()
-            self.l3.destroy()
-            self.l4.destroy()
+            self.tb_1.destroy()
+            self.tb_2.destroy()
+            self.tb_3.destroy()
+            self.tb_4.destroy()
+            self.label_1.destroy()
+            self.label_2.destroy()
+            self.label_3.destroy()
+            self.label_4.destroy()
 
     def init_eades_constant_widgets(self):
         # Frame der die Label und TextInputs h�lt
@@ -321,29 +342,29 @@ class Window:
         # Position des Frames in der GUI setzen
         self.eades_options_frame.grid(column=1, row=3)
 
-        self.l1 = tk.Label(self.eades_options_frame, text="c1")
-        self.l1.pack(side=tk.LEFT)
+        self.label_1 = tk.Label(self.eades_options_frame, text="c1")
+        self.label_1.pack(side=tk.LEFT)
         # Textfield for c1 Eades constant
-        self.t1 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
-        self.t1.pack(side=tk.LEFT)
-        self.t1.insert(tk.END, self.current_algo.constant_1)
-        self.l2 = tk.Label(self.eades_options_frame, text="c2")
-        self.l2.pack(side=tk.LEFT)
+        self.tb_1 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
+        self.tb_1.pack(side=tk.LEFT)
+        self.tb_1.insert(tk.END, self.current_algo.constant_1)
+        self.label_2 = tk.Label(self.eades_options_frame, text="c2")
+        self.label_2.pack(side=tk.LEFT)
         # Textfield for c2 Eades constant
-        self.t2 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
-        self.t2.pack(side=tk.LEFT)
-        self.t2.insert(tk.END, self.current_algo.constant_2)
-        self.l3 = tk.Label(self.eades_options_frame, text="c3")
-        self.l3.pack(side=tk.LEFT)
+        self.tb_2 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
+        self.tb_2.pack(side=tk.LEFT)
+        self.tb_2.insert(tk.END, self.current_algo.constant_2)
+        self.label_3 = tk.Label(self.eades_options_frame, text="c3")
+        self.label_3.pack(side=tk.LEFT)
         # Textfield for c3 Eades constant
-        self.t3 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
-        self.t3.pack(side=tk.LEFT)
-        self.t3.insert(tk.END, self.current_algo.constant_3)
-        self.l4 = tk.Label(self.eades_options_frame, text="c4")
-        self.l4.pack(side=tk.LEFT)
+        self.tb_3 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
+        self.tb_3.pack(side=tk.LEFT)
+        self.tb_3.insert(tk.END, self.current_algo.constant_3)
+        self.label_4 = tk.Label(self.eades_options_frame, text="c4")
+        self.label_4.pack(side=tk.LEFT)
         # Textfield for c4 Eades constant
-        self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
-        self.t4.pack(side=tk.LEFT)
-        self.t4.insert(tk.END, self.current_algo.constant_4)
+        self.tb_4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus=0)
+        self.tb_4.pack(side=tk.LEFT)
+        self.tb_4.insert(tk.END, self.current_algo.constant_4)
 # ----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
 
