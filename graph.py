@@ -9,25 +9,18 @@ from typing import List
 import json
 from vector import Vector
 
-
-
-
 # typedefs
 AdjacencyList = List[List[int]]
 AdjacencyListEntry = List[int]
 AdjacencyMatrix = List[List[int]]
 
-# TODO How to type annotate the return type of class methods
-# SOLUTION https://stackoverflow.com/questions/15853469/putting-current-class-as-return-type-annotation
 # TODO Should GraphNode and GraphEdge be in the graphvisual module since the are only important for the graphical
 # TODO representation of graphs
-# TODO Redraw methoden so das nicht alles neue erstleelt werden muss
 # TODO Siehe https://stackoverflow.com/questions/13212300/how-to-reconfigure-tkinter-canvas-items
 # TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
 # TODO Natuerlich nur optional
 # TODO mit with  verpacken
 
-# TODO Schauen wo ich list comprrhension anwenden kann
 
 # BUG Die letzte Node is nicht auswaehlebar
 # TODO DFS Visualisierung und ueberlegen wie ich mit Graphen umgehe die nicht integer vertices haben
@@ -41,7 +34,6 @@ class GraphNode:
     #: Radius of the nodes
     graphNodeRadius = 12
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
-    # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
 
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour) -> None:
         """
@@ -86,19 +78,6 @@ class GraphNode:
                                                 right_corner.x,
                                                 right_corner.y, fill="black")
 
-    def move_old(self, x: float, y: float):
-        """
-        NOTE: Does immediately change the position on the canvas
-        :param x: The x-offset which should be added
-        :param y: The y-offset which should be added
-        :return:
-        """
-        # update current position
-        self.position.x += x
-        self.position.y += y
-        # update current canvas position
-        self.canvas.move(self.canvas_id, x, y)
-        self.canvas.move(self.canvas_text_id, x, y)
 
     def move(self, x: float, y: float):
         """
@@ -110,14 +89,6 @@ class GraphNode:
         # update current position
         self.position.x += x
         self.position.y += y
-        # TODO WTF!! Das kann nicht stimmen, das neuerstellen in redraw_graph ist schneller als
-        # TODO das verschieben via config, das waere sehr interessant
-        # self.canvas.coords(self.canvas_id, self.position.x - self.graphNodeRadius / 1.5,
-        #                                         self.position.y - self.graphNodeRadius / 1.5,
-        #                                         self.position.x + self.graphNodeRadius,
-        #                                         self.position.y + self.graphNodeRadius)
-        # self.canvas.coords(self.canvas_text_id)
-
     def __str__(self):
         return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
 
@@ -211,17 +182,5 @@ class GraphEdge:
         # Create line and save id
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
-    @classmethod
-    def from_nodes(cls, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> 'GraphEdge':
-        """
-        :param canvas:      The canvas on which the edge should be drawn
-        :type canvas:       tk.Canvas
-        :param start_node:  The node where the edge should start
-        :type start_node:   GraphNode
-        :param end_node:    The node where the edge should start
-        :type end_node:     GraphNode
-        :return:
-        """
-        return cls(canvas=canvas, start_node=start_node, end_node=end_node)
 
 
