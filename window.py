@@ -186,7 +186,12 @@ class Window:
             # Falls nicht, sollen die Widgets geloescht werden damit sie nicht angezeigt werden
             self.del_eades_constant_widgets()
 
-    def load_graph(self, filepath):
+    def load_graph(self, filepath) -> None:
+        """
+        Loads a graph from the specified filepath, also initializes the tab and the graph visuals
+        in which the graph will be displayed
+        :param filepath: Filepath from which the graph should be loaded    
+        """
         print("Loading graph...")
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
