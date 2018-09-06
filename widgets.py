@@ -2,12 +2,11 @@ from graph import Graph, GraphNode
 from typing import List
 import tkinter as tk
 from tkinter import filedialog
-from tkinter import ttk
 
 
 class OpenGraphDialog:
-    def __init__(self, root):
-        self.filename = "test"
+    def __init__(self, root) -> None:
+        self.filename: str = "test"
         self.eades = tk.BooleanVar()
         self.fruchterman_reingold = tk.BooleanVar()
 
@@ -40,9 +39,9 @@ class OpenGraphDialog:
 
 
 class NoteBookTab:
-    def __init__(self, canvas, graph, graph_vis, algo=""):
-        self.canvas = canvas
-        self.graph = graph
+    def __init__(self, canvas, graph, graph_vis, algo="") -> None:
+        self.canvas: tk.Canvas = canvas
+        self.graph: Graph = graph
         self.graph_vis = graph_vis
         # TODO Dynamisch statt hardcoded
         self.original_canvas_width = 1414
@@ -56,11 +55,11 @@ class NoteBookTab:
 
 
 class InfoMenu(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         tk.Frame.__init__(self, parent)
         self.parent = parent
-        self.label = []
-        self.label_val = []
+        self.label: List[str] = []
+        self.label_val: List[str] = []
         self.row_ctr = 0
         self.parent.bind("<Command-l>", self.print)
         self.visible = True
@@ -88,7 +87,7 @@ class InfoMenu(tk.Frame):
 
 
 class NodeInfo:
-    def __init__(self,root,node: GraphNode, adjacent_nodes: List[GraphNode]):
+    def __init__(self, root, node: GraphNode, adjacent_nodes: List[GraphNode]) -> None:
         self.root = root
         self.window = tk.Toplevel(self.root)
         # Sorgt dafuer das die Info Fenster nicht durch das "Main"-Fenster verdeckt
