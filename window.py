@@ -252,7 +252,13 @@ class Window:
         current_tab.canvas.bind("<Control-c>", current_tab.graph_vis.redraw_graph)
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.set_focus)
         # add="+" sorgt dafuer das die vorherige Funktion die auf der Tasten liegt nicht ueberschrieben wird
+        current_tab.canvas.bind("<Control-p>", current_tab.zoom_in)
+        current_tab.canvas.bind("<Control-p>", current_tab.graph_vis.inc_zoomlevel, add="+")
+
+        current_tab.canvas.bind("<Control-o>", current_tab.zoom_out)
+        current_tab.canvas.bind("<Control-o>", current_tab.graph_vis.dec_zoomlevel, add="+")
         current_tab.canvas.bind("<Button-1>", current_tab.graph_vis.select_node, add="+")
+
 
         self.del_eades_constant_widgets()
 
