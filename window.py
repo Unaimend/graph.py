@@ -1,13 +1,15 @@
+"""Module which handles most of the ui-stuff aka top level window stuff"""
+
 # -*- coding: latin-1 -*-
-from graph import Graph
 import tkinter as tk
 from tkinter import ttk
+import time
+from graph import Graph
 from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
 from fr import FruchtermanReingold
 from utils import timeit
-import time
 from depth_first_search import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Siehe Shift-MouseWheel MouseWheel
@@ -68,7 +70,7 @@ class Window:
         # File menu
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         # self.viewmenu.add_separator()
-        self.filemenu.add_command(label="Open...    (CMD+N)", command=self.open_new_graph )
+        self.filemenu.add_command(label="Open...    (CMD+N)", command=self.open_new_graph)
         self.filemenu.add_command(label="Exit", command=root.quit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
 
@@ -96,6 +98,7 @@ class Window:
         # self.root.bind_all('<Shift-MouseWheel>', lambda x: print("links"))
 
     def get_current_notebook_tab_index(self, event=None):
+        """Method get the index of the current notebook tabbb"""
         """
         :param event: 
         :return: Return the index of the current Notebook Tab
@@ -112,7 +115,7 @@ class Window:
                                                   xscrollcommand=self.xscrollbar.set,
                                                   yscrollcommand=self.yscrollbar.set), None, None))
         # Erstellten Tab zum Canvas hizufuegen
-        self.nb.add(self.tabs[index].canvas,  text="Canvas " + str(index))
+        self.nb.add(self.tabs[index].canvas, text="Canvas " + str(index))
         # Damit die Daten aktualisiert werden
 
     def delete_tab(self, event=None) -> None:
@@ -124,6 +127,7 @@ class Window:
         self.nb.forget("current")
 
     def run(self):
+        """Starts the application"""
         self.root.mainloop()
 
     def open_new_graph(self, event="nothing"):
