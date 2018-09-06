@@ -9,6 +9,8 @@ __pycache__/
 #IntelliJ
 *idea/*
 
+etags.exe
+
 # Distribution / packaging
 .Python
 env/
