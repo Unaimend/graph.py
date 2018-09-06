@@ -6,8 +6,8 @@ from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
 from fr import FruchtermanReingold
+from utils import timeit
 import time
-from vector import Vector
 from depth_first_search import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Siehe Shift-MouseWheel MouseWheel
@@ -143,7 +143,7 @@ class Window:
         self.info_menu.add_label("Azyklisch")
         self.info_menu.label_val[2]["text"] = ""
 
-        self.info_menu.add_label("Zusammenh�ngend")
+        self.info_menu.add_label("Zusammenhaengend")
         self.info_menu.label_val[3]["text"] = ""
 
         self.info_menu.add_label("Algorithmus")
