@@ -4,12 +4,13 @@
    :synopsis: This module includes classes for drawing graphs and graph algos.
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
-from graph import Graph, GraphEdge, GraphNode
 import random
 import tkinter as tk
 import math
-from widgets import NodeInfo
 from typing import Dict, List
+from graph import Graph, GraphEdge, GraphNode
+from widgets import NodeInfo
+
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
 # TODO Wenn kraefte sehr klein sind = 0 setzen wegen floating point ungenauigkeit(gute idee?)
