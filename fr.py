@@ -25,8 +25,6 @@ class FruchtermanReingold:
     # nicht vorhanden ist dieses Attribut simuliere ich dadurch das ich fuer jede node die verschiebung
     # berechne und in der Liste speichere. an [0] steht also der Wert um den die Node mit der Id 0
     # verschoben werden soll etc.
-    # TODO UNITTESSSSTTSSSSSSS
-
     @staticmethod
     def distance(node1: graph.GraphNode, node2: graph.GraphNode) -> float:
         # TODO Die funktion gehoert hier nicht hin(doppelt) siehe ead.
@@ -62,15 +60,15 @@ class FruchtermanReingold:
     def do_fr(self, how_often: int):
         for x in range(0, how_often):
             # Das hier in Funk. do_fr_one_iter
-            self.displacement_list = [Vector(0, 0)] * self.graph_visuals.nodeCounter
+            self.displacement_list = [Vector(0, 0)] * self.graph_visuals.node_counter
             self.calc_attractive_forces()
 
             self.calc_repelling_forces()
             i = 0
             for disp in self.displacement_list:
                 v = min(disp.abs(), self.t)
-                direction = Vector(disp.to_unit().x * v, disp.to_unit().y * v )
-                self.graph_visuals.graphNodes[i].move(direction.x, direction.y)
+                direction = Vector(disp.to_unit().x * v, disp.to_unit().y * v)
+                self.graph_visuals.graph_nodes[i].move(direction.x, direction.y)
                 i = i + 1
             self.cool()
 
@@ -106,8 +104,8 @@ class FruchtermanReingold:
         # Diese MEthode berechnet die abstossenden Kraefte
         # BUG  Ist diese(displacement list) Liste hier moeglicherweise
         # mit nicht nullwerete gefuellt was den algo. kaputmacht
-        for node in self.graph_visuals.graphNodes:
-            for nodes in self.graph_visuals.graphNodes:
+        for node in self.graph_visuals.graph_nodes:
+            for nodes in self.graph_visuals.graph_nodes:
                 if node.id != nodes.id:
                     diff = node.position - nodes.position
                     diff_length = diff.abs()
@@ -121,7 +119,7 @@ class FruchtermanReingold:
         """
         Calculates and "anwenden" the attractive forces 
         """
-        for edge in self.graph_visuals.graphEdges:
+        for edge in self.graph_visuals.graph_edges:
             diff = edge.start_node.position - edge.end_node.position
             diff_length = diff.abs()
             scaled_x_comp = diff.to_unit().x * self.fa(diff_length)
@@ -139,7 +137,3 @@ class FruchtermanReingold:
         :return: Nothing 
         """
         self.t = self.t - 1
-
-
-
-
