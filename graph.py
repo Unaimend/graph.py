@@ -4,10 +4,11 @@
    :synopsis: This module includes classes necessary for working with graphs
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
+import tkinter as tk
 from typing import List
 import json
 from vector import Vector
-import tkinter as tk
+
 
 
 
@@ -32,6 +33,7 @@ AdjacencyMatrix = List[List[int]]
 # TODO DFS Visualisierung und ueberlegen wie ich mit Graphen umgehe die nicht integer vertices haben
 # IDEE Als isomorphen graphen zu einem integer graphen betrachtemn
 
+
 class GraphNode:
     """
     Class which represents a node in a graph
@@ -41,7 +43,7 @@ class GraphNode:
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
     # TODO Nodes sollte wissen zu wem sie adjazent sind(sollten sie das?)
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour):
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour) -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :type x0: tk.Canvadraw_ids: Whether to draw ids or not
@@ -77,7 +79,7 @@ class GraphNode:
                                                 left_corner.y,
                                                 right_corner.x,
                                                 right_corner.y, fill="white")
-            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id, fill = self.colour)
+            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id, fill=self.colour)
         else:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
@@ -124,8 +126,8 @@ class Graph:
     """
     Class for representing graphs
     """
-    def __init__(self, filepath: str=None, adjacency_list: AdjacencyList=None,
-                 adjacency_matrix: AdjacencyMatrix=None):
+    def __init__(self, filepath: str = None, adjacency_list: AdjacencyList = None,
+                 adjacency_matrix: AdjacencyMatrix = None) -> None:
         """
         Note: All the variables are exlusive, that means if on is supplied the others should not be used
         :param filepath: The path from which the graph should be loaded
@@ -174,7 +176,7 @@ class Graph:
         return cls(adjacency_list=adjacency_list)
 
     @classmethod
-    def from_adjacency_matrix(cls,  adjacency_matrix: AdjacencyMatrix) -> 'Graph':
+    def from_adjacency_matrix(cls, adjacency_matrix: AdjacencyMatrix) -> 'Graph':
         """
         :param adjacency_matrix: The adj. matrix from which the graph sould be loaded
         :return: A new graph instance
@@ -191,9 +193,9 @@ class Graph:
 
 class GraphEdge:
     """
-    The class reprents a graph edge
+    This class represents a graph edge
     """
-    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode):
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
         """
         :param canvas: The canvas on which the edge should be drawn
         :type canvas: tk.Canvas
