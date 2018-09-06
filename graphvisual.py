@@ -7,9 +7,10 @@
 import random
 import tkinter as tk
 import math
-from typing import Dict, List
+from typing import List
 from graph import Graph, GraphEdge, GraphNode
 from widgets import NodeInfo
+from vector import Vector
 
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
@@ -20,6 +21,9 @@ from widgets import NodeInfo
 
 
 class GraphVisual:
+    """
+    Class for displaying an undirected graph
+    """
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
@@ -125,10 +129,6 @@ class GraphVisual:
             for y in x:
                 self.node_adjacency_list[counter].append(self.graph_nodes[y])
             counter += 1
-
-    def to_pixel_pos(self, x: float, y: float) -> Dict[str, float]:
-        pos = {"x": 1 / self.width * x, "y": 1 / self.height * y}
-        return pos
 
     def redraw_nodes(self):
         """

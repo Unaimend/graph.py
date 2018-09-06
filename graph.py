@@ -71,7 +71,8 @@ class GraphNode:
                                                 left_corner.y,
                                                 right_corner.x,
                                                 right_corner.y, fill="white")
-            self.canvas_text_id = canvas.create_text(self.position.x + 2, self.position.y + 2, text=self.id, fill=self.colour)
+            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
+            self.canvas_text_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.id, fill=self.colour)
         else:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
