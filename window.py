@@ -327,6 +327,10 @@ class Window:
         current_tab.graph_vis.generate_edges()
 
     def del_eades_constant_widgets(self):
+        """
+        FUNctions which handles the deletetion of the eades labels and text boxes
+        :return: 
+        """
         # Wenn self.eades_options_frame exisitiert, exisitieren die anderen Variablen auch
         # und es is sicher .destroy zu callen
         if self.eades_options_frame is not None:
@@ -341,6 +345,7 @@ class Window:
             self.label_4.destroy()
 
     def init_eades_constant_widgets(self):
+        """Initializes all the eades constant"""
         # Frame der die Label und TextInputs h�lt
         self.eades_options_frame = tk.Frame(self.root)
         # Position des Frames in der GUI setzen
