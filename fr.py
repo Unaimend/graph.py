@@ -25,39 +25,12 @@ class FruchtermanReingold:
     # nicht vorhanden ist dieses Attribut simuliere ich dadurch das ich fuer jede node die verschiebung
     # berechne und in der Liste speichere. an [0] steht also der Wert um den die Node mit der Id 0
     # verschoben werden soll etc.
-    @staticmethod
-    def distance(node1: graph.GraphNode, node2: graph.GraphNode) -> float:
-        # TODO Die funktion gehoert hier nicht hin(doppelt) siehe ead.
-        """
-        Calculates the distance between two nodes
-        :param node1: The "start" node
-        :param node2: The "end" node
-        :return: The distance between the two nodes
-        """
-        # Pythagorean theorem in R^2(euclidean distance in R^2)
-        x_diff = node1.position.x - node2.position.x
-        y_diff = node1.position.y - node2.position.y
-        distance = math.sqrt(x_diff ** 2 + y_diff ** 2)
-        return distance
-
-    @staticmethod
-    def unit_vector(node1: graph.GraphNode, node2: graph.GraphNode) -> Vector:
-        """
-        Calculates the unit vector between two given nodes
-        :param node1: The "start" node
-        :param node2: The "end" node
-        :return: The unit vector between two given nodes
-        """
-        # Calculate x and y distance separate
-        unit_vec = Vector(node1.position.x - node2.position.x, node1.position.y - node2.position.y)
-        # Divide vector by its length to obtain a unit vector
-        x_comp = unit_vec.x / FruchtermanReingold.distance(node1, node2)
-        y_comp = unit_vec.y / FruchtermanReingold.distance(node1, node2)
-        unit_vec = Vector(x_comp, y_comp)
-        return unit_vec
-
-
     def do_fr(self, how_often: int):
+        """
+        "EXECUTes the algorithm
+        :param how_often: How often the fr algorithm should be executed 
+        :return: 
+        """
         for x in range(0, how_often):
             # Das hier in Funk. do_fr_one_iter
             self.displacement_list = [Vector(0, 0)] * self.graph_visuals.node_counter
