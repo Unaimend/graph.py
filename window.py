@@ -246,31 +246,12 @@ class Window:
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab()]
         # Graphen auf dem gearbeitet wird zuweisen
-        FruchtermanReingold.graph_visuals = current_tab.graph_vis
-        # Flaeche der Zeichenflaeche berechnen
-        FruchtermanReingold.area = Window.CANVAS_HEIGHT * Window.CANVAS_WIDTH
         # FruchtermanReingold.k =  math.sqrt(FruchtermanReingold.area / FruchtermanReingold.graph_visuals.nodeCounter)
         # TODO Warum ist das hardgecoded
-        FruchtermanReingold.k = 50
-        # Startwert fuers cooling
-        FruchtermanReingold.t = 100
-        start = time.time()
-        for x in range(0, 100):
-            # Das hier in Funk. do_fr_one_iter
-            FruchtermanReingold.displacement_list = [Vector(0, 0)] * FruchtermanReingold.graph_visuals.nodeCounter
-            FruchtermanReingold.calc_attractive_forces()
+        fr = FruchtermanReingold(graph_visuals=current_tab.graph_vis, canvas_width=Window.CANVAS_WIDTH,
+                                 canvas_height=Window.CANVAS_HEIGHT, k=50, t=100 )
 
-            FruchtermanReingold.calc_repelling_forces()
-            i = 0
-            for disp in FruchtermanReingold.displacement_list:
-                v = min(disp.abs(), FruchtermanReingold.t)
-         #       print("V", v)
-                direction = Vector(disp.to_unit().x * v, disp.to_unit().y * v )
-                FruchtermanReingold.graph_visuals.graphNodes[i].move(direction.x, direction.y)
-                i = i + 1
-            FruchtermanReingold.cool()
-        end = time.time()
-        #print("Elapsed Time", end - start)
+        timeit(fr.do_fr)
 
         current_tab.graph_vis.redraw_nodes()
 
