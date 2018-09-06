@@ -8,7 +8,7 @@ from eades import Eades
 from fr import FruchtermanReingold
 import time
 from vector import Vector
-from depthFirstSearch import DepthFirstSearch
+from depth_first_search import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Bind mac touchbad to scrollbars
 # TODO Siehe Shift-MouseWheel MouseWheel
@@ -254,6 +254,7 @@ class Window:
         FruchtermanReingold.t = 100
         start = time.time()
         for x in range(0, 100):
+            # Das hier in Funk. do_fr_one_iter
             FruchtermanReingold.displacement_list = [Vector(0, 0)] * FruchtermanReingold.graph_visuals.nodeCounter
             FruchtermanReingold.calc_attractive_forces()
 
@@ -337,24 +338,24 @@ class Window:
         # Textfield for c1 Eades constant
         self.t1 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t1.pack(side=tk.LEFT)
-        self.t1.insert(tk.END, self.current_algo.c1)
+        self.t1.insert(tk.END, self.current_algo.constant_1)
         self.l2 = tk.Label(self.eades_options_frame, text="c2")
         self.l2.pack(side=tk.LEFT)
         # Textfield for c2 Eades constant
         self.t2 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t2.pack(side=tk.LEFT)
-        self.t2.insert(tk.END, self.current_algo.c2)
+        self.t2.insert(tk.END, self.current_algo.constant_2)
         self.l3 = tk.Label(self.eades_options_frame, text="c3")
         self.l3.pack(side=tk.LEFT)
         # Textfield for c3 Eades constant
         self.t3 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2)
         self.t3.pack(side=tk.LEFT)
-        self.t3.insert(tk.END, self.current_algo.c3)
+        self.t3.insert(tk.END, self.current_algo.constant_3)
         self.l4 = tk.Label(self.eades_options_frame, text="c4")
         self.l4.pack(side=tk.LEFT)
         # Textfield for c4 Eades constant
         self.t4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus = 0)
         self.t4.pack(side=tk.LEFT)
-        self.t4.insert(tk.END, self.current_algo.c4)
+        self.t4.insert(tk.END, self.current_algo.constant_4)
 # ----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
 
