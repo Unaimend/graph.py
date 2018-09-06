@@ -1,8 +1,8 @@
 # -*- coding: latin-1 -*-
-from graph import Graph, GraphNode
+from graph import Graph
 import tkinter as tk
 from tkinter import ttk
-from widgets import OpenGraphDialog, NoteBookTab, NodeInfo, InfoMenu
+from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 from graphvisual import GraphVisual
 from eades import Eades
 from fr import FruchtermanReingold
@@ -10,7 +10,6 @@ import time
 from vector import Vector
 from depth_first_search import DepthFirstSearch
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
-# TODO Bind mac touchbad to scrollbars
 # TODO Siehe Shift-MouseWheel MouseWheel
 # TODO Wenn graph gezeichnet wird sollten scrollsbars auf anfang gesetzt werden damit man den graphen sieht
 
@@ -18,8 +17,7 @@ from depth_first_search import DepthFirstSearch
 # TODO Slices um das \n oder so loszuwerden beim den textfeldern(anber erst string.rstrip anschauen
 # Passiert falls man mit Enter versucht die Textfield eingabe zu bestaetigen,
 # Das Emter drucken in einem Label sollte dafuer sorgen dass das Canvas ausgewaehlt wird
-# TODO Ueberlegen ob ich die Alg. async mache
-# BUG Die Scrollbars scrollen alle nur den ersten Tab und nicht den zz. ausgewaelten
+
 
 # Frozen binarie am Besten mit pypy3
 

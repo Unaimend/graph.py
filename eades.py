@@ -25,19 +25,7 @@ class Eades:
         # Beeinflusstt die konv. Gesch.
         self.constant_4 = 0.1
 
-    # c1 = 2
-    # c2 = 1
-    # # c3 = 10000
-    # c3 = 1
-    # c4 = 0.1
 
-    # c1 = 2
-    # c2 = 1
-    # # c3 = 10000
-    # c3 = 1
-    # c4 = 0.1
-
-    # 2,200,5000,0.1
     @staticmethod
     def distance(node1: graph.GraphNode, node2: graph.GraphNode) -> float:
         # TODO Die funktion gehoert hier nicht hin.
