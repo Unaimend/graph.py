@@ -1,7 +1,7 @@
-from graph import Graph, GraphNode
 from typing import List
 import tkinter as tk
 from tkinter import filedialog
+from graph import Graph, GraphNode
 
 
 class OpenGraphDialog:
