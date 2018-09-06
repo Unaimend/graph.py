@@ -1,3 +1,4 @@
+# pylint: skip-file
 from eades import Eades
 import unittest
 from graph import GraphNode
