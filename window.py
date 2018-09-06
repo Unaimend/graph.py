@@ -115,6 +115,9 @@ class Window:
         self.nb.add(self.tabs[index].canvas,  text="Canvas " + str(index))
         # Damit die Daten aktualisiert werden
 
+    def delete_tab(self, event=None):
+        self.nb.forget("current")
+
     def run(self):
         self.root.mainloop()
 
