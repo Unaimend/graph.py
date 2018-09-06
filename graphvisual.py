@@ -34,11 +34,11 @@ class GraphVisual:
         self.window = window
         # Specifies the minimal distance two nodes are allowed to have
         # needed when user places nodes himself
-        self.graphNodesMinDistance = 2 * GraphNode.graphNodeRadius
+        self.graph_nodes_min_distance = 2 * GraphNode.graphNodeRadius
         # Array for the the nodes of the graph(holds GraphNodes objects)
-        self.graphNodes: List[GraphNode] = []
+        self.graph_nodes: List[GraphNode] = []
         # Array for the the edges of the graph(holds GraphEdge objects)
-        self.graphEdges: List[GraphEdge] = []
+        self.graph_edges: List[GraphEdge] = []
         # Adjacency list but with nodes instead of integers
         # Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drinnen die zu x adj. sind.,
         # x ist zurzeit die id der node von der die adjazenz ausgehen soll
@@ -50,11 +50,11 @@ class GraphVisual:
         self.graph: Graph = None
 
         # Saves the coordinates of the last two clicked notes
-        self.clickedNodes: List[GraphNode] = []
+        self.clicked_nodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
-        self.drawNodeIds: bool = False
+        self.draw_node_ids: bool = False
         # Helper variable for the node id
-        self.nodeCounter = 0
+        self.node_counter = 0
         random.seed(GraphVisual.seed)
         if graph:
             self.graph = graph
@@ -94,10 +94,10 @@ class GraphVisual:
         """
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
         for x in self.graph.adjacency_list:
-            self.graphNodes.append(
+            self.graph_nodes.append(
                 GraphNode(self.canvas, random.randint(0, self.width),
-                          random.randint(0, self.height), self.drawNodeIds, self.nodeCounter, "black"))
-            self.nodeCounter += 1
+                          random.randint(0, self.height), self.draw_node_ids, self.node_counter, "black"))
+            self.node_counter += 1
 
     def generate_adj_list(self):
         """
@@ -109,7 +109,7 @@ class GraphVisual:
         for x in self.graph.adjacency_list:
             self.node_adjacency_list.append([])
             for y in x:
-                self.node_adjacency_list[counter].append(self.graphNodes[y])
+                self.node_adjacency_list[counter].append(self.graph_nodes[y])
             counter += 1
 
     def to_pixel_pos(self, x: float, y: float) -> Dict[str, float]:
@@ -122,38 +122,38 @@ class GraphVisual:
         """
         # TODO Hier sollte eine redraw methode der GraphNode und GraphEdge Klasse genutzt werden
         # Delete nodes and node text from the canvas
-        for node in self.graphNodes:
+        for node in self.graph_nodes:
             self.canvas.delete(node.canvas_id)
             self.canvas.delete(node.canvas_text_id)
 
         alternative_nodelist = []
         # Redraw nodes with updated arguments
-        for node in self.graphNodes:
+        for node in self.graph_nodes:
             alternative_nodelist.append(GraphNode(self.canvas, node.position.x, node.position.y,
-                                                  self.drawNodeIds, node.id, node.colour))
-        self.graphNodes = alternative_nodelist
+                                                  self.draw_node_ids, node.id, node.colour))
+        self.graph_nodes = alternative_nodelist
 
     def generate_edges(self):
         """Generates edges between graph nodes, can also be used to redraw edges"""
         # Deletes all old edges from the canvas
-        for edges in self.graphEdges:
+        for edges in self.graph_edges:
             self.canvas.delete(edges.id)
 
         # Init graphEdges with an new array because the old edges are not needed anymore
-        self.graphEdges = []
+        self.graph_edges = []
 
         # Iterate over all nodes(those are GraphNode objects)
-        for node in self.graphNodes:
+        for node in self.graph_nodes:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = GraphEdge.from_nodes(canvas=self.canvas, start_node=node, end_node=nodes)
+                edge = GraphEdge(canvas=self.canvas, start_node=node, end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 # TODO Ich haette gerne jede Kante nur einmal in der Liste, da ich micht nicht sicher bin
                 # TODO welche Auswirkungen das auf den Algorithmus von Fruchterman-Reingold hat
                 # TODO aber es muesste mathematisch korrekt sein das jede Kante 2mal vorkomment
                 # TODO da sie ja eig. versch. Kanten darstellen
-                self.graphEdges.append(edge)
+                self.graph_edges.append(edge)
 
     @staticmethod
     def set_focus(event=None):
@@ -176,10 +176,10 @@ class GraphVisual:
 
     def change_node_look(self, event=None):
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
-        if not self.drawNodeIds:
-            self.drawNodeIds = True
+        if not self.draw_node_ids:
+            self.draw_node_ids = True
         else:
-            self.drawNodeIds = False
+            self.draw_node_ids = False
         self.redraw_graph()
 
     def select_node(self, event):
@@ -188,9 +188,9 @@ class GraphVisual:
         # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
         current_smallest_dist = 16
 
-        nearest_node = self.graphNodes[0]
+        nearest_node = self.graph_nodes[0]
 
-        for node in self.graphNodes:
+        for node in self.graph_nodes:
             x_offset = (nearest_node.position.x - x) ** 2
             y_offset = (nearest_node.position.y - y) ** 2
             current_smallest_dist = math.sqrt(x_offset + y_offset)
@@ -209,7 +209,7 @@ class GraphVisual:
             self.current_selected_node = nearest_node
             # Infofenster erstellen und oeffnen
             self.current_info = NodeInfo(self.window, self.current_selected_node, self.node_adjacency_list[self.current_selected_node.id])
-            for node in self.graphNodes:
+            for node in self.graph_nodes:
                 # Alle nodes die nicht ausgeaehlt wurden schwarz faerben
                 if node != self.current_selected_node:
                     node.colour = "black"
@@ -217,7 +217,7 @@ class GraphVisual:
         else:
             # Falls keine Node ausgewaehlt wurde sollen alle Nodes schwarz sein
             self.current_selected_node = None
-            for node in self.graphNodes:
+            for node in self.graph_nodes:
                 node.colour = "black"
                 self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
 
