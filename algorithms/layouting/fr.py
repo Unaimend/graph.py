@@ -12,6 +12,15 @@ class FruchtermanReingold:
     """ Class which implements the layouting-algorithm from EAD[84]
     """
     def __init__(self, graph_visuals, canvas_width, canvas_height, k, t):
+        """
+        Ctor. 
+        :param graph_visuals: Handles all the stuff that has to do with drawing
+        :param canvas_width: Width of the canvas
+        :param canvas_height: Height of the canvas 
+        :param k: See Paper 
+        :param t: See Paper
+        """
+
         self.graph_visuals = graph_visuals
         self.canvas_width = canvas_width
         self.canvas_length = canvas_height
