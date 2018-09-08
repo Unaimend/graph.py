@@ -50,7 +50,7 @@ class GraphNode:
         self.canvas = canvas
         #: The id that will be drawn "in the node"
         self.id = id
-        #: The id to identify this node
+        #: The id to identify this node on the canvas
         self.canvas_id = 0
         #: Id to identify the text of this node
         self.canvas_text_id = "-1"
@@ -93,6 +93,10 @@ class GraphNode:
     def __str__(self):
         return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
 
+    def set_pos(self, x, y):
+        self.position.x = x
+        self.position.y = y
+
 
 class Graph:
     """
@@ -127,9 +131,16 @@ class Graph:
             f.close()
             # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
+            # self.traverse_binary_tree(2)
+
+            # print(self.parent(8), self.parent(7))
+            # print(self.dist_from_root(8), self.dist_from_root(7))
             print("Adjacency list", self.adjacency_list)
         else:
             print("TODO exception")
+
+        self.is_binary_tree = True
+        self.node_id = 0
 
     @classmethod
     def from_file(cls, filepath: str) -> 'Graph':
@@ -161,6 +172,107 @@ class Graph:
         :return: adjacency_list from the give node
         """
         return self.adjacency_list[node.id]
+
+    def root_index(self):
+        """Returns the  index of the root"""
+        if self.is_binary_tree:
+            return 0
+        return -1
+
+    def traverse_binary_tree(self, index):
+        # pylint: disable=C1801
+        """Traverse the whole binary tree"""
+        if len(self.adjacency_list) > 0:
+            if index == 0:
+                for child_index in self.adjacency_list[0]:
+                    self.traverse_binary_tree(child_index)
+            else:
+                print(index)
+                # In current node has children(>1 because every node has its parent node as an adj. list entry)
+                if len(self.adjacency_list[index]) > 1:
+                    for counter in range(1, len(self.adjacency_list[index])):
+                        self.traverse_binary_tree(self.adjacency_list[index][counter])
+                else:
+                    pass
+
+        else:
+            print("Cant traverse an emtpy graph")
+
+    def subtree_index(self, index):
+        # pylint: disable=C1801
+        """
+        Calculates all indices of of the subtree from node[index]
+        :param index: The index to the node from which you want the subtree 
+        :return: A List made of the indices to the nodes of the subtree 
+        """
+        indices = []
+        if len(self.adjacency_list) > 0:
+            if index == 0:
+                indices.append(0)
+                for child_index in self.adjacency_list[0]:
+                    self.traverse_binary_tree(child_index)
+            else:
+                indices.append(index)
+                # In current node has children(>1 because every node has its parent node as an adj. list entry)
+                if len(self.adjacency_list[index]) > 1:
+                    for counter in range(1, len(self.adjacency_list[index])):
+                        self.traverse_binary_tree(self.adjacency_list[index][counter])
+                else:
+                    pass
+
+        else:
+            print("Cant traverse an emtpy graph")
+
+        return indices[0:-1]
+
+    def parent(self, index):
+        """
+        Calculates the index from to parent from node[index]
+        :param index: The index of the node from which you want the parent
+        :return: The parent of node[index] or -1 if you ask for the parent of the root
+        """
+        if index == 0:
+            return -1
+        return self.adjacency_list[index][0]
+
+    def dist_from_root(self, index):
+        """
+        Calculates the distance from root to node[index], should be the number of edges
+        :param index: The index of the node from which you want the distance
+        :return: The distance from root to node[index]  
+        """
+        if index == 0:
+            return 0
+        return self.dist_from_root(self.parent(index)) + 1
+
+    def left(self, index):
+        """
+        Get the index left child of index
+        :param index: index of the node from which you wan't the left child index
+        :return: The index oft the left child of index or -1 if node[index] doesnt exist
+        """
+        index = -1
+        try:
+            index = self.adjacency_list[index][1]
+            return index
+        except IndexError:
+            return index
+
+    def right(self, index):
+        """
+        Get the index right child of index
+        :param index: index of the node from which you wan't the right child index
+        :return: The index of the right child of index or -1 if node[index] doesnt exist
+        """
+        index = -1
+        try:
+            index = self.adjacency_list[index][2]
+            return index
+        except IndexError:
+            return index
+
+
+
 
 
 class GraphEdge:
