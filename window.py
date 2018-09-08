@@ -1,16 +1,22 @@
+# pylint: disable=C0303, W0511
 """Module which handles most of the ui-stuff aka top level window stuff"""
-
+import time
 # -*- coding: latin-1 -*-
 import tkinter as tk
 from tkinter import ttk
-import time
+
+from algorithms.layouting.fr import FruchtermanReingold
+from algorithms.layouting.lefty import Lefty
+from algorithms.layouting.eades import Eades
+
+
+from algorithms.depth_first_search import DepthFirstSearch
 from graph import Graph
-from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 from graphvisual import GraphVisual
-from eades import Eades
-from fr import FruchtermanReingold
 from utils import timeit
-from depth_first_search import DepthFirstSearch
+from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
+
+
 # TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
 # TODO Siehe Shift-MouseWheel MouseWheel
 # TODO Wenn graph gezeichnet wird sollten scrollsbars auf anfang gesetzt werden damit man den graphen sieht
@@ -24,6 +30,7 @@ from depth_first_search import DepthFirstSearch
 
 
 class Window:
+    """ClLass which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
     CANVAS_WIDTH = 1400
     CANVAS_HEIGHT = 700
@@ -31,6 +38,7 @@ class Window:
     # TODO Jeder Tab hat ja die moeglichkeit einen anderen Algorithmus zu verwenden
     EADES = False
     FRUCHTERMAN_REINGOLD = False
+    LEFTY = False
 
     def __init__(self, root):
         self.root = root
@@ -98,6 +106,7 @@ class Window:
         # self.root.bind_all('<Shift-MouseWheel>', lambda x: print("links"))
 
     def get_current_notebook_tab_index(self, event=None):
+        # pylint: disable=W0613
         """Method get the index of the current notebook tabbb"""
         """
         :param event: 
@@ -106,6 +115,7 @@ class Window:
         return self.nb.index("current")
 
     def add_canvas(self, event=None):
+        # pylint: disable=W0613
         # Anzahl der Tabs herausfinden
         index = len(self.nb.tabs())
         # Neuen Tab und zugehoeriges Canvas erstellen
@@ -119,6 +129,7 @@ class Window:
         # Damit die Daten aktualisiert werden
 
     def delete_tab(self, event=None) -> None:
+        # pylint: disable=W0613
         """
         Functons which closes the current ttk Notebook Tab
         :param event: --- 
@@ -131,6 +142,7 @@ class Window:
         self.root.mainloop()
 
     def open_new_graph(self, event="nothing"):
+        # pylint: disable=W0613
         """
         Funktion welche das Oeffnen eines neuen Graphen regelt, also das Auswehlen
         des json datei, das Auswaehlen des Algos und das setzen der Konstanten und Informationen 
@@ -141,6 +153,7 @@ class Window:
         current_instance = OpenGraphDialog(self.root)
         Window.EADES = current_instance.eades.get()
         Window.FRUCHTERMAN_REINGOLD = current_instance.fruchterman_reingold.get()
+        Window.LEFTY = current_instance.lefty.get()
         self.load_graph(current_instance.filename)
         self.toggle_info_menu()
         self.toggle_info_menu()
@@ -166,6 +179,7 @@ class Window:
         self.info_menu.label_val[4]["text"] = self.tabs[self.get_current_notebook_tab_index()].algorithm
 
     def toggle_info_menu(self, event=None) -> None:
+        # pylint: disable=W0613
         """
         Toggles the Info Menue
         :param event: 
@@ -194,6 +208,7 @@ class Window:
         self.tabs[self.get_current_notebook_tab_index()].canvas.configure(width=new_width)
 
     def renew_info_menu_data(self, event=None) -> None:
+        # pylint: disable=W0613
         """
         Reloads the Info-Menue-Data when the Info Menue got toggled
         :param event: 
@@ -233,6 +248,8 @@ class Window:
             current_tab.algorithm = "eades"
         elif Window.FRUCHTERMAN_REINGOLD:
             current_tab.algorithm = "fr"
+        elif Window.LEFTY:
+            current_tab.algorithm = "lefty"
         else:
             current_tab.algorithm = "None"
 
@@ -272,12 +289,30 @@ class Window:
             self.init_eades_constant_widgets()
         elif Window.FRUCHTERMAN_REINGOLD:
             current_tab.canvas.bind("<Control-s>", self.do_fruchterman_reingold)
+        elif Window.LEFTY:
+            current_tab.canvas.bind("<Control-s>", self.do_sexy)
+
 
         # Next algorithm gui stuff
         current_tab.graph_vis.redraw_graph()
         # ---------------------------------------------------------------------------------------------
 
+    def do_sexy(self, event=None)->None:
+        # pylint: disable=W0613
+        current_tab = self.tabs[self.get_current_notebook_tab_index()]
+
+        sexy = Lefty(graph_visuals=current_tab.graph_vis, graph=current_tab.graph, canvas_width=Window.CANVAS_WIDTH,
+                     canvas_height=Window.CANVAS_HEIGHT)
+
+        timeit(sexy.do_lefty)
+        current_tab.graph_vis.redraw_nodes()
+        # Update adjacency list
+        current_tab.graph_vis.generate_adj_list()
+        # Update edges between nodes
+        current_tab.graph_vis.generate_edges()
+
     def do_fruchterman_reingold(self, event=None) -> None:
+        # pylint: disable=W0613
         """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab_index()]
@@ -298,6 +333,7 @@ class Window:
 
     # -----------------------------EADES SPECIFIC STUFF------------------------------------------------------------
     def do_eades_new(self, event=None):
+        # pylint: disable=W0613
         """Inititialisiert die Eades-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.tabs[self.get_current_notebook_tab_index()]
