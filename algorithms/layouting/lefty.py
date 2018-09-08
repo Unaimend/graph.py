@@ -1,9 +1,19 @@
+"""Module which implements an algorithm similiar to the first Algorithm from Iidy drawing of Trees[WH79["""
 from graphvisual import  GraphVisual
 from graph import Graph
 
-class SexyTree:
 
+class Lefty:
+    """Class which implements an algorithm similiar to the first Algorithm from Iidy drawing of Trees[WH79["""
     def __init__(self, graph_visuals, graph, canvas_width, canvas_height):
+        """
+        Ctor. 
+        :param graph_visuals: Handles all the stuff that has to do with drawing
+        :param canvas_width: Width of the canvas
+        :param canvas_height: Height of the canvas 
+        :param k: See Paper 
+        :param t: See Paper
+        """
         self.graph_visuals = graph_visuals
         self.canvas_width = canvas_width
         self.canvas_length = canvas_height
@@ -19,13 +29,15 @@ class SexyTree:
 
 
 
-    def do_sexy(self):
+    def do_lefty(self) -> None:
+        """
+        Executes the whole algorithm 
+        """
         nexts = [100] * (self.max_height+2)
         depths = [0] * len(self.graph.adjacency_list)
         print("LEN", len(nexts))
         def pos(index, depth):
             curr_node = self.graph_visuals.graph_nodes[index]
-            print("DEPTH", depth)
             posit = nexts[depth]
             # Wenn diese if zutrifft kann direkt links von mir kein Knoten sein
             # also koennen wir eine positon nach links gehen ohne wen zu treffen
@@ -63,7 +75,7 @@ class SexyTree:
             # for node in self.graph_visuals.graph_nodes:
             #     dist = self.graph.dist_from_root(node.id)
             #     node.set_pos(node.position.x, dist * 100 )
-        print("DID SEXY")
+
 # current = 0
 #         next_x = [1]*self.max_height
 #         status = [1]*len(self.graph.adjacency_list)
