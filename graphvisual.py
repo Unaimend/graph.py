@@ -84,6 +84,7 @@ class GraphVisual:
         self.coordinate_fuckery: Vector(float, float) = Vector(1, 1)
 
     def inc_zoomlevel(self, event):
+        # pylint: disable=W0613
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
@@ -180,6 +181,7 @@ class GraphVisual:
         caller.focus_set()
 
     def redraw_graph(self, event=None):
+        # pylint: disable=W0613
         """
         Combines methods to redraw all graphical items of the graphs 
         """
@@ -189,6 +191,7 @@ class GraphVisual:
         self.generate_edges()
 
     def change_node_look(self, event=None):
+        # pylint: disable=W0613
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
         if not self.draw_node_ids:
             self.draw_node_ids = True
@@ -198,7 +201,7 @@ class GraphVisual:
 
     def select_node(self, event):
         """Selects a node and opens a window with important informatoion about the selected node"""
-        x, y = event.x, event.y
+        x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
         current_smallest_dist = 16
 
@@ -208,15 +211,17 @@ class GraphVisual:
             x_offset = (nearest_node.position.x - x) ** 2
             y_offset = (nearest_node.position.y - y) ** 2
             current_smallest_dist = math.sqrt(x_offset + y_offset)
-            adjusted_node_pos  = Vector(0,0)
+            adjusted_node_pos = Vector(0, 0)
+            # adjusted_node_pos.x = node.position.x
+            # adjusted_node_pos.y = node.position.y
             adjusted_node_pos.x = (node.position.x-self.width/2)*self.coordinate_fuckery.x+self.width/2
             adjusted_node_pos.y = (node.position.y-self.height/2)*self.coordinate_fuckery.y+self.height / 2
 
             x_offset = (adjusted_node_pos.x - x) ** 2
             y_offset = (adjusted_node_pos.y - y) ** 2
             dist = math.sqrt(x_offset + y_offset)
-            print("OFF", x_offset, "\ ", y_offset, '\ ', dist, "|", current_smallest_dist)
-            if dist < current_smallest_dist:
+            # print("OFF", x_offset, "\ ", y_offset, '\ ', dist, "|", current_smallest_dist)
+            if dist <= current_smallest_dist:
                 nearest_node = node
                 distance_dic[dist] = node.canvas_text_id
 
