@@ -1,9 +1,10 @@
 # pylint: skip-file
-from eades import Eades
-import unittest
-from graph import GraphNode
-import tkinter as tk
 import math
+import tkinter as tk
+import unittest
+
+from algorithms.layouting.eades import Eades
+from graph import GraphNode
 
 
 class EadesTest(unittest.TestCase):
