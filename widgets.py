@@ -1,3 +1,4 @@
+"""Module which contains all the ui widgets"""
 from typing import List
 import tkinter as tk
 from tkinter import filedialog
@@ -5,10 +6,16 @@ from graph import Graph, GraphNode
 
 
 class OpenGraphDialog:
+    """This is the window in which all setup options for algorithms and the algorithm you be chosen"""
     def __init__(self, root) -> None:
+        """
+        Ctor
+        :param root: The root window in which this Dialog should be opened 
+        """
         self.filename: str = "test"
         self.eades = tk.BooleanVar()
         self.fruchterman_reingold = tk.BooleanVar()
+        self.lefty = tk.BooleanVar()
 
         self.root = root
         self.window = tk.Toplevel(self.root)
@@ -22,6 +29,7 @@ class OpenGraphDialog:
         # TODO Show menue on if graph in none empty
 
     def open_graph(self):
+        """The functions which opens the window and adds all the options"""
         var = tk.IntVar()
         self.filename = filedialog.askopenfilename(title="Select file",
                                                    filetypes=(("graph files", "*.json"), ("all files", "*.*")))
@@ -34,12 +42,25 @@ class OpenGraphDialog:
         c.pack()
         c1 = tk.Checkbutton(self.window, text="Fruchterman-Reingold", variable=self.fruchterman_reingold, onvalue=True, offvalue=False)
         c1.pack()
+        c2 = tk.Checkbutton(self.window, text="Sexy", variable=self.lefty, onvalue=True,
+                            offvalue=False)
+        c2.pack()
         button.wait_variable(var)
         self.window.destroy()
 
 
 class NoteBookTab:
+    """
+    Verwaltungs-Class to handle the tab functionality like closing, opening, moving etc
+    """
     def __init__(self, canvas, graph, graph_vis, algo="") -> None:
+        """
+        Ctor.
+        :param canvas: 
+        :param graph: 
+        :param graph_vis: 
+        :param algo: 
+        """
         self.canvas: tk.Canvas = canvas
         self.graph: Graph = graph
         self.graph_vis = graph_vis
@@ -54,19 +75,22 @@ class NoteBookTab:
         self.graph_vis = graph_vis
 
     def zoom_in(self, event=None):
+        # pylint: disable=W0613
         # 0.9 if event.delta < 0 else 1.1
         amount = 1.1
         # DIe Null sollte width/2, height/2 sein aber das fuckt die berechnugn ab,
         # self.canvas.scale(tk.ALL, 0, 0, amount, amount)
-        self.canvas.scale(tk.ALL, self.graph_vis.width/2, self.graph_vis.height/2, amount, amount)
+        self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
 
     def zoom_out(self, event=None):
+        # pylint: disable=W0613
         print("WOOT")
         # 0.9 if event.delta < 0 else 1.1
         amount = 0.9
         self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
 
 class InfoMenu(tk.Frame):
+    # pylint: disable=R0901
     def __init__(self, parent) -> None:
         tk.Frame.__init__(self, parent)
         self.parent = parent
@@ -95,6 +119,7 @@ class InfoMenu(tk.Frame):
             self.grid()
 
     def print(self, event=None):
+        # pylint: disable=W0613
         print("TEST")
 
 
