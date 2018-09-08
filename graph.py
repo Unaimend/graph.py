@@ -35,7 +35,7 @@ class GraphNode:
     graphNodeRadius = 12
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour) -> None:
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black") -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :type x0: tk.Canvadraw_ids: Whether to draw ids or not
@@ -79,7 +79,6 @@ class GraphNode:
                                                 right_corner.x,
                                                 right_corner.y, fill="black")
 
-
     def move(self, x: float, y: float):
         """
         NOTE: Does not change the position on the canvas, a redraw must be called to do that
@@ -90,6 +89,7 @@ class GraphNode:
         # update current position
         self.position.x += x
         self.position.y += y
+
     def __str__(self):
         return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
 
@@ -131,13 +131,13 @@ class Graph:
             f.close()
             # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
-            # self.traverse_binary_tree(2)
-
-            # print(self.parent(8), self.parent(7))
-            # print(self.dist_from_root(8), self.dist_from_root(7))
             print("Adjacency list", self.adjacency_list)
         else:
             print("TODO exception")
+
+        # print("WP", self.subtree_index(0))
+
+
 
         self.is_binary_tree = True
         self.node_id = 0
@@ -187,7 +187,7 @@ class Graph:
                 for child_index in self.adjacency_list[0]:
                     self.traverse_binary_tree(child_index)
             else:
-                print(index)
+                # print("TRAV", index)
                 # In current node has children(>1 because every node has its parent node as an adj. list entry)
                 if len(self.adjacency_list[index]) > 1:
                     for counter in range(1, len(self.adjacency_list[index])):
@@ -223,7 +223,7 @@ class Graph:
         else:
             print("Cant traverse an emtpy graph")
 
-        return indices[0:-1]
+        return indices
 
     def parent(self, index):
         """
