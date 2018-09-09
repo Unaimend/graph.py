@@ -84,12 +84,22 @@ class GraphVisual:
         self.coordinate_fuckery: Vector(float, float) = Vector(1, 1)
 
     def inc_zoomlevel(self, event):
+        """
+        Calculates the misplacement which comes from zooming(which is scaling) the canvas
+        :param event: --- 
+        :return: 
+        """
         # pylint: disable=W0613
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
 
     def dec_zoomlevel(self, event):
+        """
+        Calculates the misplacement which comes from zooming(which is scaling) the canvas
+        :param event: --- 
+        :return: 
+        """
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
 

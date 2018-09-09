@@ -93,7 +93,13 @@ class GraphNode:
     def __str__(self):
         return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
 
-    def set_pos(self, x, y):
+    def set_pos(self, x: float, y: float) -> None:
+        """
+        Sets the position of the node to the specified x,y coordinates
+        :param x: x-coordinate on the canvas 
+        :param y: y-coordinate on the cnavas
+        :return: 
+        """
         self.position.x = x
         self.position.y = y
 
