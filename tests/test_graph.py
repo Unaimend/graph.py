@@ -1,3 +1,4 @@
+# pylint: skip-file
 import unittest
 from graph import Graph
 
@@ -8,7 +9,6 @@ class GraphTest(unittest.TestCase):
 
     def setUp(self):
         self.graph = Graph("./graphs/simple_bin_tree.json")
-
 
     def test_fileloading(self):
         with self.assertRaises(FileNotFoundError):
