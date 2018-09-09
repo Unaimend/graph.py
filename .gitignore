@@ -10,7 +10,7 @@ __pycache__/
 *idea/*
 
 etags.exe
-
+project_env
 # Distribution / packaging
 .Python
 env/
