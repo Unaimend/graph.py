@@ -81,7 +81,7 @@ class GraphVisual:
         #for x in self.node_adjacency_list:
         #    for y in x: print(y.id)
 
-        self.coordinate_fuckery: Vector(float, float) = Vector(1, 1)
+        self.coordinate_fuckery: Vector[float, float] = Vector(1, 1)
 
     def inc_zoomlevel(self, event):
         """
@@ -93,7 +93,6 @@ class GraphVisual:
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
-
     def dec_zoomlevel(self, event):
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
@@ -102,8 +101,6 @@ class GraphVisual:
         """
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
-
-
 
     @classmethod
     def from_graph(cls, window, canvas: tk.Canvas, height: int = None, width: int = None, graph: Graph = None):
