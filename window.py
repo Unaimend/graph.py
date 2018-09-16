@@ -8,8 +8,6 @@ from tkinter import ttk
 from algorithms.layouting.fr import FruchtermanReingold
 from algorithms.layouting.lefty import Lefty
 from algorithms.layouting.eades import Eades
-
-
 from algorithms.depth_first_search import DepthFirstSearch
 from graph import Graph
 from graphvisual import GraphVisual
