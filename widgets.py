@@ -38,11 +38,11 @@ class OpenGraphDialog:
         label = tk.Label(self.window, text="Which layouting algorithm do you want to use")
         label.pack()
         # TODO Combobox statt Checkbutton oder Radiobuttons
-        c = tk.Checkbutton(self.window, text="eades", variable=self.eades, onvalue=True, offvalue=False)
+        c = tk.Checkbutton(self.window, text="Eades", variable=self.eades, onvalue=True, offvalue=False)
         c.pack()
         c1 = tk.Checkbutton(self.window, text="Fruchterman-Reingold", variable=self.fruchterman_reingold, onvalue=True, offvalue=False)
         c1.pack()
-        c2 = tk.Checkbutton(self.window, text="Sexy", variable=self.lefty, onvalue=True,
+        c2 = tk.Checkbutton(self.window, text="Lefty", variable=self.lefty, onvalue=True,
                             offvalue=False)
         c2.pack()
         button.wait_variable(var)
@@ -55,7 +55,7 @@ class NoteBookTab:
     """
     def __init__(self, canvas, graph, graph_vis, algo="") -> None:
         """
-        Ctor.
+    Ctor.   
         :param canvas: 
         :param graph: 
         :param graph_vis: 
@@ -88,6 +88,7 @@ class NoteBookTab:
         # 0.9 if event.delta < 0 else 1.1
         amount = 0.9
         self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
+
 
 class InfoMenu(tk.Frame):
     # pylint: disable=R0901
@@ -129,6 +130,8 @@ class NodeInfo:
         self.window = tk.Toplevel(self.root)
         # Sorgt dafuer das die Info Fenster nicht durch das "Main"-Fenster verdeckt
         self.window.attributes("-topmost", True)
+
+        self.window.bind("<Escape>", self.close )
         self.info_menu = InfoMenu(self.window)
         self.info_menu.pack()
         self.info_menu.add_label("Id")
@@ -145,3 +148,6 @@ class NodeInfo:
         self.info_menu.toggle()
         button = tk.Button(self.window, text="Close", command=self.window.destroy)
         button.pack()
+
+    def close(self, event=None):
+        self.window.destroy()
