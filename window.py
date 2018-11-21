@@ -8,7 +8,7 @@ from tkinter import ttk
 from algorithms.layouting.fr import FruchtermanReingold
 from algorithms.layouting.lefty import Lefty
 from algorithms.layouting.eades import Eades
-from algorithms.depth_first_search import DepthFirstSearch
+from algorithms.depth_first_search import DepthFirstSearch, DfsVisual
 from graph import Graph
 from graphvisual import GraphVisual
 from utils import timeit
@@ -89,7 +89,11 @@ class Window:
         self.viewmenu.add_command(label="Toggle ids")
         self.viewmenu.add_command(label="Clear canvas       (Strg+c)")
         self.viewmenu.add_command(label="Toggle Info Menue  (Strg+b)", command=self.toggle_info_menu)
-        self.menubar.add_cascade(label="View", menu=self.viewmenu)
+        self.menubar.add_cascade(label="View", menu=self.viewmenu, command=self.run_dfs)
+
+        # View menu
+        self.algorithms_menu = tk.Menu(self.menubar, tearoff=0)
+        self.algorithms_menu.add_command(label="Run dfs")
 
         self.nb.grid(column=1, row=0, sticky=tk.E)
         # Add shortcuts
@@ -415,5 +419,10 @@ class Window:
         self.tb_4 = tk.Text(self.eades_options_frame, height=1, width=5, relief="sunken", borderwidth=2, takefocus=0)
         self.tb_4.pack(side=tk.LEFT)
         self.tb_4.insert(tk.END, self.current_algo.constant_4)
-# ----------------------------EADES SPECIFIC STUFF END--------------------------------------------------------------------------------
+# ----------------------------EADES SPECIFIC STUFF END------------------------------------------------------------------
+
+    def run_dfs(self, event=None):
+        # pylint: disable=W0613
+        DfsVisual(self.tabs[self.get_current_notebook_tab_index()], colour="black")
+        DfsVisual.run()
 

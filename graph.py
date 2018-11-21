@@ -8,7 +8,7 @@ import tkinter as tk
 from typing import List
 import json
 from vector import Vector
-
+from logger import logger
 # typedefs
 AdjacencyList = List[List[int]]
 AdjacencyListEntry = List[int]
@@ -43,6 +43,7 @@ class GraphNode:
         :param id: The id which should be drawn in node
         :type id: int
         """
+
 
         #: Canvas position for the node
         self.position = Vector(x, y)
@@ -128,7 +129,8 @@ class Graph:
         # Load from a file
         # https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
         if filepath:
-            print("Loading from " + filepath)
+            logger.info("Loading from" + filepath)
+            # print("Loading from " + filepath)
             # Get file descriptor
             f = open(self.filepath, "r")
             # Load data into the adjacency_list
@@ -137,14 +139,10 @@ class Graph:
             f.close()
             # Get the vertice count
             self.vertice_count = len(self.adjacency_list)
-            print("Adjacency list", self.adjacency_list)
+            logger.info("Adjacency list" + str(self.adjacency_list))
         else:
-            print("TODO exception")
-
+            pass
         # print("WP", self.subtree_index(0))
-
-
-
         self.is_binary_tree = True
         self.node_id = 0
 
@@ -257,12 +255,14 @@ class Graph:
         :param index: index of the node from which you wan't the left child index
         :return: The index oft the left child of index or -1 if node[index] doesnt exist
         """
-        index = -1
         try:
-            index = self.adjacency_list[index][1]
+            if index == self.root_index():
+                index = self.adjacency_list[index][0]
+            else:
+                index = self.adjacency_list[index][1]
             return index
         except IndexError:
-            return index
+            return -1
 
     def right(self, index):
         """
@@ -270,15 +270,14 @@ class Graph:
         :param index: index of the node from which you wan't the right child index
         :return: The index of the right child of index or -1 if node[index] doesnt exist
         """
-        index = -1
         try:
-            index = self.adjacency_list[index][2]
+            if index == self.root_index():
+                index = self.adjacency_list[index][1]
+            else:
+                index = self.adjacency_list[index][2]
             return index
         except IndexError:
-            return index
-
-
-
+            return -1
 
 
 class GraphEdge:

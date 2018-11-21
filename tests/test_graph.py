@@ -8,7 +8,7 @@ class GraphTest(unittest.TestCase):
     #     self.graph = Graph("./graphs/simple_bin_tree.json")
 
     def setUp(self):
-        self.graph = Graph("./graphs/simple_bin_tree.json")
+        self.graph = Graph("../graphs/simple_bin_tree.json")
 
     def test_fileloading(self):
         with self.assertRaises(FileNotFoundError):
@@ -24,11 +24,19 @@ class GraphTest(unittest.TestCase):
         self.assertEqual(self.graph.parent(1), 0)
         self.assertEqual(self.graph.parent(2), 0)
 
-    # def test_subtree(self):
-    #     self.graph = Graph("./graphs/simple_bin_tree.json")
-    #     self.assertEqual(self.graph.subtree_index(0), [1, 2])
+    def test_left(self):
+        self.assertEqual(self.graph.left(0), 1)
+        self.assertEqual(self.graph.left(1), -1)
+
+    def test_right(self):
+        self.assertEqual(self.graph.right(0), 2)
+        self.assertEqual(self.graph.left(2), -1)
 
 
+
+        # def test_subtree(self):
+        #     self.graph = Graph("./graphs/simple_bin_tree.json")
+        #     self.assertEqual(self.graph.subtree_index(0), [1, 2])
 
 if __name__ == '__main__':
     unittest.main()

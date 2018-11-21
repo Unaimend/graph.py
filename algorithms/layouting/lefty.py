@@ -11,8 +11,6 @@ class Lefty:
         :param graph_visuals: Handles all the stuff that has to do with drawing
         :param canvas_width: Width of the canvas
         :param canvas_height: Height of the canvas 
-        :param k: See Paper 
-        :param t: See Paper
         """
         self.graph_visuals = graph_visuals
         self.canvas_width = canvas_width
@@ -27,8 +25,6 @@ class Lefty:
 
         print("max height", self.max_height)
 
-
-
     def do_lefty(self) -> None:
         """
         Executes the whole algorithm 
@@ -36,6 +32,7 @@ class Lefty:
         nexts = [100] * (self.max_height+2)
         depths = [0] * len(self.graph.adjacency_list)
         print("LEN", len(nexts))
+
         def pos(index, depth):
             curr_node = self.graph_visuals.graph_nodes[index]
             posit = nexts[depth]
@@ -66,46 +63,3 @@ class Lefty:
         # pos2(0,0)
 
 
-
-
-
-
-
-
-            # for node in self.graph_visuals.graph_nodes:
-            #     dist = self.graph.dist_from_root(node.id)
-            #     node.set_pos(node.position.x, dist * 100 )
-
-# current = 0
-#         next_x = [1]*self.max_height
-#         status = [1]*len(self.graph.adjacency_list)
-#         for x in range(1, len(status)):
-#             status[x] = len(self.graph.adjacency_list[x])
-#         status[0] = 0
-#
-#
-#
-#
-#         while current != -1:
-#             print("CUR", current)
-#             if status[current] == 0:
-#                 print("Interesting Step")
-#                 dist = self.graph.dist_from_root(current)
-#                 self.graph_visuals.graph_nodes[current].set_pos(next_x[dist], dist*100 )
-#                 next_x[dist] = next_x[dist] + 2
-#                 for son_index in range(1, len(self.graph.adjacency_list[current])):
-#                     status[son_index] = 0
-#                 status[current] = 1
-#             elif 1 <=  status[current] and status[current] <= len(self.graph.adjacency_list[current]):
-#                 print("2nd")
-#                 status[current] = status[current] + 1
-#                 print("Status[current]", status[current])
-#                 try:
-#                     current = self.graph.adjacency_list[current][status[current]-1]
-#                 except IndexError:
-#                     print("ERRCUr", current)
-#                     print("ERRCHildINdex", status[current]-1)
-#                     current = self.graph.parent(current)
-#             else:
-#                 print("3d")
-#                 current = self.graph.parent(current)

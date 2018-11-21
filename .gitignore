@@ -112,3 +112,5 @@ ENV/
 default_graph Kopie\.json
 
 TAGS
+
+tag\.sh

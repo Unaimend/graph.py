@@ -61,8 +61,7 @@ class GraphVisual:
         # Helper variable for the node id
         self.node_counter = 0
         random.seed(GraphVisual.seed)
-        if graph:
-            self.graph = graph
+        self.graph = graph
 
         # Converts the graph arrays which represent the graph to
         # arrays which holds objects of Graph.edges and Graph.nodes
@@ -83,7 +82,7 @@ class GraphVisual:
 
         self.coordinate_fuckery: Vector[float, float] = Vector(1, 1)
 
-    def inc_zoomlevel(self, event):
+    def inc_zoomlevel(self, event=None):
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
         :param event: --- 
@@ -93,7 +92,7 @@ class GraphVisual:
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
-    def dec_zoomlevel(self, event):
+    def dec_zoomlevel(self, event=None):
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
         :param event: --- 

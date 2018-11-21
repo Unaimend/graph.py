@@ -55,7 +55,7 @@ class NoteBookTab:
     """
     def __init__(self, canvas, graph, graph_vis, algo="") -> None:
         """
-    Ctor.   
+        Ctor.   
         :param canvas: 
         :param graph: 
         :param graph_vis: 

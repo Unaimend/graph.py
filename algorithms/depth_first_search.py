@@ -50,3 +50,13 @@ class DepthFirstSearch:
             x = self.edge_to[x]
         path.append(self.start)
         return path
+
+
+class DfsVisual:
+
+    def __init__(self, graph_visuals, colour="red"):
+        self.graph_visuals = graph_visuals
+        self.colour = colour
+
+    def run(self):
+        raise NotImplemented()
