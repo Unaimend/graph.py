@@ -4,6 +4,7 @@
    :synopsis: This module includes classes for drawing graphs and graph algos.
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
+import threading
 import random
 import tkinter as tk
 import math
@@ -143,6 +144,8 @@ class GraphVisual:
         """
         # TODO Hier sollte eine redraw methode der GraphNode und GraphEdge Klasse genutzt werden
         # Delete nodes and node text from the canvas
+        lock = threading.Lock()
+        lock.acquire()
         for node in self.graph_nodes:
             self.canvas.delete(node.canvas_id)
             self.canvas.delete(node.canvas_text_id)
@@ -151,8 +154,9 @@ class GraphVisual:
         # Redraw nodes with updated arguments
         for node in self.graph_nodes:
             alternative_nodelist.append(GraphNode(self.canvas, node.position.x, node.position.y,
-                                                  self.draw_node_ids, node.id, node.colour))
+                                                  self.draw_node_ids, node.id, node.colour, node.node_fill_colour))
         self.graph_nodes = alternative_nodelist
+        lock.release()
 
     def generate_edges(self):
         """Generates edges between graph nodes, can also be used to redraw edges"""
@@ -198,11 +202,14 @@ class GraphVisual:
 
     def change_node_look(self, event=None):
         # pylint: disable=W0613
+
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
         if not self.draw_node_ids:
             self.draw_node_ids = True
         else:
             self.draw_node_ids = False
+        for node in self.graph_nodes:
+            print(node.node_fill_colour)
         self.redraw_graph()
 
     def select_node(self, event):
@@ -246,13 +253,13 @@ class GraphVisual:
                 # Alle nodes die nicht ausgeaehlt wurden schwarz faerben
                 if node != self.current_selected_node:
                     node.colour = "black"
-                    self.canvas.itemconfigure(node.canvas_text_id, fill="black")
+                    self.canvas.itemconfigure(node.canvas_text_id, fill=node.node_fill_colour)
         else:
             # Falls keine Node ausgewaehlt wurde sollen alle Nodes schwarz sein
             self.current_selected_node = None
             for node in self.graph_nodes:
                 node.colour = "black"
-                self.canvas.itemconfigure(nearest_node.canvas_text_id, fill="black")
+                self.canvas.itemconfigure(nearest_node.canvas_text_id, fill=node.node_fill_colour)
 
 
         # def clear_graph(self, event="nothing"):

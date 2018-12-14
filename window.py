@@ -89,11 +89,12 @@ class Window:
         self.viewmenu.add_command(label="Toggle ids")
         self.viewmenu.add_command(label="Clear canvas       (Strg+c)")
         self.viewmenu.add_command(label="Toggle Info Menue  (Strg+b)", command=self.toggle_info_menu)
-        self.menubar.add_cascade(label="View", menu=self.viewmenu, command=self.run_dfs)
+        # self.menubar.add_cascade(label="View", menu=self.viewmenu, command=self.run_dfs)
 
         # View menu
         self.algorithms_menu = tk.Menu(self.menubar, tearoff=0)
-        self.algorithms_menu.add_command(label="Run dfs")
+        self.algorithms_menu.add_command(label="Run dfs", command=self.run_dfs)
+        self.menubar.add_cascade(label="Algos", menu=self.algorithms_menu)
 
         self.nb.grid(column=1, row=0, sticky=tk.E)
         # Add shortcuts
@@ -423,6 +424,8 @@ class Window:
 
     def run_dfs(self, event=None):
         # pylint: disable=W0613
-        DfsVisual(self.tabs[self.get_current_notebook_tab_index()], colour="black")
-        DfsVisual.run()
+        a = DfsVisual(self.tabs[self.get_current_notebook_tab_index()].graph_vis, colour="black")
+        a.run()
+        print("IHI")
+
 

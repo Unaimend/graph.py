@@ -35,7 +35,7 @@ class GraphNode:
     graphNodeRadius = 12
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black") -> None:
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :type x0: tk.Canvadraw_ids: Whether to draw ids or not
@@ -57,6 +57,7 @@ class GraphNode:
         self.canvas_text_id = "-1"
 
         self.colour = colour
+        self.node_fill_colour = node_fill_colour
         """
         Boolean which determines if the node is represented through a black dot or
         through a circle with a number inside
@@ -78,7 +79,7 @@ class GraphNode:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
                                                 right_corner.x,
-                                                right_corner.y, fill="black")
+                                                right_corner.y, fill=node_fill_colour)
 
     def move(self, x: float, y: float):
         """
