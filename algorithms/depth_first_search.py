@@ -1,7 +1,6 @@
 """This module is the dfs-implementation which this program will be using"""
 import time
 from threading import Thread
-import threading
 from graph import Graph
 
 
@@ -56,23 +55,18 @@ class DepthFirstSearch:
 
 
 class DfsVisual:
-
     def __init__(self, graph_visuals, colour="red"):
         self.graph_visuals = graph_visuals
         self.colour = colour
         self.thread = None
 
     def run(self):
-        # self.sleeper(1)
         self.thread = Thread(target=self.sleeper, args=(1,))
-        # self.thread.daemon = True
-
         self.thread.start()
 
-
-    def sleeper(self, i):
+    def sleeper(self, time_between_draws):
         for node in self.graph_visuals.graph_nodes:
-            time.sleep(1)
+            time.sleep(time_between_draws)
             self.graph_visuals.graph_nodes[node.id].node_fill_colour = "green"
             print(node.id, node.node_fill_colour)
             self.graph_visuals.redraw_nodes()

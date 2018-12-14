@@ -4,6 +4,7 @@ import math
 from vector import Vector
 from utils import distance as util_distance, unit_vector
 
+
 class Eades:
     """ Class which implements the layouting-algorithm from EAD[84]
     """
@@ -17,7 +18,6 @@ class Eades:
         self.constant_3 = 300
         # Beeinflusstt die konv. Gesch.
         self.constant_4 = 0.1
-
 
     def calculate_attractive_force_for_all_nodes_and_move_accordingly_new(self, event=None):
         """

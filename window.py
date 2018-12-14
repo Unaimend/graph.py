@@ -28,7 +28,7 @@ from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 
 
 class Window:
-    """ClLass which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
+    """Class which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
     CANVAS_WIDTH = 1400
     CANVAS_HEIGHT = 700
