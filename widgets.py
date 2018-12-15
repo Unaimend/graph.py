@@ -24,6 +24,9 @@ class OpenGraphDialog:
         # self.open_new_graph_but = tk.Button(self.window, text="Open...", command=self.open_graph)
         # self.open_new_graph_but.pack()
 
+        self.window.attributes("-topmost", True)
+
+
         self.open_graph()
         # TODO Seed auswahl fuer den RNG
         # TODO Show menue on if graph in none empty

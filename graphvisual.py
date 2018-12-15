@@ -36,11 +36,11 @@ class GraphVisual:
         :param height: The height of the canvas
         :param graph: The graph which should be drawn
         """
-        self.canvas = canvas
+        self.canvas: tk.Canvas = canvas
         self.window = window
         # Specifies the minimal distance two nodes are allowed to have
         # needed when user places nodes himself
-        self.graph_nodes_min_distance = 2 * GraphNode.graphNodeRadius
+        self.graph_nodes_min_distance: int = 2 * GraphNode.graphNodeRadius
         # Array for the the nodes of the graph(holds GraphNodes objects)
         self.graph_nodes: List[GraphNode] = []
         # Array for the the edges of the graph(holds GraphEdge objects)
@@ -60,9 +60,13 @@ class GraphVisual:
         # Specifies whether the node ids should be drawn or not
         self.draw_node_ids: bool = False
         # Helper variable for the node id
-        self.node_counter = 0
+        self.node_counter: int = 0
         random.seed(GraphVisual.seed)
         self.graph = graph
+
+        self.current_selected_node: GraphNode = None
+        # Reference to the latest opened NodeInfoWindow
+        self.current_info: NodeInfo = None
 
         # Converts the graph arrays which represent the graph to
         # arrays which holds objects of Graph.edges and Graph.nodes
@@ -72,16 +76,7 @@ class GraphVisual:
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
-        self.current_selected_node = None
-        self.current_info = None
-
-        #print("Adjazenz Liste des Graphen in Integern")
-        #for x in self.graph.adjacency_list: print(x)
-        #print("Adjazenz auf Node Basis")
-        #for x in self.node_adjacency_list:
-        #    for y in x: print(y.id)
-
-        self.coordinate_fuckery: Vector[float, float] = Vector(1, 1)
+        self.coordinate_fuckery: Vector = Vector(1, 1)
 
     def inc_zoomlevel(self, event=None):
         """
@@ -103,7 +98,7 @@ class GraphVisual:
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
 
     @classmethod
-    def from_graph(cls, window, canvas: tk.Canvas, height: int = None, width: int = None, graph: Graph = None):
+    def from_graph(cls, window, canvas: tk.Canvas, height: int = 900, width: int = 1400, graph: Graph = None):
         """
         :param window: 
         :param canvas: The canvas on which the node should be drawn
@@ -214,6 +209,8 @@ class GraphVisual:
 
     def select_node(self, event):
         """Selects a node and opens a window with important informatoion about the selected node"""
+        if len(self.graph_nodes) == 0:
+            raise Exception("Empty Graph Exception")
         x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
         current_smallest_dist = 16
@@ -238,7 +235,7 @@ class GraphVisual:
                 nearest_node = node
                 distance_dic[dist] = node.canvas_text_id
 
-        nearest_node_distance = min(distance_dic.keys())
+        nearest_node_distance: int = min(distance_dic.keys())
         nearest_node_canvas_text_id = distance_dic[nearest_node_distance]
         if nearest_node_distance < 15:
             # Node die ausgewaehlt wurde rot farben
