@@ -7,7 +7,7 @@ a.member_func   {color: #32ce25;}
 # Class: GraphVisual
 
 ##Description:
-This class encapsulates variables and functions for drawing an undirected graphs
+This class encapsulates variables and functions for drawing graphs
 
 ##Member variables:
 
