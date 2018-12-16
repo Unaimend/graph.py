@@ -13,6 +13,9 @@ class Vector:
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
 
+    def __mul__(self, other):
+        return Vector(self.x * other, self.y * other)
+
     def to_unit(self):
         norm = math.sqrt(self.x ** 2 + self.y ** 2)
         a = Vector(self.x / norm, self.y / norm)
