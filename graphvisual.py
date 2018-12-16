@@ -9,7 +9,7 @@ import random
 import tkinter as tk
 import math
 from typing import List
-from graph import Graph, GraphEdge, GraphNode
+from graph import Graph, GraphEdge, GraphNode, DirectedGraphEdge
 from widgets import NodeInfo
 from vector import Vector
 
@@ -74,7 +74,10 @@ class GraphVisual:
         self.generate_adj_list()
 
         # Generate the edges between the nodes in self.node_adjacency_list
+        print("EDGES")
         self.generate_edges()
+        for edge in self.graph_edges:
+            print(edge.arrow.id)
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
@@ -157,7 +160,7 @@ class GraphVisual:
         """Generates edges between graph nodes, can also be used to redraw edges"""
         # Deletes all old edges from the canvas
         for edges in self.graph_edges:
-            self.canvas.delete(edges.id)
+            edges.delete()
 
         # Init graphEdges with an new array because the old edges are not needed anymore
         self.graph_edges = []
@@ -167,7 +170,7 @@ class GraphVisual:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = GraphEdge(canvas=self.canvas, start_node=node, end_node=nodes)
+                edge = DirectedGraphEdge(canvas=self.canvas, start_node=node, end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 # TODO Ich haette gerne jede Kante nur einmal in der Liste, da ich micht nicht sicher bin
                 # TODO welche Auswirkungen das auf den Algorithmus von Fruchterman-Reingold hat

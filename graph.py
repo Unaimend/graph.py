@@ -4,11 +4,13 @@
    :synopsis: This module includes classes necessary for working with graphs
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
+import json
 import tkinter as tk
 from typing import List
-import json
-from vector import Vector
+
 from logger import logger
+from vector import Vector
+
 # typedefs
 AdjacencyList = List[List[int]]
 AdjacencyListEntry = List[int]
@@ -66,7 +68,7 @@ class GraphNode:
 
         # TODO Magic number ersetzen
 
-        left_corner = self.position - Vector(self.graphNodeRadius/1.5, self.graphNodeRadius / 1.5)
+        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
         right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
         if draw_ids:
             self.canvas_id = canvas.create_oval(left_corner.x,
@@ -292,14 +294,86 @@ class GraphEdge:
         :param start_node: The lines starting node
         :param end_node: The lines ending node
         """
-        self.start_node = start_node
-        self.end_node = end_node
         # Start der Kanten
         self.start = Vector(start_node.position.x, start_node.position.y)
         # Ende der Kanten
         self.end = Vector(end_node.position.x, end_node.position.y)
+        self.start_node = start_node
+        self.end_node = end_node
+        self.canvas = canvas
         # Create line and save id
+        self.id = None
+        self.radius = 5
+        self.midpoint = Vector(self.start.x - (self.start.x-self.end.x)/2, self.start.y - (self.start.y-self.end.y)/2)
+        self.normal_end_point_dir: Vector = Vector(self.end.y-self.start.y, -(self.end.x-self.start.x))
+        self.normal_end_point_dir = self.normal_end_point_dir.to_unit() * 50
+        self.normal_end_point: Vector = self.midpoint + self.normal_end_point_dir
+        self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
+        self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
+
+    def delete(self):
+        pass
+
+
+
+
+class UndirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
+    def delete(self):
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.mid)
+        self.canvas.delete(self.normal)
 
+
+
+class DirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
+        # TODO Das kann kein guter code sein
+        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, fill='black')
+
+        self.arrow = EdgeArrow(canvas, self)
+
+    def delete(self):
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.arrow.id)
+        self.canvas.delete(self.normal)
+        self.canvas.delete(self.mid)
+
+
+class EdgeArrow:
+    def __init__(self, canvas: tk.Canvas, edge: DirectedGraphEdge):
+        self.canvas = canvas
+        self.edge = edge
+        self.pos = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
+        line_direction: Vector = self.edge.end-self.edge.start
+        line_direction = line_direction.to_unit() * 10
+        point1 = self.pos-line_direction*2
+        point2 = point1 + self.edge.normal_end_point_dir*0.1
+        point3 = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
+        point4 = point1 - self.edge.normal_end_point_dir*0.1
+        point5 = point1
+
+        self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
