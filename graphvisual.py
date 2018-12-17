@@ -53,7 +53,7 @@ class GraphVisual:
         # Höhe und Breite des Canvas
         self.width: float = width
         self.height: float = height
-        self.graph: Graph = None
+        self.graph: Graph
 
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
@@ -64,9 +64,9 @@ class GraphVisual:
         random.seed(GraphVisual.seed)
         self.graph = graph
 
-        self.current_selected_node: GraphNode = None
+        self.current_selected_node: GraphNode
         # Reference to the latest opened NodeInfoWindow
-        self.current_info: NodeInfo = None
+        self.current_info: NodeInfo
 
         # Converts the graph arrays which represent the graph to
         # arrays which holds objects of Graph.edges and Graph.nodes
@@ -82,6 +82,7 @@ class GraphVisual:
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
     def inc_zoomlevel(self, event=None):
+    def inc_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
         :param event: --- 
@@ -91,7 +92,7 @@ class GraphVisual:
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
-    def dec_zoomlevel(self, event=None):
+    def dec_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
         :param event: --- 
@@ -100,7 +101,7 @@ class GraphVisual:
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
 
-    @classmethod
+    def int_node_to_graph_node(self) -> None:
     def from_graph(cls, window, canvas: tk.Canvas, height: int = 900, width: int = 1400, graph: Graph = None):
         """
         :param window: 
@@ -111,7 +112,6 @@ class GraphVisual:
         """
         return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
 
-    def int_node_to_graph_node(self):
         """
         Converts the adj. list which holds integers to a list which holds GraphNodes
         Note that the here generated list doesnt hold information about how the notes are related
@@ -123,7 +123,7 @@ class GraphVisual:
                           random.randint(0, self.height), self.draw_node_ids, self.node_counter, "black"))
             self.node_counter += 1
 
-    def generate_adj_list(self):
+    def generate_adj_list(self) -> None:
         """
         Generates the adj. list
         """
@@ -136,7 +136,7 @@ class GraphVisual:
                 self.node_adjacency_list[counter].append(self.graph_nodes[y])
             counter += 1
 
-    def redraw_nodes(self):
+    def redraw_nodes(self) -> None:
         """
         Deletes all the nodes and their text from the canvas and redraws them again but with updated values
         """
@@ -156,7 +156,7 @@ class GraphVisual:
         self.graph_nodes = alternative_nodelist
         lock.release()
 
-    def generate_edges(self):
+    def generate_edges(self) -> None:
         """Generates edges between graph nodes, can also be used to redraw edges"""
         # Deletes all old edges from the canvas
         for edges in self.graph_edges:
