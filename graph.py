@@ -26,7 +26,6 @@ AdjacencyMatrix = List[List[int]]
 # TODO mit with  verpacken
 
 
-# BUG Die letzte Node is nicht auswaehlebar
 # TODO DFS Visualisierung und ueberlegen wie ich mit Graphen umgehe die nicht integer vertices haben
 # IDEE Als isomorphen graphen zu einem integer graphen betrachtemn
 

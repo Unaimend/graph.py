@@ -39,6 +39,17 @@ This class encapsulates variables and functions for drawing graphs
 
 <a class="member_var">current_info:</a> NodeInfo
 
+##Constructors
+<a class="member_func">__init__</a><a>(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None)</a>  
+    
+**Parameters**  
+1. window: TODO  
+2. canvas: The canvas on which all the nodes should be drawn.     
+3. width: The width of the canvas.  
+4. height: The height of the canvas.  
+5. graph: The graph which should be drawn.
+</br></br></br>
+
 ##Member functions
 
 <a class="member_func">inc_zoomlevel</a><a>(self, event=None) -> None</a>     
@@ -97,13 +108,12 @@ Selects a node and opens a window with important informatoion about the selected
 
 **Parameters**  
 1. event: Needed parameter so that the function can be used with tkinter events.
-</br></br>
-
+</br></br></br>
 
 ##Static functions
 
 <a class="member_func">set_focus</a><a>(event=None)</a>  
 The tkinter text widget doesn't loose focus if another widget is clicked this function emulates this behaviour.  
 **Parameters**  
-1. event	
+1. event: Needed parameter so that the function can be used with tkinter events.	
 
