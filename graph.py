@@ -7,6 +7,8 @@
 import json
 import tkinter as tk
 from typing import List
+import abc
+
 
 from logger import logger
 from vector import Vector
@@ -40,13 +42,12 @@ class GraphNode:
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:
         """
         :param canvas: The canvas on which the node should be drawn
-        :type x0: tk.Canvadraw_ids: Whether to draw ids or not
-        :type draw_ids: bool
+        :param x: 
+        :param y:
+        :param draw_ids: bool
         :param id: The id which should be drawn in node
-        :type id: int
+        :param colour
         """
-
-
         #: Canvas position for the node
         self.position = Vector(x, y)
         #: The canvas on which the node should be drawn(for multi-canvas support)
@@ -287,6 +288,7 @@ class GraphEdge:
     """
     This class represents a graph edge
     """
+    __metaclass__ = abc.ABCMeta
     def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
         """
         :param canvas: The canvas on which the edge should be drawn
@@ -311,10 +313,9 @@ class GraphEdge:
         self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
         self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
 
+    @abc.abstractmethod
     def delete(self):
-        pass
-
-
+        return
 
 
 class UndirectedGraphEdge(GraphEdge):
@@ -335,7 +336,6 @@ class UndirectedGraphEdge(GraphEdge):
         self.canvas.delete(self.id)
         self.canvas.delete(self.mid)
         self.canvas.delete(self.normal)
-
 
 
 class DirectedGraphEdge(GraphEdge):
@@ -364,16 +364,16 @@ class DirectedGraphEdge(GraphEdge):
 
 class EdgeArrow:
     def __init__(self, canvas: tk.Canvas, edge: DirectedGraphEdge):
-        self.canvas = canvas
-        self.edge = edge
-        self.pos = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
+        self.canvas: tk.Canvas = canvas
+        self.edge: GraphEdge = edge
+        self.pos: Vector = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
         line_direction: Vector = self.edge.end-self.edge.start
         line_direction = line_direction.to_unit() * 10
-        point1 = self.pos-line_direction*2
-        point2 = point1 + self.edge.normal_end_point_dir*0.1
-        point3 = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
-        point4 = point1 - self.edge.normal_end_point_dir*0.1
-        point5 = point1
+        point1: Vector = self.pos-line_direction*2
+        point2: Vector = point1 + self.edge.normal_end_point_dir*0.1
+        point3: Vector = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
+        point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
+        point5: Vector = point1
 
         self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 

@@ -31,10 +31,12 @@ class GraphVisual:
     def __init__(self, window, canvas: tk.Canvas, width: int, height: int, graph: Graph) -> None:
         """
         Ctor. for GraphVisual
+        :parm window: TODO
         :param canvas: The canvas on which the node should be drawn
         :param width: The width of the canvas
         :param height: The height of the canvas
         :param graph: The graph which should be drawn
+        :returns: None
         """
         self.canvas: tk.Canvas = canvas
         self.window = window
@@ -76,12 +78,20 @@ class GraphVisual:
         # Generate the edges between the nodes in self.node_adjacency_list
         print("EDGES")
         self.generate_edges()
-        for edge in self.graph_edges:
-            print(edge.arrow.id)
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
-    def inc_zoomlevel(self, event=None):
+    @classmethod
+    def from_graph(cls, window, canvas: tk.Canvas, height: int = 900, width: int = 1400, graph: Graph = None):
+        """
+        :param window: 
+        :param canvas: The canvas on which the node should be drawn
+        :param width: The width of the canvas
+        :param height: The height of the canvas
+        :param graph: The graph which should be drawn
+        """
+        return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
+
     def inc_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
@@ -102,16 +112,6 @@ class GraphVisual:
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
 
     def int_node_to_graph_node(self) -> None:
-    def from_graph(cls, window, canvas: tk.Canvas, height: int = 900, width: int = 1400, graph: Graph = None):
-        """
-        :param window: 
-        :param canvas: The canvas on which the node should be drawn
-        :param width: The width of the canvas
-        :param height: The height of the canvas
-        :param graph: The graph which should be drawn
-        """
-        return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
-
         """
         Converts the adj. list which holds integers to a list which holds GraphNodes
         Note that the here generated list doesnt hold information about how the notes are related
@@ -119,15 +119,15 @@ class GraphVisual:
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
         for x in self.graph.adjacency_list:
             self.graph_nodes.append(
-                GraphNode(self.canvas, random.randint(0, self.width),
-                          random.randint(0, self.height), self.draw_node_ids, self.node_counter, "black"))
+                GraphNode(self.canvas, float(random.randint(0, self.width)),
+                          float(random.randint(0, self.height)), self.draw_node_ids, self.node_counter, "black"))
             self.node_counter += 1
 
     def generate_adj_list(self) -> None:
         """
         Generates the adj. list
         """
-        self.node_adjacency_list = []
+        self.node_adjacency_list: List[List[GraphNode]] = []
         # TODO Use enumerate
         counter = 0
         for x in self.graph.adjacency_list:
