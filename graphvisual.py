@@ -28,7 +28,7 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int, height: int, graph: Graph) -> None:
+    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None) -> None:
         """
         Ctor. for GraphVisual
         :parm window: TODO
@@ -50,7 +50,7 @@ class GraphVisual:
         # Adjacency list but with nodes instead of integers
         # Im Eintrag node_adjacency_list[x] stehen als nodes alle nodes drinnen die zu x adj. sind.,
         # x ist zurzeit die id der node von der die adjazenz ausgehen soll
-        self.node_adjacency_list: List[GraphNode] = []
+        self.node_adjacency_list: List[List[GraphNode]] = []
 
         # Höhe und Breite des Canvas
         self.width: float = width
@@ -64,9 +64,11 @@ class GraphVisual:
         # Helper variable for the node id
         self.node_counter: int = 0
         random.seed(GraphVisual.seed)
+        if not graph:
+            raise Exception("A graph must not be None")
         self.graph = graph
 
-        self.current_selected_node: GraphNode
+        self.current_selected_node: GraphNode 
         # Reference to the latest opened NodeInfoWindow
         self.current_info: NodeInfo
 
@@ -81,17 +83,6 @@ class GraphVisual:
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
-    @classmethod
-    def from_graph(cls, window, canvas: tk.Canvas, height: int = 900, width: int = 1400, graph: Graph = None):
-        """
-        :param window: 
-        :param canvas: The canvas on which the node should be drawn
-        :param width: The width of the canvas
-        :param height: The height of the canvas
-        :param graph: The graph which should be drawn
-        """
-        return cls(window=window, canvas=canvas, height=height, width=width, graph=graph)
-
     def inc_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
@@ -103,6 +94,7 @@ class GraphVisual:
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 1.1
 
     def dec_zoomlevel(self, event=None) -> None:
+        # pylint: disable=W0613
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
         :param event: --- 
@@ -117,10 +109,10 @@ class GraphVisual:
         Note that the here generated list doesnt hold information about how the notes are related
         """
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
-        for x in self.graph.adjacency_list:
+        for _ in range(0, len(self.graph.adjacency_list)):
             self.graph_nodes.append(
-                GraphNode(self.canvas, float(random.randint(0, self.width)),
-                          float(random.randint(0, self.height)), self.draw_node_ids, self.node_counter, "black"))
+                GraphNode(self.canvas, random.randint(0, int(self.width)),
+                          random.randint(0, int(self.height)), self.draw_node_ids, self.node_counter, "black"))
             self.node_counter += 1
 
     def generate_adj_list(self) -> None:
@@ -179,7 +171,7 @@ class GraphVisual:
                 self.graph_edges.append(edge)
 
     @staticmethod
-    def set_focus(event=None):
+    def set_focus(event=None) -> None:
         """
         Text widget doesn't loose focus if another widget is clicked
         this function emulates this behaviour.
@@ -188,7 +180,7 @@ class GraphVisual:
         caller = event.widget
         caller.focus_set()
 
-    def redraw_graph(self, event=None):
+    def redraw_graph(self, event=None) -> None:
         # pylint: disable=W0613
         """
         Combines methods to redraw all graphical items of the graphs 
@@ -198,25 +190,21 @@ class GraphVisual:
         self.generate_adj_list()
         self.generate_edges()
 
-    def change_node_look(self, event=None):
+    def change_node_look(self, event=None) -> None:
         # pylint: disable=W0613
-
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
-        if not self.draw_node_ids:
-            self.draw_node_ids = True
-        else:
-            self.draw_node_ids = False
+        self.draw_node_ids = not bool(self.draw_node_ids)
         for node in self.graph_nodes:
             print(node.node_fill_colour)
         self.redraw_graph()
 
-    def select_node(self, event):
+    def select_node(self, event) -> None:
         """Selects a node and opens a window with important informatoion about the selected node"""
-        if len(self.graph_nodes) == 0:
+        if not self.graph_nodes:
             raise Exception("Empty Graph Exception")
         x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
-        current_smallest_dist = 16
+        current_smallest_dist: float = 16
 
         nearest_node = self.graph_nodes[0]
         distance_dic = {}
@@ -238,7 +226,7 @@ class GraphVisual:
                 nearest_node = node
                 distance_dic[dist] = node.canvas_text_id
 
-        nearest_node_distance: int = min(distance_dic.keys())
+        nearest_node_distance: float = min(distance_dic.keys())
         nearest_node_canvas_text_id = distance_dic[nearest_node_distance]
         if nearest_node_distance < 15:
             # Node die ausgewaehlt wurde rot farben
