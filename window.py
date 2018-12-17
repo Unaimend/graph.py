@@ -240,7 +240,7 @@ class Window:
         # Aktuellem Tab den Graphen zuweisen
         current_tab.set_graph((Graph.from_file(filepath=filepath)))
         # Aktuellem Tab die GraphVisuals zuweisen
-        current_tab.set_graph_vis(GraphVisual.from_graph(
+        current_tab.set_graph_vis(GraphVisual(
             window=self.root,
             canvas=self.tabs[self.get_current_notebook_tab_index()].canvas,
             width=Window.CANVAS_WIDTH, height=Window.CANVAS_HEIGHT,
