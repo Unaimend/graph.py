@@ -40,10 +40,6 @@ This class encapsulates variables and functions for drawing graphs
 <a class="member_var">current_info:</a> NodeInfo
 
 ##Member functions
-<a class="member_func">from_graph</a>  
-1. a  
-2. b  
-3. c  
 
 <a class="member_func">inc_zoomlevel</a><a>(self, event=None) -> None</a>     
 Calculates the misplacement which comes from zooming(which is scaling) the canvas
