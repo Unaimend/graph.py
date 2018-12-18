@@ -36,7 +36,7 @@ class FruchtermanReingold:
     # verschoben werden soll etc.
     def do_fr(self, how_often: int):
         """
-        "EXECUTes the algorithm
+        "Executes the algorithm
         :param how_often: How often the fr algorithm should be executed 
         :return: 
         """
@@ -54,7 +54,6 @@ class FruchtermanReingold:
                 i = i + 1
             self.cool()
 
-
     def fr(self, distance: float) -> float:
         """
         Calculates the repulsive force for a given distance
@@ -70,7 +69,7 @@ class FruchtermanReingold:
     def fa(self, distance: float) -> float:
         """
         Calculates the attractive force for the distance
-        :param distance:  
+        :param distance:
         :return: The attractive force for the distance
         """
         if self.k is None:
@@ -80,7 +79,7 @@ class FruchtermanReingold:
 
     def calc_repelling_forces(self):
         """
-        Calculates and "anwenden" the attractive forces 
+        Calculates and applies the attractive forces 
         """
         # TODO WIe sorgge ich dafuer das die dispalcement lsite hier garantiert lange genug ist
         # Diese MEthode berechnet die abstossenden Kraefte
@@ -99,7 +98,7 @@ class FruchtermanReingold:
 
     def calc_attractive_forces(self):
         """
-        Calculates and "anwenden" the attractive forces 
+        Calculates and applies the attractive forces 
         """
         for edge in self.graph_visuals.graph_edges:
             diff = edge.start_node.position - edge.end_node.position

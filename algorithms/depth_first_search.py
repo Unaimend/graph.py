@@ -1,7 +1,7 @@
 """This module is the dfs-implementation which this program will be using"""
 import time
 from threading import Thread
-from graph import Graph
+from graph import Graph, EmptyGraphError
 
 
 class DepthFirstSearch:
@@ -11,6 +11,8 @@ class DepthFirstSearch:
         :param graph: The on which the algorithm will be acting
         :param start_node: The start node from dfs, important if the graph isn't connected
         """
+        if graph.vertice_count == 0:
+            raise EmptyGraphError
         self.marked = [False] * graph.vertice_count
         self.edge_to = [-1] * graph.vertice_count
         self.start = start_node

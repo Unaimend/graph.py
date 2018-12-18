@@ -5,12 +5,13 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
+from algorithms.depth_first_search import DepthFirstSearch, DfsVisual
+from algorithms.layouting.eades import Eades
 from algorithms.layouting.fr import FruchtermanReingold
 from algorithms.layouting.lefty import Lefty
-from algorithms.layouting.eades import Eades
-from algorithms.depth_first_search import DepthFirstSearch, DfsVisual
-from graph import Graph
+from graph import Graph, EmptyGraphError
 from graphvisual import GraphVisual
+from logger import logger
 from utils import timeit
 from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 
@@ -259,12 +260,14 @@ class Window:
         self.info_menu.label_val[4]["text"] = current_tab.algorithm
 
 
-        #     ALGORITHM TEST AREA
-        test = DepthFirstSearch(current_tab.graph, 0)
-
-        for x in range(current_tab.graph.vertice_count):
-            print("IS connected to", test.has_path_to(x))
-
+        # ALGORITHM TEST AREA
+        try:
+            test = DepthFirstSearch(current_tab.graph, 0)
+            for x in range(current_tab.graph.vertice_count):
+                print("IS connected to", test.has_path_to(x))
+        except EmptyGraphError:
+            logger.info("Did not ran dfs because the graph was empty " + str(__file__))
+        
         # ALL ACTIONS WHICH ARE ON TAB LEVEL SHOULD BE ADDED HERE
         # Bind actions to the last added graph_vis
         # TODO Control-w to close tab

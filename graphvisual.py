@@ -9,7 +9,7 @@ import random
 import tkinter as tk
 import math
 from typing import List
-from graph import Graph, GraphEdge, GraphNode, DirectedGraphEdge
+from graph import Graph, GraphEdge, GraphNode, DirectedGraphEdge, EmptyGraphError
 from widgets import NodeInfo
 from vector import Vector
 
@@ -201,7 +201,7 @@ class GraphVisual:
     def select_node(self, event) -> None:
         """Selects a node and opens a window with important informatoion about the selected node"""
         if not self.graph_nodes:
-            raise Exception("Empty Graph Exception")
+            raise EmptyGraphError
         x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         # Damit die if abfrage weiter unten(current_smallest_dist < 15) bei einer leeren Liste false ist.
         current_smallest_dist: float = 16

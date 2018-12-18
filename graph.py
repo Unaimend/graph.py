@@ -288,6 +288,7 @@ class GraphEdge:
     This class represents a graph edge
     """
     __metaclass__ = abc.ABCMeta
+    
     def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
         """
         :param canvas: The canvas on which the edge should be drawn
@@ -376,3 +377,19 @@ class EdgeArrow:
 
         self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
+
+class EmptyGraphError(Exception):
+    """Raised when an operation attempts a state transition that's not
+    allowed.
+
+    Attributes:
+        previous -- state at beginning of transition
+        next -- attempted new state
+        message -- explanation of why the specific transition is not allowed
+    """
+
+    def __init__(self):
+        self.message = "Empty graph provided were it must not be empty"
+        
+    def __str__(self):
+        return self.message
