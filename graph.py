@@ -379,17 +379,4 @@ class EdgeArrow:
 
 
 class EmptyGraphError(Exception):
-    """Raised when an operation attempts a state transition that's not
-    allowed.
-
-    Attributes:
-        previous -- state at beginning of transition
-        next -- attempted new state
-        message -- explanation of why the specific transition is not allowed
-    """
-
-    def __init__(self):
-        self.message = "Empty graph provided were it must not be empty"
-        
-    def __str__(self):
-        return self.message
+    pass
