@@ -61,17 +61,28 @@ class DfsVisual:
         self.graph_visuals = graph_visuals
         self.colour = colour
         self.thread = None
+        
+        if len(graph_visuals.graph_nodes) == 0:
+            raise EmptyGraphError
+        
+        self.marked = [False] * len(graph_visuals.graph_nodes)
+        self.start_node = graph_visuals.graph_nodes[0]
+        self.run()
 
     def run(self):
-        self.thread = Thread(target=self.sleeper, args=(1,))
+        self.thread = Thread(target=self.dfs_, args=(self.start_node,))
         self.thread.start()
 
-    def sleeper(self, time_between_draws):
-        for node in self.graph_visuals.graph_nodes:
-            time.sleep(time_between_draws)
-            self.graph_visuals.graph_nodes[node.id].node_fill_colour = "green"
-            print(node.id, node.node_fill_colour)
-            self.graph_visuals.redraw_nodes()
+    # TODO In jedem Step die graph_visuals.node_adjacency_list in ne Liste KOPIEREN und dann eifnach uebschreiben udn 
+    # neue zeichen wenn previous/next frame gefordert wird 
+    def dfs_(self, node):
+        self.marked[node.id] = True
+        self.graph_visuals.graph_nodes[node.id].node_fill_colour = "green"
+        self.graph_visuals.redraw_nodes()
+        for node in self.graph_visuals.node_adjacency_list[node.id]:
+            time.sleep(0.3)
+            if not self.marked[node.id]:
+                self.dfs_(node)
 
 
 
