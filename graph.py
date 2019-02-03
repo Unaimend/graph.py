@@ -310,8 +310,8 @@ class GraphEdge:
         self.normal_end_point_dir: Vector = Vector(self.end.y-self.start.y, -(self.end.x-self.start.x))
         self.normal_end_point_dir = self.normal_end_point_dir.to_unit() * 50
         self.normal_end_point: Vector = self.midpoint + self.normal_end_point_dir
-        self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
-        self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
+        # self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
+        # self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
 
     @abc.abstractmethod
     def delete(self):
@@ -357,9 +357,9 @@ class DirectedGraphEdge(GraphEdge):
 
     def delete(self):
         self.canvas.delete(self.id)
-        self.canvas.delete(self.arrow.id)
-        self.canvas.delete(self.normal)
-        self.canvas.delete(self.mid)
+        # self.canvas.delete(self.arrow.id)
+        # self.canvas.delete(self.normal)
+        # self.canvas.delete(self.mid)
 
 
 class EdgeArrow:
@@ -375,7 +375,7 @@ class EdgeArrow:
         point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
         point5: Vector = point1
 
-        self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
+        # self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
 
 class EmptyGraphError(Exception):

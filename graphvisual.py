@@ -200,6 +200,7 @@ class GraphVisual:
 
     def select_node(self, event) -> None:
         """Selects a node and opens a window with important informatoion about the selected node"""
+        # TODO DAS MUSS ALLES NEU
         if not self.graph_nodes:
             raise EmptyGraphError
         x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
