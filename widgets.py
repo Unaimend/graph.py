@@ -100,6 +100,7 @@ class InfoMenu(tk.Frame):
         self.parent = parent
         self.label: List[str] = []
         self.label_val: List[str] = []
+        self.buttons = []
         self.row_ctr = 0
         self.parent.bind("<Command-l>", self.print)
         self.visible = True
@@ -113,6 +114,15 @@ class InfoMenu(tk.Frame):
         self.label_val.append(label_val)
 
         self.row_ctr += 1
+
+    def add_button(self, text="", fnc=lambda: print("hello"), row=-1, column=0):
+        if row == -1:
+            row = self.row_ctr
+        button = tk.Button(self, text=text, anchor=tk.W, command=fnc)
+        button.grid(row=row, column=column)
+        self.buttons.append(button)
+        
+
 
     def toggle(self):
         if self.visible:

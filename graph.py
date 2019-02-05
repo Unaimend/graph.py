@@ -24,7 +24,7 @@ AdjacencyMatrix = List[List[int]]
 # TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
 # TODO Natuerlich nur optional
 # TODO mit with  verpacken
-
+# TODO "Graphen-Mittelpunkt" berechen und den imer auf (0,0) setzen
 
 # TODO DFS Visualisierung und ueberlegen wie ich mit Graphen umgehe die nicht integer vertices haben
 # IDEE Als isomorphen graphen zu einem integer graphen betrachtemn

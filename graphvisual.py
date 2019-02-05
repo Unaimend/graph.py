@@ -194,8 +194,8 @@ class GraphVisual:
         # pylint: disable=W0613
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
         self.draw_node_ids = not bool(self.draw_node_ids)
-        for node in self.graph_nodes:
-            print(node.node_fill_colour)
+        # for node in self.graph_nodes:
+        #     print(node.node_fill_colour)
         self.redraw_graph()
 
     def select_node(self, event) -> None:
