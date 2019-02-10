@@ -1,8 +1,9 @@
 """Module which contains all the ui widgets"""
 from typing import List
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, Widget, ttk
 from graph import Graph, GraphNode
+from algorithms.layouting.layout_algorithm import LayoutAlgorithm
 
 
 class OpenGraphDialog:
@@ -52,25 +53,45 @@ class OpenGraphDialog:
         self.window.destroy()
 
 
-class NoteBookTab:
+class NoteBookTab(tk.Frame):
     """
     Verwaltungs-Class to handle the tab functionality like closing, opening, moving etc
     """
-    def __init__(self, canvas, graph, graph_vis, algo="") -> None:
-        """
-        Ctor.   
-        :param canvas: 
-        :param graph: 
-        :param graph_vis: 
-        :param algo: 
-        """
-        self.canvas: tk.Canvas = canvas
-        self.graph: Graph = graph
+    def __init__(self, nb, graph_vis, algo: LayoutAlgorithm, root, index) -> None:
+        tk.Frame.__init__(self, root)
+        self.index = index
+        self.CANVAS_WIDTH = 1400
+        self.CANVAS_HEIGHT = 700
+        self.nb = nb
+        self.widgetName = index
+        
+        self.root = root
+        self.xscrollbar = tk.Scrollbar(self.root, orient=tk.HORIZONTAL)
+        self.xscrollbar.grid(column=0, row=2, sticky=tk.E + tk.W)
+
+        self.yscrollbar = tk.Scrollbar(self.root, orient=tk.VERTICAL)
+        self.yscrollbar.grid(column=2, row=0, sticky=tk.S + tk.N, rowspan=1)
+        
+        self.canvas: tk.Canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
+                                                  width=self.CANVAS_WIDTH, height=self.CANVAS_HEIGHT,
+                                                  background='white', scrollregion=(-2000, -2000, 2000, 2000),
+                                                  xscrollcommand=self.xscrollbar.set,
+                                                  yscrollcommand=self.yscrollbar.set)
+        self.canvas.grid(column=0, row=1)
+        
         self.graph_vis = graph_vis
         # TODO Dynamisch statt hardcoded
         self.original_canvas_width = 1414
         self.algorithm = algo
 
+        self.xscrollbar.config(command=self.canvas.xview)
+        self.yscrollbar.config(command=self.canvas.yview)
+        
+
+        # Frame der die Label und TextInputs h�lt
+        self.algorithm_options_frame = tk.Frame(root)
+
+        
     def set_graph(self, graph):
         self.graph = graph
 
@@ -91,6 +112,8 @@ class NoteBookTab:
         # 0.9 if event.delta < 0 else 1.1
         amount = 0.9
         self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
+
+
 
 
 class InfoMenu(tk.Frame):
