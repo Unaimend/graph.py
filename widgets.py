@@ -11,7 +11,7 @@ class OpenGraphDialog:
     def __init__(self, root) -> None:
         """
         Ctor
-        :param root: The root window in which this Dialog should be opened 
+        :param root: The root window in which this Dialog should be opened
         """
         self.filename: str = "test"
         self.eades = tk.BooleanVar()
@@ -42,11 +42,15 @@ class OpenGraphDialog:
         label = tk.Label(self.window, text="Which layouting algorithm do you want to use")
         label.pack()
         # TODO Combobox statt Checkbutton oder Radiobuttons
-        c = tk.Checkbutton(self.window, text="Eades", variable=self.eades, onvalue=True, offvalue=False)
+        c = tk.Checkbutton(self.window, text="Eades", variable=self.eades,
+                           onvalue=True, offvalue=False)
         c.pack()
-        c1 = tk.Checkbutton(self.window, text="Fruchterman-Reingold", variable=self.fruchterman_reingold, onvalue=True, offvalue=False)
+        c1 = tk.Checkbutton(self.window, text="Fruchterman-Reingold",
+                            variable=self.fruchterman_reingold, onvalue=True,
+                            offvalue=False)
         c1.pack()
-        c2 = tk.Checkbutton(self.window, text="Lefty", variable=self.lefty, onvalue=True,
+        c2 = tk.Checkbutton(self.window, text="Lefty", variable=self.lefty,
+                            onvalue=True,
                             offvalue=False)
         c2.pack()
         button.wait_variable(var)
@@ -64,21 +68,23 @@ class NoteBookTab(tk.Frame):
         self.CANVAS_HEIGHT = 700
         self.nb = nb
         self.widgetName = index
-        
+
         self.root = root
         self.xscrollbar = tk.Scrollbar(self.root, orient=tk.HORIZONTAL)
         self.xscrollbar.grid(column=0, row=2, sticky=tk.E + tk.W)
 
         self.yscrollbar = tk.Scrollbar(self.root, orient=tk.VERTICAL)
         self.yscrollbar.grid(column=2, row=0, sticky=tk.S + tk.N, rowspan=1)
-        
+
         self.canvas: tk.Canvas = tk.Canvas(self.root, relief=tk.SUNKEN, bd=4,
-                                                  width=self.CANVAS_WIDTH, height=self.CANVAS_HEIGHT,
-                                                  background='white', scrollregion=(-2000, -2000, 2000, 2000),
-                                                  xscrollcommand=self.xscrollbar.set,
-                                                  yscrollcommand=self.yscrollbar.set)
+                                           width=self.CANVAS_WIDTH,
+                                           height=self.CANVAS_HEIGHT,
+                                           background='white',
+                                           scrollregion=(-2000, -2000, 2000, 2000),
+                                           xscrollcommand=self.xscrollbar.set,
+                                           yscrollcommand=self.yscrollbar.set)
         self.canvas.grid(column=0, row=1)
-        
+
         self.graph_vis = graph_vis
         # TODO Dynamisch statt hardcoded
         self.original_canvas_width = 1414
@@ -86,12 +92,12 @@ class NoteBookTab(tk.Frame):
 
         self.xscrollbar.config(command=self.canvas.xview)
         self.yscrollbar.config(command=self.canvas.yview)
-        
+
 
         # Frame der die Label und TextInputs h�lt
         self.algorithm_options_frame = tk.Frame(root)
 
-        
+
     def set_graph(self, graph):
         self.graph = graph
 
@@ -144,7 +150,7 @@ class InfoMenu(tk.Frame):
         button = tk.Button(self, text=text, anchor=tk.W, command=fnc)
         button.grid(row=row, column=column)
         self.buttons.append(button)
-        
+
 
 
     def toggle(self):
