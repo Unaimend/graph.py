@@ -114,3 +114,5 @@ default_graph Kopie\.json
 TAGS
 
 tag\.sh
+
+algorithms/\.#depth_first_search\.py
