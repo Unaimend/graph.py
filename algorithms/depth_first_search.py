@@ -6,7 +6,7 @@ from graph import Graph, EmptyGraphError
 
 class DepthFirstSearch:
     """This class is the dfs-implementation which this program will be using"""
-    def __init__(self, graph: Graph, start_node) -> None:
+    def __init__(self, graph: Graph, start_node: int) -> None:
         """
         :param graph: The on which the algorithm will be acting
         :param start_node: The start node from dfs, important if the graph isn't connected
@@ -14,6 +14,7 @@ class DepthFirstSearch:
         if graph.vertice_count == 0:
             raise EmptyGraphError
         self.marked = [False] * graph.vertice_count
+        self.contains_cycle = False
         self.edge_to = [-1] * graph.vertice_count
         self.start = start_node
         self._dfs(graph, start_node)
@@ -30,6 +31,8 @@ class DepthFirstSearch:
             if not self.marked[node]:
                 self.edge_to[node] = start_node
                 self._dfs(graph, node)
+            else:
+                self.contains_cycle = True
 
     def has_path_to(self, node):
         """
@@ -57,14 +60,13 @@ class DepthFirstSearch:
 
 
 class DfsVisual:
-    def __init__(self, graph_visuals, colour="red"):
+    def __init__(self, graph_visuals, colour="red", func=(lambda x: x)):
         self.graph_visuals = graph_visuals
         self.colour = colour
         self.thread = None
-        
+        self.func = func
         if len(graph_visuals.graph_nodes) == 0:
             raise EmptyGraphError
-        
         self.marked = [False] * len(graph_visuals.graph_nodes)
         self.start_node = graph_visuals.graph_nodes[0]
         self.run()
@@ -77,7 +79,7 @@ class DfsVisual:
     # neue zeichen wenn previous/next frame gefordert wird 
     def dfs_(self, node):
         self.marked[node.id] = True
-        self.graph_visuals.graph_nodes[node.id].node_fill_colour = "green"
+        func(self.graph_visuals.graph_nodes[node.id])
         self.graph_visuals.redraw_nodes()
         for node in self.graph_visuals.node_adjacency_list[node.id]:
             time.sleep(0.3)

@@ -5,11 +5,7 @@
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
 import json
-import tkinter as tk
 from typing import List
-import abc
-
-
 from logger import logger
 from vector import Vector
 
@@ -18,7 +14,6 @@ AdjacencyList = List[List[int]]
 AdjacencyListEntry = List[int]
 AdjacencyMatrix = List[List[int]]
 
-# TODO Should GraphNode and GraphEdge be in the graphvisual module since the are only important for the graphical
 # TODO representation of graphs
 # TODO Siehe https://stackoverflow.com/questions/13212300/how-to-reconfigure-tkinter-canvas-items
 # TODO Graphen als n-gon aufstellen und dann algorithmen anwenden einfach for the lullz
@@ -30,82 +25,14 @@ AdjacencyMatrix = List[List[int]]
 # IDEE Als isomorphen graphen zu einem integer graphen betrachtemn
 
 
-class GraphNode:
-    """
-    Class which represents a node in a graph
-    """
-    #: Radius of the nodes
-    graphNodeRadius = 12
-    # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
+class GraphError(Exception):
+    pass
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:
-        """
-        :param canvas: The canvas on which the node should be drawn
-        :param x: 
-        :param y:
-        :param draw_ids: bool
-        :param id: The id which should be drawn in node
-        :param colour
-        """
-        #: Canvas position for the node
-        self.position = Vector(x, y)
-        #: The canvas on which the node should be drawn(for multi-canvas support)
-        self.canvas = canvas
-        #: The id that will be drawn "in the node"
-        self.id = id
-        #: The id to identify this node on the canvas
-        self.canvas_id = 0
-        #: Id to identify the text of this node
-        self.canvas_text_id = "-1"
+class LoadingError(GraphError):
+    pass
 
-        self.colour = colour
-        self.node_fill_colour = node_fill_colour
-        """
-        Boolean which determines if the node is represented through a black dot or
-        through a circle with a number inside
-        """
-        self.draw_ids = draw_ids
-
-        # TODO Magic number ersetzen
-
-        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
-        right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
-        if draw_ids:
-            self.canvas_id = canvas.create_oval(left_corner.x,
-                                                left_corner.y,
-                                                right_corner.x,
-                                                right_corner.y, fill="white")
-            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
-            self.canvas_text_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.id, fill=self.colour)
-        else:
-            self.canvas_id = canvas.create_oval(left_corner.x,
-                                                left_corner.y,
-                                                right_corner.x,
-                                                right_corner.y, fill=node_fill_colour)
-
-    def move(self, x: float, y: float):
-        """
-        NOTE: Does not change the position on the canvas, a redraw must be called to do that
-        :param x: The x-offset which should be added
-        :param y: The y-offset which should be added
-        :return:
-        """
-        # update current position
-        self.position.x += x
-        self.position.y += y
-
-    def __str__(self):
-        return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
-
-    def set_pos(self, x: float, y: float) -> None:
-        """
-        Sets the position of the node to the specified x,y coordinates
-        :param x: x-coordinate on the canvas 
-        :param y: y-coordinate on the cnavas
-        :return: 
-        """
-        self.position.x = x
-        self.position.y = y
+class DecodingError(GraphError):
+    pass
 
 
 class Graph:
@@ -113,7 +40,7 @@ class Graph:
     Class for representing graphs
     """
     def __init__(self, filepath: str = None, adjacency_list: AdjacencyList = None,
-                 adjacency_matrix: AdjacencyMatrix = None) -> None:
+                 adjacency_matrix: AdjacencyMatrix = None, version = 0) -> None:
         """
         Note: All the variables are exlusive, that means if on is supplied the others should not be used
         :param filepath: The path from which the graph should be loaded
@@ -128,6 +55,8 @@ class Graph:
         self.adjacency_matrix = adjacency_matrix
         # Total number of vertices
         self.vertice_count = None
+        self.j = None
+        self.version = 0
 
         # Load from a file
         # https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
@@ -135,18 +64,33 @@ class Graph:
             logger.info("Loading from" + filepath)
             # print("Loading from " + filepath)
             # Get file descriptor
-            f = open(self.filepath, "r")
-            # Load data into the adjacency_list
-            self.adjacency_list = json.load(f)
-            # Close file
-            f.close()
-            # Get the vertice count
-            self.vertice_count = len(self.adjacency_list)
-            logger.info("Adjacency list" + str(self.adjacency_list))
+            try:
+                f = open(self.filepath, "r")
+                try:
+                    # Load data into the adjacency_list
+                    self.j = json.load(f)
+                    self.version = self.j["version"]
+                    if self.version == 0:
+                        self.adjacency_list = self.j["adj_list"]
+                    if self.version == 1:
+                        self.adjacency_list = self.convert_from_adjacency_matrix(self.j["adj_matrix"])
+                    logger.info("Adjacency list" + str(self.adjacency_list))
+                except json.JSONDecodeError:
+                    logger.error("Colud not decode " + filepath + "to Json")
+                    raise DecodingError
+            except FileNotFoundError:
+                logger.error("Could not load" + filepath)
+                raise LoadingError
+            finally:
+                # Close file
+                f.close()
         else:
-            pass
-        # print("WP", self.subtree_index(0))
-        self.is_binary_tree = True
+            if self.adjacency_matrix is not None:
+                self.adjacency_list = self.convert_from_adjacency_matrix(self.adjacency_matrix)
+            self.version = version
+        # Get the vertice count
+        self.vertice_count = len(self.adjacency_list)
+        self.is_binary_tree = False
         self.node_id = 0
 
     @classmethod
@@ -158,27 +102,44 @@ class Graph:
         return cls(filepath=filepath)
 
     @classmethod
-    def from_adjacency_list(cls, adjacency_list: AdjacencyList) -> 'Graph':
+    def from_adjacency_list(cls, adjacency_list: AdjacencyList, version) -> 'Graph':
         """
         :param adjacency_list: The adj. list from which the graph sould be loaded
         :return:  A new graph instance
         """
-        return cls(adjacency_list=adjacency_list)
+        return cls(adjacency_list=adjacency_list, version=version)
 
     @classmethod
-    def from_adjacency_matrix(cls, adjacency_matrix: AdjacencyMatrix) -> 'Graph':
+    def from_adjacency_matrix(cls, adjacency_matrix: AdjacencyMatrix, version) -> 'Graph':
         """
         :param adjacency_matrix: The adj. matrix from which the graph sould be loaded
         :return: A new graph instance
         """
-        return cls(adjacency_matrix=adjacency_matrix)
+        return cls(adjacency_matrix=adjacency_matrix, version=version)
 
-    def adjacent_to(self, node: GraphNode) -> AdjacencyListEntry:
+    def convert_from_adjacency_matrix(self, matrix):
+        adj_list = list()
+        row_count = len(matrix)
+        column_count = len(matrix[0])
+
+        for y, value in enumerate(matrix):
+            #add new node per row
+            #print(value)
+            adj_list.append([])
+            for x, value2 in enumerate(matrix[y]):
+                if matrix[y][x]:
+                    adj_list[y].append(x)
+                #print("(%s,%s)" % (y,x))
+
+        return adj_list
+
+
+    def adjacent_to(self, node: int) -> AdjacencyListEntry:
         """
         :param node: The node from which you want the ajd. list
         :return: adjacency_list from the give node
         """
-        return self.adjacency_list[node.id]
+        return self.adjacency_list[node]
 
     def root_index(self):
         """Returns the  index of the root"""
@@ -282,100 +243,6 @@ class Graph:
         except IndexError:
             return -1
 
-
-class GraphEdge:
-    """
-    This class represents a graph edge
-    """
-    __metaclass__ = abc.ABCMeta
-    
-    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
-        """
-        :param canvas: The canvas on which the edge should be drawn
-        :type canvas: tk.Canvas
-        :param start_node: The lines starting node
-        :param end_node: The lines ending node
-        """
-        # Start der Kanten
-        self.start = Vector(start_node.position.x, start_node.position.y)
-        # Ende der Kanten
-        self.end = Vector(end_node.position.x, end_node.position.y)
-        self.start_node = start_node
-        self.end_node = end_node
-        self.canvas = canvas
-        # Create line and save id
-        self.id = None
-        self.radius = 5
-        self.midpoint = Vector(self.start.x - (self.start.x-self.end.x)/2, self.start.y - (self.start.y-self.end.y)/2)
-        self.normal_end_point_dir: Vector = Vector(self.end.y-self.start.y, -(self.end.x-self.start.x))
-        self.normal_end_point_dir = self.normal_end_point_dir.to_unit() * 50
-        self.normal_end_point: Vector = self.midpoint + self.normal_end_point_dir
-        # self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
-        # self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
-
-    @abc.abstractmethod
-    def delete(self):
-        return
-
-
-class UndirectedGraphEdge(GraphEdge):
-    """
-    This class represents a graph edge
-    """
-    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
-        """
-        :param canvas: The canvas on which the edge should be drawn
-        :type canvas: tk.Canvas
-        :param start_node: The lines starting node
-        :param end_node: The lines ending node
-        """
-        super().__init__(canvas, start_node, end_node)
-        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
-
-    def delete(self):
-        self.canvas.delete(self.id)
-        self.canvas.delete(self.mid)
-        self.canvas.delete(self.normal)
-
-
-class DirectedGraphEdge(GraphEdge):
-    """
-    This class represents a graph edge
-    """
-    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
-        """
-        :param canvas: The canvas on which the edge should be drawn
-        :type canvas: tk.Canvas
-        :param start_node: The lines starting node
-        :param end_node: The lines ending node
-        """
-        super().__init__(canvas, start_node, end_node)
-        # TODO Das kann kein guter code sein
-        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, fill='black')
-
-        self.arrow = EdgeArrow(canvas, self)
-
-    def delete(self):
-        self.canvas.delete(self.id)
-        # self.canvas.delete(self.arrow.id)
-        # self.canvas.delete(self.normal)
-        # self.canvas.delete(self.mid)
-
-
-class EdgeArrow:
-    def __init__(self, canvas: tk.Canvas, edge: DirectedGraphEdge):
-        self.canvas: tk.Canvas = canvas
-        self.edge: GraphEdge = edge
-        self.pos: Vector = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
-        line_direction: Vector = self.edge.end-self.edge.start
-        line_direction = line_direction.to_unit() * 10
-        point1: Vector = self.pos-line_direction*2
-        point2: Vector = point1 + self.edge.normal_end_point_dir*0.1
-        point3: Vector = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
-        point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
-        point5: Vector = point1
-
-        # self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
 
 class EmptyGraphError(Exception):

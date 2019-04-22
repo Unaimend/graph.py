@@ -2,20 +2,24 @@
 from graphvisual import  GraphVisual
 from graph import Graph
 
+from algorithms.layouting.layout_algorithm import LayoutAlgorithm
 
-class Lefty:
+class_name = "Lefty"
+
+class Lefty(LayoutAlgorithm):
     """Class which implements an algorithm similiar to the first Algorithm from Iidy drawing of Trees[WH79["""
-    def __init__(self, graph_visuals, graph, canvas_width, canvas_height):
+    def __init__(self, graph_visuals):
         """
         Ctor. 
         :param graph_visuals: Handles all the stuff that has to do with drawing
         :param canvas_width: Width of the canvas
         :param canvas_height: Height of the canvas 
         """
+        LayoutAlgorithm.__init__(self, "Lefty")
         self.graph_visuals = graph_visuals
-        self.canvas_width = canvas_width
-        self.canvas_length = canvas_height
-        self.graph = graph
+        self.canvas_width = self.graph_visuals.width
+        self.canvas_length = self.graph_visuals.height
+        self.graph = self.graph_visuals.graph
         self.max_height = -1
 
         for x in range(0, len(self.graph.adjacency_list)):
@@ -25,7 +29,10 @@ class Lefty:
 
         print("max height", self.max_height)
 
-    def do_lefty(self) -> None:
+    def init_widgets(self):
+        pass
+
+    def run(self) -> None:
         """
         Executes the whole algorithm 
         """

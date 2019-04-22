@@ -8,8 +8,9 @@ import threading
 import random
 import tkinter as tk
 import math
+import abc
 from typing import List
-from graph import Graph, GraphEdge, GraphNode, DirectedGraphEdge, EmptyGraphError
+from graph import Graph, EmptyGraphError
 from widgets import NodeInfo
 from vector import Vector
 
@@ -68,7 +69,7 @@ class GraphVisual:
             raise Exception("A graph must not be None")
         self.graph = graph
 
-        self.current_selected_node: GraphNode 
+        self.current_selected_node: GraphNode
         # Reference to the latest opened NodeInfoWindow
         self.current_info: NodeInfo
 
@@ -83,11 +84,52 @@ class GraphVisual:
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
+    def find_max_nodes(self):
+
+
+        max_x = int(max([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
+        min_x = int(min([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
+
+        max_y = int(max([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
+        min_y = int(min([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
+
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+
+        def create_circle(x, y, r, canvasName): #center coordinates, radius
+            x0 = x - r
+            y0 = y - r
+            x1 = x + r
+            y1 = y + r
+            return canvasName.create_oval(x0, y0, x1, y1, fill="yellow")
+
+        print("MIDDLE", min_x+midpoint_x, max_y-midpoint_y)
+        print("MIDDLE_SCREEN", self.width/2, self.height/2)
+        self.oval = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
+        self.oval3 =  create_circle(min_x+midpoint_x, max_y-midpoint_y, 20, self.canvas)
+
+        self.oval4 =  create_circle(self.width/2, self.height/2, 20, self.canvas)
+        #print("min_x %s max_x %s min_y %s max_y %s" % (min_x, max_x, min_y, max_y))
+        return self.width/2 - (min_x+midpoint_x),  (self.height/2) - (max_y-midpoint_y)
+
+
+    def translate_to_mid(self):
+        diff_x, diff_y = self.find_max_nodes()
+
+        print("DIFF", diff_x, diff_y)
+        for x in self.graph_nodes:
+            x.move(diff_x, diff_y)
+
+        self.generate_adj_list()
+        # # update edges between nodes
+        self.generate_edges()
+        self.redraw_graph()
+
     def inc_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
-        :param event: --- 
-        :return: 
+        :param event: ---
+        :return:
         """
         # pylint: disable=W0613
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
@@ -97,8 +139,8 @@ class GraphVisual:
         # pylint: disable=W0613
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
-        :param event: --- 
-        :return: 
+        :param event: ---
+        :return:
         """
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
@@ -183,7 +225,7 @@ class GraphVisual:
     def redraw_graph(self, event=None) -> None:
         # pylint: disable=W0613
         """
-        Combines methods to redraw all graphical items of the graphs 
+        Combines methods to redraw all graphical items of the graphs
         """
         self.canvas.delete(tk.ALL)
         self.redraw_nodes()
@@ -295,6 +337,176 @@ class GraphVisual:
 
 
 
+class GraphNode:
+    """
+    Class which represents a node in a graph
+    """
+    #: Radius of the nodes
+    graphNodeRadius = 12
+    # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
+
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:
+        """
+        :param canvas: The canvas on which the node should be drawn
+        :param x:
+        :param y:
+        :param draw_ids: bool
+        :param id: The id which should be drawn in node
+        :param colour
+        """
+        #: Canvas position for the node
+        self.position = Vector(x, y)
+        #: The canvas on which the node should be drawn(for multi-canvas support)
+        self.canvas = canvas
+        #: The id that will be drawn "in the node"
+        self.id = id
+        #: The id to identify this node on the canvas
+        self.canvas_id = 0
+        #: Id to identify the text of this node
+        self.canvas_text_id = "-1"
+
+        self.colour = colour
+        self.node_fill_colour = node_fill_colour
+        """
+        Boolean which determines if the node is represented through a black dot or
+        through a circle with a number inside
+        """
+        self.draw_ids = draw_ids
+
+        # TODO Magic number ersetzen
+
+        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
+        right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
+        if draw_ids:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="white")
+            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
+            self.canvas_text_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.id, fill=self.colour)
+        else:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill=node_fill_colour)
+
+    def move(self, x: float, y: float):
+        """
+        NOTE: Does not change the position on the canvas, a redraw must be called to do that
+        :param x: The x-offset which should be added
+        :param y: The y-offset which should be added
+        :return:
+        """
+        # update current position
+        self.position.x += x
+        self.position.y += y
+
+    def __str__(self):
+        return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
+
+    def set_pos(self, x: float, y: float) -> None:
+        """
+        Sets the position of the node to the specified x,y coordinates
+        :param x: x-coordinate on the canvas
+        :param y: y-coordinate on the cnavas
+        :return:
+        """
+        self.position.x = x
+        self.position.y = y
+
+
+class GraphEdge:
+    """
+    This class represents a graph edge
+    """
+    __metaclass__ = abc.ABCMeta
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        # Start der Kanten
+        self.start = Vector(start_node.position.x, start_node.position.y)
+        # Ende der Kanten
+        self.end = Vector(end_node.position.x, end_node.position.y)
+        self.start_node = start_node
+        self.end_node = end_node
+        self.canvas = canvas
+        # Create line and save id
+        self.id = None
+        self.radius = 5
+        self.midpoint = Vector(self.start.x - (self.start.x-self.end.x)/2, self.start.y - (self.start.y-self.end.y)/2)
+        self.normal_end_point_dir: Vector = Vector(self.end.y-self.start.y, -(self.end.x-self.start.x))
+        self.normal_end_point_dir = self.normal_end_point_dir.to_unit() * 50
+        self.normal_end_point: Vector = self.midpoint + self.normal_end_point_dir
+        # self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
+        # self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
+
+    @abc.abstractmethod
+    def delete(self):
+        return
+
+
+class UndirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
+        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
+
+    def delete(self):
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.mid)
+        self.canvas.delete(self.normal)
+
+
+class DirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
+        # TODO Das kann kein guter code sein
+        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, fill='black')
+
+        self.arrow = EdgeArrow(canvas, self)
+
+    def delete(self):
+        self.canvas.delete(self.id)
+        # self.canvas.delete(self.arrow.id)
+        # self.canvas.delete(self.normal)
+        # self.canvas.delete(self.mid)
+
+
+class EdgeArrow:
+    def __init__(self, canvas: tk.Canvas, edge: DirectedGraphEdge):
+        self.canvas: tk.Canvas = canvas
+        self.edge: GraphEdge = edge
+        self.pos: Vector = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
+        line_direction: Vector = self.edge.end-self.edge.start
+        line_direction = line_direction.to_unit() * 10
+        point1: Vector = self.pos-line_direction*2
+        point2: Vector = point1 + self.edge.normal_end_point_dir*0.1
+        point3: Vector = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
+        point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
+        point5: Vector = point1
+
+        # self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
 
 # TODO Graphen sollte so realisiert werden
@@ -305,6 +517,3 @@ class GraphVisual:
 #           "e" : ["c"],
 #           "f" : []
 #         }
-
-
-
