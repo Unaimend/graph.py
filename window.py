@@ -55,7 +55,6 @@ class Window(tk.Tk, Subject, Observer):
         self.nb.grid(column=0, row=0, sticky=tk.N)
 
         self.bind("<Control-t>", self.open_new_graph)
-        # self.root.bind("<Control-b>", self.toggle_info_menu)
         self.bind("<Control-w>", self.delete_tab)
         self.bind("<Control-s>", self.do_algo)
         self.bind("<Control-r>", self.zoom_out)
@@ -182,44 +181,3 @@ class Window(tk.Tk, Subject, Observer):
         current_tab.redraw_graph()
         #threading.Thread(target=algo.run).start()
 
-
-    # def toggle_info_menu(self, event=None) -> None:
-    #     # pylint: disable=W0613
-    #     """
-    #     Toggles the Info Menue
-    #     :param event:
-    #     """
-    #     new_width = 0
-    #     self.info_menu.toggle()
-    #
-    #     # Neue Breite berechnen(abhaengig davon ob das info_menu zu sehen ist oder nicht)
-    #     if self.info_menu.visible:
-    #         new_width = self.tabs[self.get_current_notebook_tab_index()].original_canvas_width
-    #         try:
-    #             # HIER KOMMEN DIE ZUWEISUNGEN FUER DATEN DES INFO MENUES HIN
-    #             self.info_menu.label_val[0]["text"] = str(self.tabs[self.get_current_notebook_tab_index()].graph.vertice_count)
-    #
-    #         except AttributeError:
-    #             self.info_menu.label_val[0]["text"] = ""
-    #         try:
-    #             pass
-    #         except AttributeError:
-    #             pass
-    #     else:
-    #         # Magic 28 sorgt dafuer das canvas nicht an Breite waechst
-    #         # TODO: Gehts locker kaputt wenn ich die Aufloesung aendere
-    #         new_width = self.info_menu.winfo_width() + self.tabs[self.get_current_notebook_tab_index()].canvas.winfo_width() - 28
-    #
-    #     self.tabs[self.get_current_notebook_tab_index()].canvas.configure(width=new_width)
-    #
-    # def renew_info_menu_data(self, event=None) -> None:
-    #     # pylint: disable=W0613
-    #     """
-    #     Reloads the Info-Menue-Data when the Info Menue got toggled
-    #     :param event:
-    #     """
-    #     # Beim toggeln werden die Daten aktualisiert deswegen toggeln wir hier 2x mal
-    #     # um den Anzeigestatus beizubehalten aber die Daten zu aktualiseren
-    #     self.toggle_info_menu()
-    #     self.toggle_info_menu()
-    #     # Check ob der in diesem Tab verwendete Algorithmus des von Eades ist oder nicht
