@@ -18,20 +18,7 @@ from widgets import OpenGraphDialog, NoteBookTab, InfoMenu
 
 from graphs.ncircle import n_circle
 
- # https://stackoverflow.com/questions/7546050/switch-between-two-frames-in-tkinter/7557028#7557028
-
-# https://stackoverflow.com/questions/7546050/switch-between-two-frames-in-tkinter/7557028#7557028
-
-# TODO Enter druecken in den Eades Kosntantenboxen geht gar nicht gut
-# TODO Siehe Shift-MouseWheel MouseWheel
-# TODO Wenn graph gezeichnet wird sollten scrollsbars auf anfang gesetzt werden damit man den graphen sieht
-
 # TODO RESIZABLE
-# TODO Slices um das \n oder so loszuwerden beim den textfeldern(anber erst string.rstrip anschauen
-# Passiert falls man mit Enter versucht die Textfield eingabe zu bestaetigen,
-# Das Emter drucken in einem Label sollte dafuer sorgen dass das Canvas ausgewaehlt wird
-# TODO Eigentlich war es vollieg retarded die Layoutingklassen static zu machen denn
-# TODo jetzt kann man  nichtmal in zwei Tabs den gleichen Algorithmus mit versch. Parametern starten
 
 class Window(tk.Tk, Subject, Observer):
     """Class which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
@@ -71,11 +58,15 @@ class Window(tk.Tk, Subject, Observer):
         # self.root.bind("<Control-b>", self.toggle_info_menu)
         self.bind("<Control-w>", self.delete_tab)
         self.bind("<Control-s>", self.do_algo)
+        self.bind("<Control-r>", self.zoom_out)
+        self.bind("<Control-f>", self.zoom_in)
 
-        self.bind("<Control-r>", self.zoom)
 
-    def zoom(self, event):
+    def zoom_out(self, event=None):
         self.get_current_tab().zoom_out()
+
+    def zoom_in(self, event=None):
+        self.get_current_tab().zoom_in()
 
     def attach(self, observer) -> None:
         Subject.attach(self, observer)
@@ -97,11 +88,6 @@ class Window(tk.Tk, Subject, Observer):
             current_tab.change_graph(graph)
             current_tab.graph_vis.redraw_graph()
 
-    def get_tkinter_notebook_id(self, id):
-        new = id[id.rfind("."):-1]
-        print(new)
-
-    def get_graph_name(self, filepath: str):
         return filepath.split("/")[-1]
 
     def load_graph(self, filepath):
@@ -110,7 +96,6 @@ class Window(tk.Tk, Subject, Observer):
         in which the graph will be displayed
         :param filepath: Filepath from which the graph should be loaded
         """
-
         logger.debug("Loading graph...")
         # Herausfinden in welchem Tab man sich befindet
         #logger.debug("TABS", self.nb.tabs())
@@ -121,6 +106,7 @@ class Window(tk.Tk, Subject, Observer):
         # Aktuellem Tab den Graphen zuweisen
         current_tab.set_graph(Graph.from_adjacency_list([], 0))
         # Aktuellem Tab die GraphVisuals zuweisen
+        # TODO Das sollte nicht in der view passieren, generell sollte das load im controller sein
         current_tab.set_graph_vis(GraphVisual(
             window=self,
             canvas=current_tab.canvas,
@@ -128,6 +114,7 @@ class Window(tk.Tk, Subject, Observer):
             graph=current_tab.graph))
         self.model.load_graph_from_file(self.get_graph_name(filepath), filepath, newest_tab)
 
+    # TODO Sollte das auch ins model?
     def add_tab(self, event=None, graph_name: str = ""):
         # pylint: disable=W0613
         # Neuen Tab und zugehoeriges Canvas erstellen
@@ -168,7 +155,7 @@ class Window(tk.Tk, Subject, Observer):
         #a = "/home/td/dev/projects/graph.py/graphs/k20.json"
         #self.add_tab(a)
         #self.load_graph(a)
-
+        # TODO Sollte das hier ein call an den Controller sein
         self.add_tab(current_instance.filename)
         self.load_graph(current_instance.filename)
 
@@ -181,6 +168,7 @@ class Window(tk.Tk, Subject, Observer):
         return self.tabs[newest_tab]
 
 
+    # TODO Auch das sollte in controller
     def do_algo(self, event=None) -> None:
         # pylint: disable=W0613
         """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
@@ -191,17 +179,9 @@ class Window(tk.Tk, Subject, Observer):
         algo = klass(graph_visuals=current_tab.graph_vis)
 
         algo.run()
+        current_tab.redraw_graph()
         #threading.Thread(target=algo.run).start()
 
-        current_tab.graph_vis.translate_to_mid()
-        #jcurrent_tab.graph_vis.redraw_nodes()
-        # update adjacency list
-        #current_tab.graph_vis.generate_adj_list()
-        # # update edges between nodes
-        #current_tab.graph_vis.generate_edges()
-        #current_tab.graph_vis.redraw_graph()
-
-        #current_tab.graph_vis.find_max_nodes()
 
     # def toggle_info_menu(self, event=None) -> None:
     #     # pylint: disable=W0613

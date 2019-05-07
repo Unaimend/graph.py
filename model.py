@@ -42,24 +42,45 @@ class MainModel(Subject):
         self.load_layouting_algos()
         self.view = None
 
+
     def attach(self, observer):
         Subject.attach(self, observer)
 
     def load_layouting_algos(self):
-        print("CWD:", os.getcwd())
-        path = "algorithms/layouting/"
-        entries = os.listdir(path)
-        entries = [x for x in entries if x not in ["layout_algorithm.py", "__pycache__"]]
 
+        excluded_files = frozenset({"layout_algorithm.py", "__pycache__"})
+
+        logger.info("CWD: %s" % os.getcwd())
+        path = "algorithms/layouting/"
+
+        if not os.path.exists(path):
+            logger.debug("Making %s directory" % path)
+            os.makedirs(path)
+
+        # TODO GIBTS KEIN LIST MINUS/REMOVE
+        entries = set(os.listdir(path)) - excluded_files
+
+
+        # TODO Teil der For-Schleife eigene (pure?)Fkt. auslagern
         for file in entries:
             module = file[0:-3]
-            print("MODULE", module)
-            exec("import %s as %s" % ((path+file).replace("/", ".")[0:-3], module))
-            name = eval("" +module+".class_name")
-            print("NAME", name)
-            mod = __import__((path+file).replace("/", ".")[0:-3], fromlist=[name])
-            klass = getattr(mod, name)
-            self.layout_algos[name] = klass
+            logger.info("Loading %s" % module)
+            name = "default"
+            try:
+                mod = __import__((path+file).replace("/", ".")[0:-3], fromlist=[name])
+                name= getattr(mod, "class_name")
+                logger.info("Trying to import %s from %s"% (name, file))
+                try:
+                    klass = getattr(mod, name)
+                    self.layout_algos[name] = klass
+                except AttributeError as error:
+                    logger.error(error)
+                    logger.error("The module %s does not have a class with the name %s", module, name)
+            except AttributeError as e:
+                logger.error(e)
+                logger.error("Could not load %s" % module)
+                logger.error("Each module must have the .class_name attribute")
+
 
     def load_graph_from_file(self, name: str, filepath: str, tab) -> None:
         """

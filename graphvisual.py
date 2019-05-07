@@ -21,6 +21,10 @@ from vector import Vector
 # TOOD Mutates:
 # TODO https://youtu.be/_AEJHKGk9ns?t=19m3s
 
+#TODO Statt mittepunkt des umkreises die durchscnitspotiion benutzen bzw. gleich varaible programmieren
+
+# TODO VISITOR PATTERN FUER GRAPHNE KRAM DAMIT MAN NICHT AM GRAPPH FUMMELN MUSS
+
 
 class GraphVisual:
     """
@@ -29,7 +33,7 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None) -> None:
+    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None, draw_circle=False, draw_mid=False) -> None:
         """
         Ctor. for GraphVisual
         :parm window: TODO
@@ -57,7 +61,6 @@ class GraphVisual:
         self.width: float = width
         self.height: float = height
         self.graph: Graph
-
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
@@ -79,44 +82,70 @@ class GraphVisual:
         self.generate_adj_list()
 
         # Generate the edges between the nodes in self.node_adjacency_list
-        print("EDGES")
         self.generate_edges()
+
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+
+        if draw_circle:
+            self.circle = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
+            self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
+        else:
+            self.circle = None
+            self.circle_center = None
+        if draw_mid:
+            self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+        else:
+            self.middle_point = None
+
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
+
+    def create_circle(self, x, y, r): #center coordinates, radius
+        x0 = x - r
+        y0 = y - r
+        x1 = x + r
+        y1 = y + r
+        return self.canvas.create_oval(x0, y0, x1, y1, fill="yellow")
+
+    def draw_canvas_mid(self):
+        if self.middle_point is not None:
+            self.canvas.delete(self.middle_point)
+        self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+
+    def draw_graph_circle_center(self):
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+        if self.circle is not None:
+            self.canvas.delete(self.circle)
+        if self.circle_center is not None:
+            self.canvas.delete(self.circle_center)
+
+        self.circle = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
+        self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
+
     def find_max_nodes(self):
-
-
+        if len(self.graph_nodes) == 0:
+            return 0,0,0,0
+        # TODO look at max function kannste da nen lamda mitgeben bringt dads dwas?
         max_x = int(max([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
         min_x = int(min([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
 
         max_y = int(max([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
         min_y = int(min([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
 
-        midpoint_x = (max_x-min_x)/2
-        midpoint_y = (max_y-min_y)/2
-
-        def create_circle(x, y, r, canvasName): #center coordinates, radius
-            x0 = x - r
-            y0 = y - r
-            x1 = x + r
-            y1 = y + r
-            return canvasName.create_oval(x0, y0, x1, y1, fill="yellow")
-
-        print("MIDDLE", min_x+midpoint_x, max_y-midpoint_y)
-        print("MIDDLE_SCREEN", self.width/2, self.height/2)
-        self.oval = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
-        self.oval3 =  create_circle(min_x+midpoint_x, max_y-midpoint_y, 20, self.canvas)
-
-        self.oval4 =  create_circle(self.width/2, self.height/2, 20, self.canvas)
-        #print("min_x %s max_x %s min_y %s max_y %s" % (min_x, max_x, min_y, max_y))
-        return self.width/2 - (min_x+midpoint_x),  (self.height/2) - (max_y-midpoint_y)
+        return min_x, max_x, min_y, max_y
 
 
     def translate_to_mid(self):
-        diff_x, diff_y = self.find_max_nodes()
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+        diff_x, diff_y = self.width/2 - (min_x+midpoint_x),  (self.height/2) - (max_y-midpoint_y)
 
-        print("DIFF", diff_x, diff_y)
         for x in self.graph_nodes:
             x.move(diff_x, diff_y)
 
@@ -227,8 +256,8 @@ class GraphVisual:
         """
         Combines methods to redraw all graphical items of the graphs
         """
-        self.canvas.delete(tk.ALL)
         self.redraw_nodes()
+
         self.generate_adj_list()
         self.generate_edges()
 
@@ -335,14 +364,12 @@ class GraphVisual:
     #             self.clickedNodes = []
 
 
-
-
 class GraphNode:
     """
     Class which represents a node in a graph
     """
     #: Radius of the nodes
-    graphNodeRadius = 12
+    graphNodeRadius = 6
     # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
     def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:

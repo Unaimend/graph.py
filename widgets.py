@@ -31,6 +31,9 @@ class OpenGraphDialog:
         self.window.destroy()
 
 
+
+# TODO Eigenes Widget fuer das Editor Window, MVC mit EditorController, EditorView, EditorModel?
+# TODO Graph in MCV auslagern? dann hat ein Tab ne GraphView und ne EditorView
 class NoteBookTab(tk.Frame):
     """
     Verwaltungs-Class to handle the tab functionality like closing, opening, moving etc
@@ -52,6 +55,10 @@ class NoteBookTab(tk.Frame):
         self.yscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.yscrollbar.grid(column=3, row=1, sticky=tk.S + tk.N, rowspan=1)
 
+        self.text = tk.Text(self, width=200, height=200)
+
+        self.toggle = 0
+
         self.canvas: tk.Canvas = tk.Canvas(self, relief=tk.SUNKEN, bd=4,
                                            width=self.CANVAS_WIDTH,
                                            height=self.CANVAS_HEIGHT,
@@ -62,7 +69,12 @@ class NoteBookTab(tk.Frame):
                                            yscrollincrement=2,
                                            xscrollincrement=2
         )
+
+        self.text.grid(column=0, row=1)
         self.canvas.grid(column=0, row=1)
+
+        self.text.grid_forget()
+
 
 
         self.combo = ttk.Combobox(self, values = list(self.model.layout_algos.keys()), state='readonly' )
@@ -81,6 +93,8 @@ class NoteBookTab(tk.Frame):
         self.canvas.bind('<Button-5>',lambda event:
                          self.canvas.yview_scroll(event.num, "units"))
 
+
+        self.root.bind("<n>", self.toggle_text)
         self.canvas.bind("<Button>", self.touchpad_events)
 
          #Frame der die Label und TextInputs h�lt
@@ -92,6 +106,18 @@ class NoteBookTab(tk.Frame):
         w = tk.Label(self.algorithm_options_frame, text="Hello Frame")
         w.pack()
 
+        self.zoom = 1
+
+
+    def toggle_text(self, event):
+        if self.toggle == 0:
+            self.toggle = 1
+            self.text.grid(column=0, row=1)
+        else:
+            self.toggle = 0
+            self.text.grid_forget()
+
+
 
     def touchpad_events(self, event):
         if event.num==6:
@@ -100,11 +126,6 @@ class NoteBookTab(tk.Frame):
         elif event.num==7:
             self.canvas.xview_scroll(event.num, "units")
             return "break"
-
-    def update(self, event=None):
-        print(self.canvas)
-        print(self.graph_vis)
-        #self.canvas.lift()
 
     def change_graph(self, graph):
         ga = gv.GraphVisual(
@@ -121,20 +142,22 @@ class NoteBookTab(tk.Frame):
     def set_graph_vis(self, graph_vis):
         self.graph_vis = graph_vis
 
+
     def zoom_in(self, event=None):
         # pylint: disable=W0613
-        # 0.9 if event.delta < 0 else 1.1
         amount = 1.1
-        # DIe Null sollte width/2, height/2 sein aber das fuckt die berechnugn ab,
-        # self.canvas.scale(tk.ALL, 0, 0, amount, amount)
+        self.zoom *= amount
         self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
 
     def zoom_out(self, event=None):
         # pylint: disable=W0613
-        # 0.9 if event.delta < 0 else 1.1
         amount = 0.9
+        self.zoom *= amount
         self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, amount, amount)
 
+    def redraw_graph(self):
+        self.graph_vis.translate_to_mid()
+        self.canvas.scale(tk.ALL, self.graph_vis.width / 2, self.graph_vis.height / 2, self.zoom, self.zoom)
 
 
 
