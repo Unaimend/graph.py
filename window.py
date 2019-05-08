@@ -87,6 +87,8 @@ class Window(tk.Tk, Subject, Observer):
             current_tab.change_graph(graph)
             current_tab.graph_vis.redraw_graph()
 
+
+    def get_graph_name(self, filepath: str):
         return filepath.split("/")[-1]
 
     def load_graph(self, filepath):
