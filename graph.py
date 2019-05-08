@@ -58,6 +58,8 @@ class Graph:
         self.j = None
         self.version = 0
 
+        self.values = list()
+
         # Load from a file
         # https://stackoverflow.com/questions/1369526/what-is-the-python-keyword-with-used-for
         if filepath:
@@ -72,9 +74,15 @@ class Graph:
                     self.version = self.j["version"]
                     if self.version == 0:
                         self.adjacency_list = self.j["adj_list"]
+                        logger.info("Adjacency list" + str(self.adjacency_list))
                     if self.version == 1:
                         self.adjacency_list = self.convert_from_adjacency_matrix(self.j["adj_matrix"])
-                    logger.info("Adjacency list" + str(self.adjacency_list))
+                    # Load values for the nodes(Optional)
+                    try:
+                        self.values = self.j["values"]
+                        logger.debug("Values are %s", self. values)
+                    except KeyError:
+                        logger.debug("Values list is not specified")
                 except json.JSONDecodeError:
                     logger.error("Colud not decode " + filepath + "to Json")
                     raise DecodingError

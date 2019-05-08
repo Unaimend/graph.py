@@ -110,7 +110,10 @@ class Window(tk.Tk, Subject, Observer):
             window=self,
             canvas=current_tab.canvas,
             width=current_tab.CANVAS_WIDTH, height=current_tab.CANVAS_HEIGHT,
-            graph=current_tab.graph))
+            graph=current_tab.graph,
+            draw_node_ids = False,
+            draw_values = True
+        ))
         self.model.load_graph_from_file(self.get_graph_name(filepath), filepath, newest_tab)
 
     # TODO Sollte das auch ins model?

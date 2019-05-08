@@ -33,7 +33,7 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None, draw_circle=False, draw_mid=False) -> None:
+    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None, draw_circle=False, draw_mid=False, draw_node_ids=False, draw_values=False) -> None:
         """
         Ctor. for GraphVisual
         :parm window: TODO
@@ -64,7 +64,8 @@ class GraphVisual:
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
-        self.draw_node_ids: bool = False
+        self.draw_node_ids: bool = draw_node_ids
+        self.draw_values = draw_values
         # Helper variable for the node id
         self.node_counter: int = 0
         random.seed(GraphVisual.seed)
@@ -180,10 +181,10 @@ class GraphVisual:
         Note that the here generated list doesnt hold information about how the notes are related
         """
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
-        for _ in range(0, len(self.graph.adjacency_list)):
+        for i in range(0, len(self.graph.adjacency_list)):
             self.graph_nodes.append(
                 GraphNode(self.canvas, random.randint(0, int(self.width)),
-                          random.randint(0, int(self.height)), self.draw_node_ids, self.node_counter, "black"))
+                          random.randint(0, int(self.height)), self.draw_node_ids, self.node_counter, "black", draw_values = self.draw_values, value = self.graph.values[i]))
             self.node_counter += 1
 
     def generate_adj_list(self) -> None:
@@ -210,12 +211,21 @@ class GraphVisual:
         for node in self.graph_nodes:
             self.canvas.delete(node.canvas_id)
             self.canvas.delete(node.canvas_text_id)
+            self.canvas.delete(node.canvas_value_id)
 
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graph_nodes:
-            alternative_nodelist.append(GraphNode(self.canvas, node.position.x, node.position.y,
-                                                  self.draw_node_ids, node.id, node.colour, node.node_fill_colour))
+            alternative_nodelist.append(GraphNode(canvas =self.canvas,
+                                                  x = node.position.x,
+                                                  y =node.position.y,
+                                                  draw_ids = self.draw_node_ids,
+                                                  id = node.id,
+                                                  colour = node.colour,
+                                                  node_fill_colour = node.node_fill_colour,
+                                                  draw_values = self.draw_values,
+                                                  value = node.value
+            ))
         self.graph_nodes = alternative_nodelist
         lock.release()
 
@@ -369,10 +379,9 @@ class GraphNode:
     Class which represents a node in a graph
     """
     #: Radius of the nodes
-    graphNodeRadius = 6
-    # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
+    graphNodeRadius = 6 # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black") -> None:
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black", value = 1, draw_values = False) -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :param x:
@@ -391,7 +400,7 @@ class GraphNode:
         self.canvas_id = 0
         #: Id to identify the text of this node
         self.canvas_text_id = "-1"
-
+        self.canvas_value_id  = "-1"
         self.colour = colour
         self.node_fill_colour = node_fill_colour
         """
@@ -400,6 +409,9 @@ class GraphNode:
         """
         self.draw_ids = draw_ids
 
+
+        self.value = value
+        self.draw_values = True
         # TODO Magic number ersetzen
 
         left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
@@ -411,11 +423,20 @@ class GraphNode:
                                                 right_corner.y, fill="white")
             text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
             self.canvas_text_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.id, fill=self.colour)
+        elif self.draw_values:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="white")
+            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
+            self.canvas_value_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.value, fill=self.colour)
         else:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
                                                 right_corner.x,
                                                 right_corner.y, fill=node_fill_colour)
+
+
 
     def move(self, x: float, y: float):
         """
