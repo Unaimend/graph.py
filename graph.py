@@ -75,6 +75,11 @@ class Graph:
                     if self.version == 0:
                         self.adjacency_list = self.j["adj_list"]
                         logger.info("Adjacency list" + str(self.adjacency_list))
+                    # This is the cycle free adj. list representation.
+                    # Normal: [        This version: [
+                    #          [1],                   [1],
+                    #          [0]                    []
+                    #         ]                      ]
                     if self.version == 0.1:
                         self.adjacency_list = self.j["adj_list"]
                         logger.info("Adjacency list" + str(self.adjacency_list))

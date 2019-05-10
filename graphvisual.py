@@ -110,6 +110,9 @@ class GraphVisual:
 
         if self.graph_nodes != []:
             t = T.Tree(self.graph_nodes[0], self.node_adjacency_list)
+            for node in t.iternodes():
+                print(node.id)
+
 
 
 
