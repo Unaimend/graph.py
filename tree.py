@@ -24,15 +24,26 @@ class Tree:
 
         self.print_tree(self.root)
 
+    # https://stackoverflow.com/questions/8991840/recursion-using-yield
+
+    # Anschauen weil rekursion manchmal suckt
+    # https://stackoverflow.com/questions/159590/way-to-go-from-recursion-to-iteration
+    # https://web.archive.org/web/20120227170843/http://cs.saddleback.edu/rwatkins/CS2B/Lab%20Exercises/Stacks%20and%20Recursion%20Lab.pdf
+    def iternodes(self):
+        stack = [self.root]
+        while stack:
+            node = stack.pop()
+            yield node
+            for child in reversed(node.children):
+                stack.append(child)
+
     def build_tree(self, parent_, children, id_, value_) -> TreeNode:
-        print("CHIL", children)
         if len(children) == 0:
             return TreeNode(parent_, id_, value_, [])
         else:
             tree_node =  TreeNode(None, id_, value_, [])
             tree_node_children = list()
             for node in children:
-                print("node", node)
                 tree_node_child = self.build_tree(parent_=tree_node, children=self.node_adj_list[node.id], id_=node.id, value_=node.value)
                 tree_node_children.append(tree_node_child)
             tree_node.set_children(tree_node_children)
