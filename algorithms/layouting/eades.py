@@ -3,12 +3,16 @@
 import math
 from vector import Vector
 from utils import distance as util_distance, unit_vector
+from algorithms.layouting.layout_algorithm import LayoutAlgorithm
+import tkinter as tk
 
+class_name = "Eades"
 
-class Eades:
+class Eades(LayoutAlgorithm):
     """ Class which implements the layouting-algorithm from EAD[84]
     """
     def __init__(self, graph_visuals):
+        LayoutAlgorithm.__init__(self, "Eades")
         self.graph_visuals = graph_visuals
 
         # Graph konv. langsamer gegen gleichgewicht besonderns bei hoher Anzahl an Iterationen
@@ -17,7 +21,22 @@ class Eades:
         self.constant_2 = 200
         self.constant_3 = 300
         # Beeinflusstt die konv. Gesch.
-        self.constant_4 = 0.1
+        self.constant_4 = 20
+
+    def init_widgets(self):
+        frame = self.algorithm_gui_area
+
+        redbutton = tk.Button(frame, text="Red", fg="red")
+        redbutton.pack(side=tk.LEFT)
+
+        greenbutton = tk.Button(frame, text="Brown", fg="brown")
+        greenbutton.pack(side=tk.LEFT)
+
+        bluebutton = tk.Button(frame, text="Blue", fg="blue")
+        bluebutton.pack(side=tk.LEFT)
+
+        blackbutton = tk.Button(frame, text="Black", fg="black")
+        blackbutton.pack(side=tk.BOTTOM)
 
     def calculate_attractive_force_for_all_nodes_and_move_accordingly_new(self, event=None):
         """
@@ -57,3 +76,12 @@ class Eades:
                     displacement.x += direction.x * repelling_force * self.constant_4
                     displacement.y += direction.y * repelling_force * self.constant_4
             node.move(displacement.x, displacement.y)
+
+
+
+    def run(self):
+        for x in (0, 100000000):
+            self.calculate_attractive_force_for_all_nodes_and_move_accordingly_new()
+            self.calculate_repelling_force_for_all_nodes_and_move_accordingly_new()
+
+

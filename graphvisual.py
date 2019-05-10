@@ -8,10 +8,13 @@ import threading
 import random
 import tkinter as tk
 import math
+import abc
 from typing import List
-from graph import Graph, GraphEdge, GraphNode, DirectedGraphEdge, EmptyGraphError
+from graph import Graph, EmptyGraphError
 from widgets import NodeInfo
 from vector import Vector
+
+import tree as T
 
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
@@ -19,6 +22,10 @@ from vector import Vector
 # TODO Dokumentieren welchen Variablen veraendert werden
 # TOOD Mutates:
 # TODO https://youtu.be/_AEJHKGk9ns?t=19m3s
+
+#TODO Statt mittepunkt des umkreises die durchscnitspotiion benutzen bzw. gleich varaible programmieren
+
+# TODO VISITOR PATTERN FUER GRAPHNE KRAM DAMIT MAN NICHT AM GRAPPH FUMMELN MUSS
 
 
 class GraphVisual:
@@ -28,7 +35,7 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None) -> None:
+    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None, draw_circle=False, draw_mid=False, draw_node_ids=False, draw_values=False) -> None:
         """
         Ctor. for GraphVisual
         :parm window: TODO
@@ -56,11 +63,11 @@ class GraphVisual:
         self.width: float = width
         self.height: float = height
         self.graph: Graph
-
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
-        self.draw_node_ids: bool = False
+        self.draw_node_ids: bool = draw_node_ids
+        self.draw_values: bool = draw_values
         # Helper variable for the node id
         self.node_counter: int = 0
         random.seed(GraphVisual.seed)
@@ -68,7 +75,7 @@ class GraphVisual:
             raise Exception("A graph must not be None")
         self.graph = graph
 
-        self.current_selected_node: GraphNode 
+        self.current_selected_node: GraphNode
         # Reference to the latest opened NodeInfoWindow
         self.current_info: NodeInfo
 
@@ -78,16 +85,91 @@ class GraphVisual:
         self.generate_adj_list()
 
         # Generate the edges between the nodes in self.node_adjacency_list
-        print("EDGES")
         self.generate_edges()
 
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+
+        if draw_circle:
+            self.circle = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
+            self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
+        else:
+            self.circle = None
+            self.circle_center = None
+        if draw_mid:
+            self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+        else:
+            self.middle_point = None
+
+
         self.coordinate_fuckery: Vector = Vector(1, 1)
+
+        # Tree
+
+
+        if self.graph_nodes != []:
+            t = T.Tree(self.graph_nodes[0], self.node_adjacency_list)
+
+
+
+
+    def create_circle(self, x, y, r): #center coordinates, radius
+        x0 = x - r
+        y0 = y - r
+        x1 = x + r
+        y1 = y + r
+        return self.canvas.create_oval(x0, y0, x1, y1, fill="yellow")
+
+    def draw_canvas_mid(self):
+        if self.middle_point is not None:
+            self.canvas.delete(self.middle_point)
+        self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+
+    def draw_graph_circle_center(self):
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+        if self.circle is not None:
+            self.canvas.delete(self.circle)
+        if self.circle_center is not None:
+            self.canvas.delete(self.circle_center)
+
+        self.circle = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
+        self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
+
+    def find_max_nodes(self):
+        if len(self.graph_nodes) == 0:
+            return 0,0,0,0
+        # TODO look at max function kannste da nen lamda mitgeben bringt dads dwas?
+        max_x = int(max([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
+        min_x = int(min([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
+
+        max_y = int(max([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
+        min_y = int(min([(lambda y: y.position.y)(node) for node in self.graph_nodes]))
+
+        return min_x, max_x, min_y, max_y
+
+
+    def translate_to_mid(self):
+        min_x, max_x, min_y, max_y = self.find_max_nodes()
+        midpoint_x = (max_x-min_x)/2
+        midpoint_y = (max_y-min_y)/2
+        diff_x, diff_y = self.width/2 - (min_x+midpoint_x),  (self.height/2) - (max_y-midpoint_y)
+
+        for x in self.graph_nodes:
+            x.move(diff_x, diff_y)
+
+        self.generate_adj_list()
+        # # update edges between nodes
+        self.generate_edges()
+        self.redraw_graph()
 
     def inc_zoomlevel(self, event=None) -> None:
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
-        :param event: --- 
-        :return: 
+        :param event: ---
+        :return:
         """
         # pylint: disable=W0613
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 1.1
@@ -97,8 +179,8 @@ class GraphVisual:
         # pylint: disable=W0613
         """
         Calculates the misplacement which comes from zooming(which is scaling) the canvas
-        :param event: --- 
-        :return: 
+        :param event: ---
+        :return:
         """
         self.coordinate_fuckery.x = self.coordinate_fuckery.x * 0.9
         self.coordinate_fuckery.y = self.coordinate_fuckery.y * 0.9
@@ -109,11 +191,26 @@ class GraphVisual:
         Note that the here generated list doesnt hold information about how the notes are related
         """
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
-        for _ in range(0, len(self.graph.adjacency_list)):
+        for i in range(0, len(self.graph.adjacency_list)):
+            value = None
+            try:
+                value = self.graph.values[i]
+            except IndexError:
+                value = None
+
             self.graph_nodes.append(
-                GraphNode(self.canvas, random.randint(0, int(self.width)),
-                          random.randint(0, int(self.height)), self.draw_node_ids, self.node_counter, "black"))
+                GraphNode(canvas=self.canvas,
+                          x=random.randint(0, int(self.width)),
+                          y=random.randint(0, int(self.height)),
+                          draw_ids=self.draw_node_ids,
+                          id=self.node_counter,
+                          colour = "black",
+                          draw_values = self.draw_values,
+                          value=value))
             self.node_counter += 1
+
+
+
 
     def generate_adj_list(self) -> None:
         """
@@ -139,12 +236,21 @@ class GraphVisual:
         for node in self.graph_nodes:
             self.canvas.delete(node.canvas_id)
             self.canvas.delete(node.canvas_text_id)
+            self.canvas.delete(node.canvas_value_id)
 
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graph_nodes:
-            alternative_nodelist.append(GraphNode(self.canvas, node.position.x, node.position.y,
-                                                  self.draw_node_ids, node.id, node.colour, node.node_fill_colour))
+            alternative_nodelist.append(GraphNode(canvas =self.canvas,
+                                                  x = node.position.x,
+                                                  y =node.position.y,
+                                                  draw_ids = self.draw_node_ids,
+                                                  id = node.id,
+                                                  colour = node.colour,
+                                                  node_fill_colour = node.node_fill_colour,
+                                                  draw_values = self.draw_values,
+                                                  value = node.value
+            ))
         self.graph_nodes = alternative_nodelist
         lock.release()
 
@@ -183,10 +289,10 @@ class GraphVisual:
     def redraw_graph(self, event=None) -> None:
         # pylint: disable=W0613
         """
-        Combines methods to redraw all graphical items of the graphs 
+        Combines methods to redraw all graphical items of the graphs
         """
-        self.canvas.delete(tk.ALL)
         self.redraw_nodes()
+
         self.generate_adj_list()
         self.generate_edges()
 
@@ -194,8 +300,8 @@ class GraphVisual:
         # pylint: disable=W0613
         """Toggles the node look from black dots to white circles white text inside and the other way around"""
         self.draw_node_ids = not bool(self.draw_node_ids)
-        for node in self.graph_nodes:
-            print(node.node_fill_colour)
+        # for node in self.graph_nodes:
+        #     print(node.node_fill_colour)
         self.redraw_graph()
 
     def select_node(self, event) -> None:
@@ -293,8 +399,185 @@ class GraphVisual:
     #             self.clickedNodes = []
 
 
+class GraphNode:
+    """
+    Class which represents a node in a graph
+    """
+    #: Radius of the nodes
+    graphNodeRadius = 6 # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
+
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, draw_values, value = 1, colour="black", node_fill_colour="black") -> None:
+        """
+        :param canvas: The canvas on which the node should be drawn
+        :param x:
+        :param y:
+        :param draw_ids: bool
+        :param id: The id which should be drawn in node
+        :param colour
+        """
+        #: Canvas position for the node
+        self.position = Vector(x, y)
+        #: The canvas on which the node should be drawn(for multi-canvas support)
+        self.canvas = canvas
+        #: The id that will be drawn "in the node"
+        self.id = id
+        #: The id to identify this node on the canvas
+        self.canvas_id = "-1"
+        #: Id to identify the text of this node
+        self.canvas_text_id = "-1"
+        self.canvas_value_id  = "-1"
+        self.colour = colour
+        self.node_fill_colour = node_fill_colour
+        """
+        Boolean which determines if the node is represented through a black dot or
+        through a circle with a number inside
+        """
+        self.draw_ids = draw_ids
+        self.value = value
+        self.draw_values = draw_values
+        # TODO Magic number ersetzen
+
+        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
+        right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
+        if self.draw_ids:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="white")
+            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
+            self.canvas_text_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.id, fill=self.colour)
+        elif self.draw_values:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill="white")
+            text_id_pos = Vector(self.position.x + 2, self.position.y + 2)
+            self.canvas_value_id = canvas.create_text(text_id_pos.x, text_id_pos.y, text=self.value, fill=self.colour)
+        else:
+            self.canvas_id = canvas.create_oval(left_corner.x,
+                                                left_corner.y,
+                                                right_corner.x,
+                                                right_corner.y, fill=node_fill_colour)
 
 
+
+    def move(self, x: float, y: float):
+        """
+        NOTE: Does not change the position on the canvas, a redraw must be called to do that
+        :param x: The x-offset which should be added
+        :param y: The y-offset which should be added
+        :return:
+        """
+        # update current position
+        self.position.x += x
+        self.position.y += y
+
+    def __str__(self):
+        return "Position x:%s y:%s, id:%s" % (self.position.x, self.position.y, self.id)
+
+    def set_pos(self, x: float, y: float) -> None:
+        """
+        Sets the position of the node to the specified x,y coordinates
+        :param x: x-coordinate on the canvas
+        :param y: y-coordinate on the cnavas
+        :return:
+        """
+        self.position.x = x
+        self.position.y = y
+
+
+class GraphEdge:
+    """
+    This class represents a graph edge
+    """
+    __metaclass__ = abc.ABCMeta
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        # Start der Kanten
+        self.start = Vector(start_node.position.x, start_node.position.y)
+        # Ende der Kanten
+        self.end = Vector(end_node.position.x, end_node.position.y)
+        self.start_node = start_node
+        self.end_node = end_node
+        self.canvas = canvas
+        # Create line and save id
+        self.id = None
+        self.radius = 5
+        self.midpoint = Vector(self.start.x - (self.start.x-self.end.x)/2, self.start.y - (self.start.y-self.end.y)/2)
+        self.normal_end_point_dir: Vector = Vector(self.end.y-self.start.y, -(self.end.x-self.start.x))
+        self.normal_end_point_dir = self.normal_end_point_dir.to_unit() * 50
+        self.normal_end_point: Vector = self.midpoint + self.normal_end_point_dir
+        # self.mid = canvas.create_oval(self.midpoint.x-self.radius, self.midpoint.y-self.radius, self.midpoint.x+self.radius, self.midpoint.y+self.radius)
+        # self.normal = canvas.create_line(self.midpoint.x, self.midpoint.y, self.normal_end_point.x, self.normal_end_point.y,  fill='black')
+
+    @abc.abstractmethod
+    def delete(self):
+        return
+
+
+class UndirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
+        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
+
+    def delete(self):
+        self.canvas.delete(self.id)
+        self.canvas.delete(self.mid)
+        self.canvas.delete(self.normal)
+
+
+class DirectedGraphEdge(GraphEdge):
+    """
+    This class represents a graph edge
+    """
+    def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
+        """
+        :param canvas: The canvas on which the edge should be drawn
+        :type canvas: tk.Canvas
+        :param start_node: The lines starting node
+        :param end_node: The lines ending node
+        """
+        super().__init__(canvas, start_node, end_node)
+        # TODO Das kann kein guter code sein
+        self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, fill='black')
+
+        self.arrow = EdgeArrow(canvas, self)
+
+    def delete(self):
+        self.canvas.delete(self.id)
+        # self.canvas.delete(self.arrow.id)
+        # self.canvas.delete(self.normal)
+        # self.canvas.delete(self.mid)
+
+
+class EdgeArrow:
+    def __init__(self, canvas: tk.Canvas, edge: DirectedGraphEdge):
+        self.canvas: tk.Canvas = canvas
+        self.edge: GraphEdge = edge
+        self.pos: Vector = Vector(self.edge.end_node.position.x, self.edge.end_node.position.y)
+        line_direction: Vector = self.edge.end-self.edge.start
+        line_direction = line_direction.to_unit() * 10
+        point1: Vector = self.pos-line_direction*2
+        point2: Vector = point1 + self.edge.normal_end_point_dir*0.1
+        point3: Vector = Vector(point1.x + line_direction.x, point1.y + line_direction.y)
+        point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
+        point5: Vector = point1
+
+        # self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
 
 # TODO Graphen sollte so realisiert werden
@@ -305,6 +588,3 @@ class GraphVisual:
 #           "e" : ["c"],
 #           "f" : []
 #         }
-
-
-

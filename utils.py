@@ -4,7 +4,7 @@ This module contains different useful functions
 import time
 import math
 
-from graph import GraphNode, GraphEdge
+import graphvisual as gv
 from vector import Vector
 
 
@@ -18,7 +18,7 @@ def timeit(func, *args) -> None:
     print("Elapsed Time of", func.__name__, ":", end - start)
 
 
-def distance(node1: GraphNode, node2: GraphNode) -> float:
+def distance(node1: gv.GraphNode, node2: gv.GraphNode) -> float:
     """
     Calculates the distance between two nodes
     :param node1: The "start" node 
@@ -30,7 +30,7 @@ def distance(node1: GraphNode, node2: GraphNode) -> float:
     return distance
 
 
-def unit_vector(node1: GraphNode, node2: GraphNode) -> Vector:
+def unit_vector(node1: gv.GraphNode, node2: gv.GraphNode) -> Vector:
     """
     Calculates the unit vector between two given nodes
     :param node1: The "start" node
