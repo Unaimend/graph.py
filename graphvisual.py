@@ -14,6 +14,8 @@ from graph import Graph, EmptyGraphError
 from widgets import NodeInfo
 from vector import Vector
 
+import tree as T
+
 # TODO enumerate instead of index in for loops
 # TODO add an addEdge and addNode to this class
 # TODO Wenn kraefte sehr klein sind = 0 setzen wegen floating point ungenauigkeit(gute idee?)
@@ -65,7 +67,7 @@ class GraphVisual:
         self.clicked_nodes: List[GraphNode] = []
         # Specifies whether the node ids should be drawn or not
         self.draw_node_ids: bool = draw_node_ids
-        self.draw_values = draw_values
+        self.draw_values: bool = draw_values
         # Helper variable for the node id
         self.node_counter: int = 0
         random.seed(GraphVisual.seed)
@@ -102,6 +104,14 @@ class GraphVisual:
 
 
         self.coordinate_fuckery: Vector = Vector(1, 1)
+
+        # Tree
+
+
+        if self.graph_nodes != []:
+            t = T.Tree(self.graph_nodes[0], self.node_adjacency_list)
+
+
 
 
     def create_circle(self, x, y, r): #center coordinates, radius
@@ -182,10 +192,25 @@ class GraphVisual:
         """
         # For every node in the ajd. list add an node to the list which holds the GraphNodes which will be drawn
         for i in range(0, len(self.graph.adjacency_list)):
+            value = None
+            try:
+                value = self.graph.values[i]
+            except IndexError:
+                value = None
+
             self.graph_nodes.append(
-                GraphNode(self.canvas, random.randint(0, int(self.width)),
-                          random.randint(0, int(self.height)), self.draw_node_ids, self.node_counter, "black", draw_values = self.draw_values, value = self.graph.values[i]))
+                GraphNode(canvas=self.canvas,
+                          x=random.randint(0, int(self.width)),
+                          y=random.randint(0, int(self.height)),
+                          draw_ids=self.draw_node_ids,
+                          id=self.node_counter,
+                          colour = "black",
+                          draw_values = self.draw_values,
+                          value=value))
             self.node_counter += 1
+
+
+
 
     def generate_adj_list(self) -> None:
         """
@@ -381,7 +406,7 @@ class GraphNode:
     #: Radius of the nodes
     graphNodeRadius = 6 # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, colour="black", node_fill_colour="black", value = 1, draw_values = False) -> None:
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, draw_values, value = 1, colour="black", node_fill_colour="black") -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :param x:
@@ -397,7 +422,7 @@ class GraphNode:
         #: The id that will be drawn "in the node"
         self.id = id
         #: The id to identify this node on the canvas
-        self.canvas_id = 0
+        self.canvas_id = "-1"
         #: Id to identify the text of this node
         self.canvas_text_id = "-1"
         self.canvas_value_id  = "-1"
@@ -408,15 +433,13 @@ class GraphNode:
         through a circle with a number inside
         """
         self.draw_ids = draw_ids
-
-
         self.value = value
-        self.draw_values = True
+        self.draw_values = draw_values
         # TODO Magic number ersetzen
 
         left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
         right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
-        if draw_ids:
+        if self.draw_ids:
             self.canvas_id = canvas.create_oval(left_corner.x,
                                                 left_corner.y,
                                                 right_corner.x,
