@@ -31,9 +31,21 @@ This class encapsulates variables and functions for drawing graphs
 
 <a class="member_var">clicked_nodes:</a> List[GraphNode]
 
+<a class="member_var">circle</a> 
+
+<a class="member_var">circle_center</a> 
+
+<a class="member_var">middle_point</a> 
+
 <a class="member_var">draw_node_ids:</a> bool
 
-<a class="member_var">node_counter:</a> int
+<a class="member_var">draw_values:</a> bool
+
+<a class="member_var">draw_mid:</a> bool
+
+<a class="member_var">draw_circle:</a> bool
+
+<a class="member_var">node_:</a> int
 
 <a class="member_var">current_selected_node:</a>
 
