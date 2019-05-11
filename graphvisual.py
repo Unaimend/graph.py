@@ -124,6 +124,25 @@ class GraphVisual:
         y1 = y + r
         return self.canvas.create_oval(x0, y0, x1, y1, fill="yellow")
 
+
+    def to_cycle_free_list(self):
+        '''
+        Converts a graph from the normal version to the cycle free version
+        Normal: [        This version: [
+                 [1],                   [1],
+                 [0]                    []
+                ]                      ]
+        '''
+        cycle_free_adj_list = list()
+        for id, nodes in enumerate(self.node_adjacency_list):
+            cycle_free_adj_list.append(list())
+            for node in nodes:
+                if id  <= node.id:
+                    cycle_free_adj_list[id].append(node)
+
+        return cycle_free_adj_list
+
+
     def draw_canvas_mid(self):
         if self.middle_point is not None:
             self.canvas.delete(self.middle_point)
