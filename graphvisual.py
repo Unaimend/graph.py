@@ -65,9 +65,14 @@ class GraphVisual:
         self.graph: Graph
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
+        self.circle = None
+        self.circle_center = None
+        self.middle_point = None
         # Specifies whether the node ids should be drawn or not
         self.draw_node_ids: bool = draw_node_ids
         self.draw_values: bool = draw_values
+        self.draw_mid: bool = draw_mid
+        self.draw_circle: bool = draw_circle
         # Helper variable for the node id
         self.node_counter: int = 0
         random.seed(GraphVisual.seed)
@@ -87,18 +92,21 @@ class GraphVisual:
         # Generate the edges between the nodes in self.node_adjacency_list
         self.generate_edges()
 
+        # calculates outermost left, outermost right, lowest, heighest nodes
         min_x, max_x, min_y, max_y = self.find_max_nodes()
+        # calculates the midpoint of the rectangle which is defined by the min, max coordinates above
         midpoint_x = (max_x-min_x)/2
         midpoint_y = (max_y-min_y)/2
 
-        if draw_circle:
+        # draws perimeter of the graph
+        if self.draw_circle:
             self.circle = self.canvas.create_oval(min_x, max_y, max_x, min_y, outline="#f11", width=5)
             self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
         else:
             self.circle = None
             self.circle_center = None
-        if draw_mid:
-            self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+        if self.draw_mid:
+            self.middle_point = self.create_circle(self.width/2, self.height/2, 20)
         else:
             self.middle_point = None
 
@@ -106,24 +114,10 @@ class GraphVisual:
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
         # Tree
-
-
         if self.graph_nodes != []:
             t = T.Tree(self)
             for node in t.iternodes():
                 print(node.id)
-
-
-
-
-
-    def create_circle(self, x, y, r): #center coordinates, radius
-        x0 = x - r
-        y0 = y - r
-        x1 = x + r
-        y1 = y + r
-        return self.canvas.create_oval(x0, y0, x1, y1, fill="yellow")
-
 
     def to_cycle_free_list(self):
         '''
@@ -137,16 +131,22 @@ class GraphVisual:
         for id, nodes in enumerate(self.node_adjacency_list):
             cycle_free_adj_list.append(list())
             for node in nodes:
-                if id  <= node.id:
+                if id <= node.id:
                     cycle_free_adj_list[id].append(node)
 
         return cycle_free_adj_list
 
+    def create_circle(self, x, y, r): #center coordinates, radius
+        x0 = x - r
+        y0 = y - r
+        x1 = x + r
+        y1 = y + r
+        return self.canvas.create_oval(x0, y0, x1, y1, fill="yellow")
 
     def draw_canvas_mid(self):
         if self.middle_point is not None:
             self.canvas.delete(self.middle_point)
-        self.middle_point =  self.create_circle(self.width/2, self.height/2, 20)
+        self.middle_point = self.create_circle(self.width/2, self.height/2, 20)
 
     def draw_graph_circle_center(self):
         min_x, max_x, min_y, max_y = self.find_max_nodes()
@@ -161,8 +161,8 @@ class GraphVisual:
         self.circle_center = self.create_circle(min_x+midpoint_x, max_y-midpoint_y, 20)
 
     def find_max_nodes(self):
-        if len(self.graph_nodes) == 0:
-            return 0,0,0,0
+        if not self.graph_nodes:
+            return 0, 0, 0, 0
         # TODO look at max function kannste da nen lamda mitgeben bringt dads dwas?
         max_x = int(max([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
         min_x = int(min([(lambda y: y.position.x)(node) for node in self.graph_nodes]))
@@ -177,7 +177,7 @@ class GraphVisual:
         min_x, max_x, min_y, max_y = self.find_max_nodes()
         midpoint_x = (max_x-min_x)/2
         midpoint_y = (max_y-min_y)/2
-        diff_x, diff_y = self.width/2 - (min_x+midpoint_x),  (self.height/2) - (max_y-midpoint_y)
+        diff_x, diff_y = self.width/2 - (min_x+midpoint_x), (self.height/2) - (max_y-midpoint_y)
 
         for x in self.graph_nodes:
             x.move(diff_x, diff_y)
@@ -226,8 +226,8 @@ class GraphVisual:
                           y=random.randint(0, int(self.height)),
                           draw_ids=self.draw_node_ids,
                           id=self.node_counter,
-                          colour = "black",
-                          draw_values = self.draw_values,
+                          colour="black",
+                          draw_values=self.draw_values,
                           value=value))
             self.node_counter += 1
 
@@ -263,16 +263,15 @@ class GraphVisual:
         alternative_nodelist = []
         # Redraw nodes with updated arguments
         for node in self.graph_nodes:
-            alternative_nodelist.append(GraphNode(canvas =self.canvas,
-                                                  x = node.position.x,
-                                                  y =node.position.y,
-                                                  draw_ids = self.draw_node_ids,
-                                                  id = node.id,
-                                                  colour = node.colour,
-                                                  node_fill_colour = node.node_fill_colour,
-                                                  draw_values = self.draw_values,
-                                                  value = node.value
-            ))
+            alternative_nodelist.append(GraphNode(canvas=self.canvas,
+                                                  x=node.position.x,
+                                                  y=node.position.y,
+                                                  draw_ids=self.draw_node_ids,
+                                                  id=node.id,
+                                                  colour=node.colour,
+                                                  node_fill_colour=node.node_fill_colour,
+                                                  draw_values=self.draw_values,
+                                                  value=node.value))
         self.graph_nodes = alternative_nodelist
         lock.release()
 
@@ -290,7 +289,7 @@ class GraphVisual:
             # Iterate over all nodes which are adjacent to node
             for nodes in self.node_adjacency_list[node.id]:
                 # Draw an edge between two nodes
-                edge = DirectedGraphEdge(canvas=self.canvas, start_node=node, end_node=nodes)
+                edge = UndirectedGraphEdge(canvas=self.canvas, start_node=node, end_node=nodes)
                 # Save the edges in an array(for possible redrawing with different settings)
                 # TODO Ich haette gerne jede Kante nur einmal in der Liste, da ich micht nicht sicher bin
                 # TODO welche Auswirkungen das auf den Algorithmus von Fruchterman-Reingold hat
@@ -378,49 +377,6 @@ class GraphVisual:
                 node.colour = "black"
                 self.canvas.itemconfigure(nearest_node.canvas_text_id, fill=node.node_fill_colour)
 
-
-        # def clear_graph(self, event="nothing"):
-    #     # clear nodes and edges
-    #     self.graphNodes = []
-    #     self.graphEdges = []
-    #     # reset nodeCounter and also the ids
-    #     self.nodeCounter = -1
-    #
-    # def createNodeAtMousePos(self, event):
-    #     is_in_circle = False
-    #     # Check for all the nodes if position of the click is in another node
-    #     for node in self.graphNodes:
-    #         if abs(
-    #             (node.position.x - event.x)) <= GraphNode.graphNodeRadius and abs(
-    #                 (node.position.y - event.y)) <= GraphNode.graphNodeRadius:
-    #             is_in_circle = True
-    #
-    #     is_far_enough = True
-    #     # Check for all the nodes if position of the click is far enough away from all the other nodes
-    #     for node in self.graphNodes:
-    #         if (abs((node.position.x - event.x)) <= self.graphNodesMinDistance and abs(
-    #             (node.position.y - event.y)) <= self.graphNodesMinDistance):
-    #             is_far_enough = False
-    #
-    #     # If distance is big enough and I clicked not int a circle draw a node
-    #     if is_far_enough and not is_in_circle:
-    #         self.nodeCounter += 1
-    #         self.graphNodes.append(
-    #             GraphNode(self.canvas, event.x, event.y, self.drawNodeIds, self.nodeCounter, "blue"))
-    #
-    #     # If distance is small(in another node) and I clicked in a node remember this node
-    #     # to draw an edge
-    #     if not is_far_enough and is_in_circle:
-    #         self.clickedNodes.append(event.x)
-    #         self.clickedNodes.append(event.y)
-    #         if len(self.clickedNodes) == 4:
-    #             self.graphEdges.append(
-    #                 GraphEdge(self.canvas, self.clickedNodes[0],
-    #                                 self.clickedNodes[1], self.clickedNodes[2],
-    #                                 self.clickedNodes[3]))
-    #             self.clickedNodes = []
-
-
 class GraphNode:
     """
     Class which represents a node in a graph
@@ -428,7 +384,7 @@ class GraphNode:
     #: Radius of the nodes
     graphNodeRadius = 6 # TODO Save and load seed for current graph so you can draw the "same" graph if you want to
 
-    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, draw_values, value = 1, colour="black", node_fill_colour="black") -> None:
+    def __init__(self, canvas: tk.Canvas, x: float, y: float, draw_ids: bool, id: int, draw_values, value=1, colour="black", node_fill_colour="black") -> None:
         """
         :param canvas: The canvas on which the node should be drawn
         :param x:
@@ -447,7 +403,7 @@ class GraphNode:
         self.canvas_id = "-1"
         #: Id to identify the text of this node
         self.canvas_text_id = "-1"
-        self.canvas_value_id  = "-1"
+        self.canvas_value_id = "-1"
         self.colour = colour
         self.node_fill_colour = node_fill_colour
         """
@@ -459,7 +415,7 @@ class GraphNode:
         self.draw_values = draw_values
         # TODO Magic number ersetzen
 
-        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius )
+        left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius)
         right_corner = self.position + Vector(self.graphNodeRadius, self.graphNodeRadius)
         if self.draw_ids:
             self.canvas_id = canvas.create_oval(left_corner.x,
@@ -508,11 +464,10 @@ class GraphNode:
         self.position.y = y
 
 
-class GraphEdge:
+class GraphEdge(abc.ABC):
     """
     This class represents a graph edge
     """
-    __metaclass__ = abc.ABCMeta
     def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
         """
         :param canvas: The canvas on which the edge should be drawn
@@ -557,14 +512,16 @@ class UndirectedGraphEdge(GraphEdge):
         self.id = canvas.create_line(self.start.x, self.start.y, self.end.x, self.end.y, smooth=True)
 
     def delete(self):
+        #Debug varaibles in GraphEdge
+        #self.canvas.delete(self.mid)
+        #self.canvas.delete(self.normal)
         self.canvas.delete(self.id)
-        self.canvas.delete(self.mid)
-        self.canvas.delete(self.normal)
+        self.canvas.delete(self.midpoint)
 
 
 class DirectedGraphEdge(GraphEdge):
     """
-    This class represents a graph edge
+    This class represents a directed graph edge
     """
     def __init__(self, canvas: tk.Canvas, start_node: GraphNode, end_node: GraphNode) -> None:
         """
@@ -580,10 +537,13 @@ class DirectedGraphEdge(GraphEdge):
         self.arrow = EdgeArrow(canvas, self)
 
     def delete(self):
+        #Debug varaibles in GraphEdge
+        #self.canvas.delete(self.mid)
+        #self.canvas.delete(self.normal)
+
+        #Has to delted because of the arrow
+        #self.canvas.delete(self.arrow.id)
         self.canvas.delete(self.id)
-        # self.canvas.delete(self.arrow.id)
-        # self.canvas.delete(self.normal)
-        # self.canvas.delete(self.mid)
 
 
 class EdgeArrow:
@@ -599,7 +559,7 @@ class EdgeArrow:
         point4: Vector = point1 - self.edge.normal_end_point_dir*0.1
         point5: Vector = point1
 
-        # self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
+        self.id = self.canvas.create_polygon([point1.x, point1.y, point2.x, point2.y, point3.x, point3.y, point4.x, point4.y, point5.x, point5.y], fill="green")
 
 
 # TODO Graphen sollte so realisiert werden
