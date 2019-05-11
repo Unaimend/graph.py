@@ -9,7 +9,7 @@ import random
 import tkinter as tk
 import math
 import abc
-from typing import List
+from typing import List, Optional
 from graph import Graph, EmptyGraphError
 from widgets import NodeInfo
 from vector import Vector
@@ -80,7 +80,7 @@ class GraphVisual:
             raise Exception("A graph must not be None")
         self.graph = graph
 
-        self.current_selected_node: GraphNode
+        self.current_selected_node: Optional[GraphNode]
         # Reference to the latest opened NodeInfoWindow
         self.current_info: NodeInfo
 

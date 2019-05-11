@@ -20,7 +20,7 @@ from graphs.ncircle import n_circle
 
 # TODO RESIZABLE
 
-DEBUG = True
+DEBUG = False
 
 class Window(tk.Tk, Subject, Observer):
     """Class which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
@@ -33,6 +33,9 @@ class Window(tk.Tk, Subject, Observer):
         when the state changes
         """
         LOAD_GRAPH = 0
+        CREATE_GRAPH = 1
+        # This modes enables the user to change the laoded graph
+        INTERACTIVE_MODE = 2
 
 
     def __init__(self, model):
