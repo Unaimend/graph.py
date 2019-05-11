@@ -14,15 +14,14 @@ class TreeNode:
 
 class Tree:
     # TODO Define Iterator behavior
-    def __init__(self, root, node_adj_list):
+    def __init__(self, graph_vis):
         #TODO Check if graph can be represented as a tree(see definition)
         #This check could be make while building the tree in build tree(tink of cycle detention with dfs)
         #At least the acyclic check can be made while building, the connectedness check hase to be made after the build step
-
-        self.node_adj_list = node_adj_list
+        root = graph_vis.graph_nodes[0]
+        self.node_adj_list = graph_vis.to_cycle_free_list()
         self.root = self.build_tree(parent_=None, children=self.node_adj_list[0],id_=root.id, value_=root.value)
 
-        self.print_tree(self.root)
 
     # https://stackoverflow.com/questions/8991840/recursion-using-yield
 
