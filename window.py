@@ -20,6 +20,8 @@ from graphs.ncircle import n_circle
 
 # TODO RESIZABLE
 
+DEBUG = True
+
 class Window(tk.Tk, Subject, Observer):
     """Class which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
@@ -155,13 +157,15 @@ class Window(tk.Tk, Subject, Observer):
         :return:
         """
         # self.add_tab(graph_name="Peter")
-        current_instance = OpenGraphDialog(self)
-        #a = "/home/td/dev/projects/graph.py/graphs/k20.json"
-        #self.add_tab(a)
-        #self.load_graph(a)
-        # TODO Sollte das hier ein call an den Controller sein
-        self.add_tab(current_instance.filename)
-        self.load_graph(current_instance.filename)
+
+        if DEBUG:
+            a = "/home/td/dev/projects/graph.py/graphs/simple_bin_tree_3.json"
+            self.add_tab(a)
+            self.load_graph(a)
+        else:
+            current_instance = OpenGraphDialog(self)
+            self.add_tab(current_instance.filename)
+            self.load_graph(current_instance.filename)
 
         # TODO WENN ICH MIT NICH IRRE SCHUETZT NICHTS DIESES OBJECT DAS DUMM
         #threading.Thread(target=self.load_graph, args=(current_instance.filename,)).start()
