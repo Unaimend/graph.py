@@ -21,10 +21,10 @@ https://vincenttam.github.io/javascripts/MathJaxLocal.js"></script>
   $$a^2 + b^2 = c^2$$ --> note that all equations between these tags will not need escaping! 
   
   $$
-  \begin{matrix}
+  \begin{align}
   1 & 2 \\
   3 & 5
-  \end{matrix}
+  \end{align}
   $$
   
  {% endraw %}
