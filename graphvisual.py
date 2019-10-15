@@ -114,10 +114,10 @@ class GraphVisual:
         self.coordinate_fuckery: Vector = Vector(1, 1)
 
         # Tree
-        if self.graph_nodes != []:
-            t = T.Tree(self)
-            for node in t.iternodes():
-                print(node.id)
+        #if self.graph_nodes != []:
+            #t = T.Tree(self)
+            #for node in t.iternodes():
+                #print(node.id)
 
     def to_cycle_free_list(self):
         '''
