@@ -22,6 +22,9 @@ from graphs.ncircle import n_circle
 
 DEBUG = False
 
+def set_col( x):
+    x.node_fill_colour= "red"
+
 class Window(tk.Tk, Subject, Observer):
     """Class which handles everything which das to do wit hthe window, user input, algorithm output, ui stuff"""
     # Dynamisch ans Canvas anpassen(Soll so gross wie das Fenster - InfoMenue groesse sein)
@@ -49,6 +52,9 @@ class Window(tk.Tk, Subject, Observer):
 
         for x in self.model.layout_algos:
             print(x, self.model.layout_algos[x])
+
+        for x in self.model.algos:
+            print(x, self.model.algos[x])
 
         self.info_menu = None
         self.geometry("1920x1080")
@@ -154,8 +160,7 @@ class Window(tk.Tk, Subject, Observer):
         # pylint: disable=W0613
         """
         Funktion welche das Oeffnen eines neuen Graphen regelt, also das Auswehlen
-        des json datei
-        ueber den Graphen
+        des json Datei ueber den Graphen
         :param event:
         :return:
         """
@@ -170,9 +175,6 @@ class Window(tk.Tk, Subject, Observer):
             self.add_tab(current_instance.filename)
             self.load_graph(current_instance.filename)
 
-        # TODO WENN ICH MIT NICH IRRE SCHUETZT NICHTS DIESES OBJECT DAS DUMM
-        #threading.Thread(target=self.load_graph, args=(current_instance.filename,)).start()
-
 
     def get_current_tab(self):
         newest_tab = self.nb.select().split(".")[1]
@@ -182,12 +184,17 @@ class Window(tk.Tk, Subject, Observer):
     # TODO Auch das sollte in controller
     def do_algo(self, event=None) -> None:
         # pylint: disable=W0613
-        """Inititialisiert die FruchtermanReingold-Klasse um den Layouting-Algorithmus korrekt auszuf�hren"""
         # Herausfinden in welchem Tab man sich befindet
         current_tab = self.get_current_tab()
         # TODO Warum ist das hardgecoded
+        klass = None
+        algo = None
+        #try:
         klass = self.model.layout_algos[self.get_current_tab().combo.get()]
         algo = klass(graph_visuals=current_tab.graph_vis)
+        #except KeyError:
+        #klass = self.model.algos[self.get_current_tab().combo.get()]
+        #algo = klass(graph_visuals=current_tab.graph_vis, colour= "red", func = set_col)
 
         algo.run()
         current_tab.redraw_graph()

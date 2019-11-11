@@ -6,7 +6,7 @@ from algorithms.layouting.layout_algorithm import LayoutAlgorithm
 class_name = "Bt"
 
 class Bt(LayoutAlgorithm):
-    """Class which implements an algorithm similiar to the first Algorithm from Iidy drawing of Trees[WH79["""
+    """Class which implements an algorithm similiar to the first Algorithm from Tidy drawing of Trees[WH79]"""
     def __init__(self, graph_visuals):
         """
         Ctor. 

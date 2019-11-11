@@ -1,13 +1,13 @@
 """
 .. module:: graph
    :platform: Unix, Windows, Mac
-   :synopsis: This module includes classes necessary for working with graphs
+   :synopsis: This module includes classes necessary for working with graphs.
+   It also defines the main data struct for representing a graph
 .. moduleauthor:: Thomas Dost(Unaimend@gmail.com)
 """
 import json
 from typing import List
 from logger import logger
-from vector import Vector
 
 # typedefs
 AdjacencyList = List[List[int]]
@@ -40,7 +40,7 @@ class Graph:
     Class for representing graphs
     """
     def __init__(self, filepath: str = None, adjacency_list: AdjacencyList = None,
-                 adjacency_matrix: AdjacencyMatrix = None, version = 0) -> None:
+                 adjacency_matrix: AdjacencyMatrix = None, version=0) -> None:
         """
         Note: All the variables are exlusive, that means if on is supplied the others should not be used
         :param filepath: The path from which the graph should be loaded
@@ -86,6 +86,8 @@ class Graph:
                     if self.version == 1:
                         self.adjacency_list = self.convert_from_adjacency_matrix(self.j["adj_matrix"])
                     # Load values for the nodes(Optional)
+                    if self.version == 2:
+                        pass
                     try:
                         self.values = self.j["values"]
                         logger.debug("Values are %s", self. values)

@@ -15,11 +15,10 @@ class MainModel(Subject):
     Class which implements the model from MVC
     Loads all the algorithms:
     """
-
     class State(Enum):
         GRAPH_CHANGED = 0
 
-    def __init__(self) -> None:
+    def __init__(self):
         """
         Checks if all needed paths exists and starts to load data which
         is needed by the application
@@ -38,10 +37,11 @@ class MainModel(Subject):
         self.is_undirected_tree = False
         self.loaded_graphs: Dict[str, Graph] = dict()
         self.layout_algos: Dict[str, LayoutAlgorithm] = dict()
+        self.algos = dict()
 
         self.load_layouting_algos()
+        self.load_algos()
         self.view = None
-
 
     def attach(self, observer):
         Subject.attach(self, observer)
@@ -59,7 +59,6 @@ class MainModel(Subject):
 
         # TODO GIBTS KEIN LIST MINUS/REMOVE
         entries = set(os.listdir(path)) - excluded_files
-
 
         # TODO Teil der For-Schleife eigene (pure?)Fkt. auslagern
         for file in entries:
@@ -81,11 +80,43 @@ class MainModel(Subject):
                 logger.error("Could not load %s" % module)
                 logger.error("Each module must have the .class_name attribute")
 
+    def load_algos(self):
+        logger.info("CWD: %s" % os.getcwd())
+        path = "algorithms/"
+
+
+        excluded_files = frozenset({"__pycache__", "layouting"})
+        if not os.path.exists(path):
+            logger.debug("Making %s directory" % path)
+            os.makedirs(path)
+
+        # TODO GIBTS KEIN LIST MINUS/REMOVE
+        entries = set(os.listdir(path)) - excluded_files
+
+        # TODO Teil der For-Schleife eigene (pure?)Fkt. auslagern
+        for file in entries:
+            module = file[0:-3]
+            logger.info("Loading %s" % module)
+            name = "default"
+            try:
+                mod = __import__((path+file).replace("/", ".")[0:-3], fromlist=[name])
+                name= getattr(mod, "class_name")
+                logger.info("Trying to import %s from %s"% (name, file))
+                try:
+                    klass = getattr(mod, name)
+                    self.algos[name] = klass
+                except AttributeError as error:
+                    logger.error(error)
+                    logger.error("The module %s does not have a class with the name %s", module, name)
+            except AttributeError as e:
+                logger.error(e)
+                logger.error("Could not load %s" % module)
+                logger.error("Each module must have the .class_name attribute")
 
     def load_graph_from_file(self, name: str, filepath: str, tab) -> None:
         """
         Load a graph from the specified file
-        Mutates: self.loaded_graphs, self.is_undirected_tree
+        Mutates: self.loaded_graphs, self.is_undirected_tree, self.subject_state
         :param name: The name under which the graph will ne accessible through the whole
         apllication
         :param filepath: The path from which the graph should be loaded
@@ -104,9 +135,10 @@ class MainModel(Subject):
         self.is_undirected_tree = self.check_undirected_tree(name)
         self.subject_state = self.State.GRAPH_CHANGED, name, tab
 
+    #TODO This should not be in the model
     def check_undirected_tree(self, name: str) -> bool:
         """
-        Checks if a graph is a undirected tree(connceted, acyclic)
+        Checks if a graph is a undirected tree(connected, acyclic)
         Mutates: self.is_connected, self.acyclic
         """
         graph = self.loaded_graphs[name]

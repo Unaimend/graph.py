@@ -77,7 +77,7 @@ class NoteBookTab(tk.Frame):
 
 
 
-        self.combo = ttk.Combobox(self, values = list(self.model.layout_algos.keys()), state='readonly' )
+        self.combo = ttk.Combobox(self, values = (list(self.model.layout_algos.keys()) + list(self.model.algos.keys())), state='readonly' )
         self.combo.current(2)
 
         self.combo.grid(column=0, row=3, sticky=tk.N)

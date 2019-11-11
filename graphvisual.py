@@ -35,7 +35,8 @@ class GraphVisual:
     #: Seed which is used in the RNG to calc. the nodes positions
     seed = 50
 
-    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400, graph: Graph = None, draw_circle=False, draw_mid=False, draw_node_ids=False, draw_values=False) -> None:
+    def __init__(self, window, canvas: tk.Canvas, width: int = 900, height: int = 1400,
+                 graph: Graph = None, draw_circle=False, draw_mid=False, draw_node_ids=False, draw_values=False) -> None:
         """
         Ctor. for GraphVisual
         :parm window: TODO
@@ -62,7 +63,7 @@ class GraphVisual:
         # Höhe und Breite des Canvas
         self.width: float = width
         self.height: float = height
-        self.graph: Graph
+        self.graph: Graph = graph
         # Saves the coordinates of the last two clicked notes
         self.clicked_nodes: List[GraphNode] = []
         self.circle = None

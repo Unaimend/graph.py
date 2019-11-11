@@ -3,6 +3,7 @@ import time
 from threading import Thread
 from graph import Graph, EmptyGraphError
 
+class_name = "DfsVisual"
 
 class DepthFirstSearch:
     """This class is the dfs-implementation which this program will be using"""
@@ -79,7 +80,7 @@ class DfsVisual:
     # neue zeichen wenn previous/next frame gefordert wird 
     def dfs_(self, node):
         self.marked[node.id] = True
-        func(self.graph_visuals.graph_nodes[node.id])
+        self.func(self.graph_visuals.graph_nodes[node.id])
         self.graph_visuals.redraw_nodes()
         for node in self.graph_visuals.node_adjacency_list[node.id]:
             time.sleep(0.3)

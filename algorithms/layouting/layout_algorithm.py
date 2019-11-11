@@ -2,6 +2,8 @@ import tkinter as tk
 from abc import ABC, abstractmethod
 from graphvisual import GraphVisual
 
+#class_name = "LayoutAlgorithm"
+
 class LayoutAlgorithm(ABC):
     def __init__(self, name: str, graph_visual: GraphVisual=None, algorithm_gui_area: tk.Frame = None):
         self.name = name

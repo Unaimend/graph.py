@@ -118,3 +118,5 @@ tag\.sh
 algorithms/\.#depth_first_search\.py
 
 graph\.py\.wiki/
+
+tags\.sh

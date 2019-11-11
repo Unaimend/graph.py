@@ -10,8 +10,6 @@ class MainController(Observer):
     :param model: The model from mvc
     :param view:  The view from mvc
     """
-
-
     def __init__(self, view: Window, model: MainModel):
         Observer.__init__(self)
         self.model = model
@@ -33,6 +31,4 @@ class MainController(Observer):
             logger.info("ctrl: Loadign new graph %s", arg[1])
         else:
             logger.info("Not handled by controller")
-
-
 
