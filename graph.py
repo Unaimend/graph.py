@@ -74,7 +74,7 @@ class Graph:
                     self.version = self.j["version"]
                     if self.version == 0:
                         self.adjacency_list = self.j["adj_list"]
-                        logger.info("Adjacency list" + str(self.adjacency_list))
+                        logger.info("adjacency list" + str(self.adjacency_list))
                     # This is the cycle free adj. list representation.
                     # Normal: [        This version: [
                     #          [1],                   [1],
@@ -87,7 +87,10 @@ class Graph:
                         self.adjacency_list = self.convert_from_adjacency_matrix(self.j["adj_matrix"])
                     # Load values for the nodes(Optional)
                     if self.version == 2:
-                        pass
+                        self.adjacency_list = self.j["adj_list"]
+                        self.node_attribs = self.j["nodes"]
+                        logger.info("adjacency list" + str(self.adjacency_list))
+                        logger.info("nodes" + str(self.node_attribs))
                     try:
                         self.values = self.j["values"]
                         logger.debug("Values are %s", self. values)

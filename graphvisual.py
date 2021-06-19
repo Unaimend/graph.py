@@ -218,9 +218,9 @@ class GraphVisual:
             value = None
             try:
                 value = self.graph.values[i]
+                print("Value", value)
             except IndexError:
                 value = None
-
             self.graph_nodes.append(
                 GraphNode(canvas=self.canvas,
                           x=random.randint(0, int(self.width)),
@@ -231,6 +231,8 @@ class GraphVisual:
                           draw_values=self.draw_values,
                           value=value))
             self.node_counter += 1
+            if self.graph.version == 2:
+                print (self.graph.node_attribs)
 
 
 
@@ -411,9 +413,10 @@ class GraphNode:
         Boolean which determines if the node is represented through a black dot or
         through a circle with a number inside
         """
-        self.draw_ids = draw_ids
+        #TODO CHANGE BACK
+        self.draw_ids = False
         self.value = value
-        self.draw_values = draw_values
+        self.draw_values = True
         # TODO Magic number ersetzen
 
         left_corner = self.position - Vector(self.graphNodeRadius, self.graphNodeRadius)
